@@ -378,6 +378,54 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .gen-status-pill.active[data-status="discard"]{background:#fbeaea;border-color:#e8b3ad;color:#a8332b}
 .gen-status-pill.active{font-weight:700}
 
+/* ============== 爆款库（Blowout Library）============== */
+.blowout-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+.blowout-stat{margin-left:auto;font-size:12.5px;color:var(--ink2);background:#fff5d0;padding:4px 10px;border-radius:999px;border:1px solid #f0c674}
+.blowout-grid{display:grid;grid-template-columns:minmax(360px,1fr) minmax(420px,1.3fr);gap:14px;margin-top:14px}
+@media(max-width:1080px){.blowout-grid{grid-template-columns:1fr}}
+.blowout-source-tabs{display:flex;gap:4px;border-bottom:2px solid #f0c674;margin-bottom:12px}
+.bst-tab{background:transparent;border:none;padding:8px 14px;font-size:13px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.bst-tab:hover{color:var(--ink)}
+.bst-tab.active{color:var(--brand2);border-bottom-color:var(--brand2);font-weight:600}
+.blowout-source-pane .fld{display:block;margin-bottom:10px}
+.blowout-source-pane .fld>span{display:block;font-size:12.5px;color:var(--ink2);margin-bottom:4px;font-weight:500}
+.blowout-source-pane input,.blowout-source-pane select,.blowout-source-pane textarea{width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;font-family:inherit}
+.blowout-source-pane textarea{resize:vertical;font-family:'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.55}
+.blowout-source-pane input:focus,.blowout-source-pane select:focus,.blowout-source-pane textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 2px rgba(202,141,33,.15)}
+.blowout-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.blowout-analyze-result{margin-top:10px;padding:12px;background:#fffdf5;border:1px solid #f0dfae;border-radius:8px;display:none}
+.blowout-analyze-result.show{display:block}
+.blowout-analyze-result .bar-title{font-size:12px;color:var(--brand2);font-weight:600;margin-bottom:6px}
+.bar-tag{display:inline-block;padding:3px 9px;background:#fff5d0;color:#7a5b1a;border:1px solid #f0c674;border-radius:999px;font-size:11.5px;margin:2px 4px 2px 0}
+.bar-tag.recommend{background:#d4ecff;color:#1d4f7c;border-color:#7ab5db;font-weight:600}
+.blowout-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.blowout-filters select{padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;background:#fff}
+.blowout-list{display:flex;flex-direction:column;gap:10px;max-height:680px;overflow:auto;padding-right:4px}
+.blowout-card{border:1px solid #f0c674;background:#fffdf5;border-radius:10px;padding:12px;transition:box-shadow .15s}
+.blowout-card:hover{box-shadow:0 4px 14px rgba(202,141,33,.18)}
+.blowout-card .row1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
+.blowout-card .title{font-weight:600;font-size:13.5px;color:var(--ink);flex:1;line-height:1.4}
+.blowout-card .meta{font-size:11.5px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.blowout-card .meta .plat{font-weight:600;padding:2px 7px;border-radius:4px;background:#fff;color:#7a5b1a;border:1px solid #f0c674}
+.blowout-card .meta .plat.抖音{background:#1c1c1c;color:#fff;border-color:#1c1c1c}
+.blowout-card .meta .plat.小红书{background:#ff2442;color:#fff;border-color:#ff2442}
+.blowout-card .meta .plat.视频号{background:#07c160;color:#fff;border-color:#07c160}
+.blowout-card .meta .plat.B站{background:#fb7299;color:#fff;border-color:#fb7299}
+.blowout-card .script{font-size:12px;line-height:1.6;color:var(--ink2);background:#fff;border:1px dashed #f0dfae;border-radius:6px;padding:8px;margin-top:4px;max-height:120px;overflow:auto;white-space:pre-wrap;word-break:break-word;font-family:'PingFang SC','Microsoft YaHei',sans-serif}
+.blowout-card .tags{margin-top:6px;font-size:11.5px}
+.blowout-card .tags .tag{display:inline-block;padding:2px 7px;background:#e8f4ff;color:#345a99;border-radius:4px;margin-right:4px;font-weight:500}
+.blowout-card .tags .tag.struct{background:#ffe4b3;color:#7a5b1a;border:1px solid #f0c674}
+.blowout-card .perf{font-size:11.5px;color:var(--accent);font-weight:600;margin-top:4px}
+.blowout-card .ops{display:flex;gap:6px;margin-top:8px;justify-content:flex-end}
+.blowout-card .ops .btn{padding:4px 10px;font-size:11.5px}
+.blowout-empty{padding:30px;text-align:center;color:var(--muted);font-size:13px}
+.blowout-empty .emo{font-size:34px;display:block;margin-bottom:6px;opacity:.6}
+.formula-block{padding:12px;background:#fff;border-left:3px solid var(--brand);border-radius:0 8px 8px 0;margin-bottom:10px}
+.formula-block .ftitle{font-weight:600;color:var(--brand2);font-size:13px;margin-bottom:4px}
+.formula-block .fdesc{font-size:12.5px;color:var(--ink2);line-height:1.6}
+.formula-block .fexample{font-size:11.5px;color:var(--muted);margin-top:6px;font-style:italic}
+.learned-formulas-meta{font-size:11.5px;color:var(--muted);margin-bottom:8px;padding:6px 10px;background:#fafafa;border-radius:6px}
+
 </style>
 </head>
 <body>
@@ -449,6 +497,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         <button class="drawer-item" onclick="switchTab('add');toggleDrawer()">➕ 登记今日数据</button>
         <button class="drawer-item" onclick="switchTab('list');toggleDrawer()">📋 视频记录</button>
         <button class="drawer-item" onclick="switchTab('hotspot');toggleDrawer()">🔥 热点库</button>
+        <button class="drawer-item" onclick="switchTab('blowout');toggleDrawer()">🏆 爆款库</button>
         <button class="drawer-item" onclick="switchTab('settings');toggleDrawer()">⚙️ 完整设置页</button>
       </div>
       <div class="drawer-section">
@@ -486,6 +535,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
     <button class="tab" data-tab="add" onclick="switchTab('add')">➕ 登记数据<span class="badge" id="badgeVideoCount">0</span></button>
     <button class="tab" data-tab="list" onclick="switchTab('list')">📋 视频数据</button>
     <button class="tab" data-tab="hotspot" onclick="switchTab('hotspot')">🔥 热点库<span class="badge" id="badgeHotspotCount">0</span></button>
+    <button class="tab" data-tab="blowout" onclick="switchTab('blowout')">🏆 爆款库<span class="badge" id="badgeBlowoutCount">0</span></button>
     <button class="tab" data-tab="settings" onclick="switchTab('settings')">⚙️ 设置</button>
   </div>
 
@@ -759,6 +809,105 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
     </div>
   </div>
 
+  <!-- ============== TAB: BLOWOUT（爆款库） ============== -->
+  <div class="tab-pane hidden" id="pane-blowout">
+    <div class="panel" style="background:linear-gradient(135deg,#fff7e6,#ffe8c2);border-color:#f0c674">
+      <h2>🏆 爆款库 <span class="muted" style="font-size:13px;font-weight:400">· 上传/标记爆款 → AI 拆解 → 自动学习 → 越写越贴</span></h2>
+      <p style="font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:8px">
+        把已经验证有效的爆款视��收入进来：<b>① 贴链接 + 粘文案</b> 或 <b>② 已发布视频标爆款</b>，AI 会自动拆解结构、匹配十个结构之一并打公式标签；
+        之后生成新脚本时，会自动按「同平台 + 同类型」召回 top-3 做 <b>few-shot</b>，越用越贴你的爆款口味。
+      </p>
+      <div class="blowout-actions">
+        <button class="btn primary" onclick="showBlowoutImport()">➕ 链接导入爆款</button>
+        <button class="btn" onclick="switchTab('list');setTimeout(()=>toast('👉 点任意视频行末尾的「🔥 标爆款」按钮'),200)">🔥 标已发布视频</button>
+        <button class="btn" id="btnLearnFormulas" onclick="learnFormulas()">🔬 归纳爆款规律</button>
+        <span class="blowout-stat" id="blowoutStat">0 条爆款 · 已学习</span>
+      </div>
+    </div>
+
+    <!-- 左右两栏：录入（左）+ 列表（右） -->
+    <div class="blowout-grid">
+      <!-- 左侧：录入区（默认折叠一个提示卡，点击按钮再展开模态） -->
+      <div class="panel">
+        <h2>📥 录入爆款</h2>
+        <div class="blowout-source-tabs">
+          <button class="bst-tab active" data-bst="link" onclick="switchBlowoutSource('link')">🔗 链接导入</button>
+          <button class="bst-tab" data-bst="manual" onclick="switchBlowoutSource('manual')">✍️ 纯文案录入</button>
+        </div>
+        <div class="blowout-source-pane" id="bst-link">
+          <label class="fld"><span>爆款视频链接（可选，抖音/小红书/B站/视频号 链接）</span>
+            <input id="biUrl" placeholder="https://www.douyin.com/video/xxxx 或留空" />
+          </label>
+          <label class="fld"><span>平台</span>
+            <select id="biPlat">
+              <option>抖音</option><option>小红书</option><option>视频号</option><option>B站</option><option>TikTok</option><option>其他</option>
+            </select>
+          </label>
+          <label class="fld"><span>视频类型</span>
+            <select id="biVtype" onchange="autoMatchStruct()"></select>
+          </label>
+          <label class="fld"><span>品类（美妆/3C/食品…）</span>
+            <input id="biCat" placeholder="如：美妆、3C 数码、食品饮料、家居、服饰…" />
+          </label>
+          <label class="fld"><span>表现数据（可选）</span>
+            <div style="display:flex;gap:8px">
+              <input id="biViews" placeholder="播放量（万）" style="flex:1" />
+              <input id="biLikes" placeholder="点赞（万）" style="flex:1" />
+            </div>
+          </label>
+          <label class="fld"><span>完整文案（粘贴）</span>
+            <textarea id="biScript" rows="6" placeholder="把视频的口播/字幕/分镜文案完整粘贴到这里…"></textarea>
+          </label>
+          <div class="blowout-btns">
+            <button class="btn primary" onclick="analyzeBlowout()">🤖 AI 拆解并匹配结构</button>
+            <button class="btn" onclick="saveBlowoutDirect()">💾 不拆解直接保存</button>
+          </div>
+          <div class="blowout-analyze-result" id="biResult"></div>
+        </div>
+        <div class="blowout-source-pane hidden" id="bst-manual">
+          <label class="fld"><span>标题</span>
+            <input id="bmTitle" placeholder="给这条爆款起个名字便于查找" />
+          </label>
+          <label class="fld"><span>平台 / 类型 / 品类</span>
+            <div style="display:flex;gap:8px">
+              <select id="bmPlat" style="flex:1"><option>抖音</option><option>小红书</option><option>视频号</option><option>B站</option><option>TikTok</option></select>
+              <select id="bmVtype" style="flex:1"></select>
+              <input id="bmCat" placeholder="品类" style="flex:1" />
+            </div>
+          </label>
+          <label class="fld"><span>完整文案</span>
+            <textarea id="bmScript" rows="8" placeholder="粘贴文案…"></textarea>
+          </label>
+          <div class="blowout-btns">
+            <button class="btn primary" onclick="analyzeBlowoutManual()">🤖 AI 拆解并匹配结构</button>
+            <button class="btn" onclick="saveBlowoutManual()">💾 直接保存</button>
+          </div>
+          <div class="blowout-analyze-result" id="bmResult"></div>
+        </div>
+      </div>
+
+      <!-- 右侧：爆款列表 -->
+      <div class="panel">
+        <h2>📚 爆款列表 <span class="muted" style="font-size:12px;font-weight:400" id="blowoutCount">0</span></h2>
+        <div class="blowout-filters">
+          <select id="bfPlat" onchange="renderBlowoutList()"><option value="">全部平��</option><option>抖音</option><option>小红书</option><option>视频号</option><option>B站</option><option>TikTok</option></select>
+          <select id="bfVtype" onchange="renderBlowoutList()"><option value="">全部类型</option></select>
+          <select id="bfStruct" onchange="renderBlowoutList()"><option value="">全部结构</option></select>
+          <button class="btn sm" onclick="clearBlowoutFilters()">重置</button>
+        </div>
+        <div class="blowout-list" id="blowoutList"></div>
+      </div>
+    </div>
+
+    <!-- 已学习的公式 -->
+    <div class="panel" style="margin-top:14px">
+      <h2>🧠 已学到的爆款规律 <span class="muted" style="font-size:12px;font-weight:400">点上方「🔬 归纳爆款规律」按钮自动生成</span></h2>
+      <div id="learnedFormulasBox">
+        <div class="empty">📭 还没有归纳过的规律。先录入一些爆款（≥3 条），再点「🔬 归纳爆款规律」让 AI 分析共性。</div>
+      </div>
+    </div>
+  </div>
+
   <!-- ============== TAB: SETTINGS ============== -->
   <div class="tab-pane hidden" id="pane-settings">
     <div class="panel" style="background:linear-gradient(135deg,#fef7e0,#fdf1d6);border-color:#ecd79a">
@@ -848,7 +997,7 @@ function escapeHtml(str){
 
 /* ================== State ================== */
 const STORAGE_KEY = 'flyelep_dashboard_v1';
-let state = { videos: [], hotspots: [], accounts: [], festivals: [] };
+let state = { videos: [], hotspots: [], accounts: [], festivals: [], blowouts: [], learnedFormulas: null };
 let currentTab = 'overview';
 let currentMonth = toMonthStr(new Date()); // YYYY-MM（本地时间）
 let charts = {};
@@ -965,7 +1114,7 @@ async function connectDataFile(){
     if(existing && (existing.videos||existing.hotspots||existing.accounts)){
       const nv=(existing.videos||[]).length, nh=(existing.hotspots||[]).length;
       if(confirm(`该文件已有数据：视频 ${nv} 条 / 热点 ${nh} 条。\n\n【确定】用文件内容覆盖当前看板\n【取消】把当前看板数据写入该文件`)){
-        state=Object.assign({videos:[],hotspots:[],accounts:[]},existing);
+        state=Object.assign({videos:[],hotspots:[],accounts:[],blowouts:[],learnedFormulas:null},existing);
         try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
       }
     }
@@ -1066,10 +1215,11 @@ function switchTab(name){
   $$('.tab-pane').forEach(p=>p.classList.add('hidden'));
   $('#pane-'+name).classList.remove('hidden');
   if(name==='overview'){ renderTodayTodo(); renderOverview(); }
-  if(name==='list') renderList();
+  if(name==='list'){ renderList(); setTimeout(injectMarkBlowoutButtons, 50); }
   if(name==='hotspot'){ renderHotspot(); renderFestivalCalendar(); }
   if(name==='add') refreshAccountOptions('vAccount');
   if(name==='settings') renderSettings();
+  if(name==='blowout'){ ensureBlowouts(); populateBlowoutSelects(); renderBlowoutList(); renderLearnedFormulasBox(); }
 }
 
 /* ================== Month Picker ================== */
@@ -1465,7 +1615,7 @@ async function generateScript(){
   showGenLoading(h, engine, {vt,vd,vf});
   if(engine==='local'){ buildLocalScript(h,a,st,plat,fn,vt,vd,vf); return; }
   // === 智谱 AI 路径 ===
-  const prompt=buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf);
+  const prompt=buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid);
   const btn=$('#genGoBtn'); if(btn) btn.disabled=true;
   try{
     const r=await callZhipu([
@@ -1486,9 +1636,18 @@ async function generateScript(){
   }finally{ if(btn) btn.disabled=false; }
 }
 
-function buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf){
+function buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid){
   const tone=PLAT_TONE[plat]||PLAT_TONE['默认'];
   const rules=(PLAT_RULES[plat]||PLAT_RULES['默认']||[]).join('\n');
+  // ===== 爆款库 · few-shot 自动学习（核心）=====
+  const fewShot = (typeof getFewShot==='function') ? getFewShot(plat, vtk, sid) : null;
+  const learnedTxt = (typeof getLearnedFormulasText==='function') ? getLearnedFormulasText() : null;
+  const fewShotBlock = fewShot
+    ? ('\n【重要 · 已验证爆款范例（top-3 · 必须模仿其结构节奏与钩子套路，但不要照抄内容）】\n'+fewShot)
+    : '';
+  const learnedBlock = learnedTxt
+    ? ('\n【重要 · 本团队已学到的爆款规律（必须融进脚本）】\n'+learnedTxt)
+    : '';
   const sys = `你是「Flyelep 大黄狗运营」团队的资深短视频脚本编剧，专门给电商/带货账号写口播脚本。
 
 【你的风格】
@@ -1499,7 +1658,7 @@ function buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf){
 【平台调性 · ${plat}】
 调性：${tone}
 平台专属写法（必须逐条遵守，否则脚本不像这个平台的号）：
-${rules}
+${rules}${fewShotBlock}${learnedBlock}
 
 【重要 · 直接成稿】
 - 你的最终输出就是脚本本身，**不要在回复中包含任何思考、规划、分析过程**
@@ -1929,7 +2088,7 @@ function renderList(){
       <td class="num">${fmtNum(v.views)}</td><td class="num">${fmtNum(v.consults)}</td>
       <td class="num">${fmtPct(v.completion)}</td><td class="num">${fmtPct(v.completion5s)}</td>
       <td class="num">${cr}%</td>
-      <td><button class="btn sm" onclick="editVideo('${v.id}')">编辑</button> <button class="btn sm danger" onclick="deleteVideo('${v.id}')">删</button></td>
+      <td><button class="btn sm" onclick="editVideo('${v.id}')">编辑</button> <button class="btn sm" onclick="markVideoAsBlowout('${v.id}')" style="background:linear-gradient(180deg,#fff5d0,#ffe4a3);color:#7a5b1a;border-color:#f0c674">🔥 标爆款</button> <button class="btn sm danger" onclick="deleteVideo('${v.id}')">删</button></td>
     </tr>`;
   }).join('');
 }
@@ -2082,6 +2241,480 @@ const SCRIPT_STRUCTS=[
   {key:'s9',label:'结构九（现象 → 危害 → 方案）',hook:t=>`「${t}」正在变成一种现象，但多数人只看到了热闹`,steps:['现象：描述正在发生的事','危害：不做 / 做错会怎样','方案：用 Flyelep 抓住这波确定性']},
   {key:'s10',label:'结构十（行业认知 → 承诺）',hook:t=>`说到「${t}」，真正拉开差距的是这条行业共识`,steps:['认知：一句行业里的硬道理','展开：为什么它是对的','承诺：跟着做，你也能拿到结果']}
 ];
+
+/* ===== 十个结构关键词映射（给 AI 拆解时辅助判断） ===== */
+const STRUCT_KEYWORDS={
+  s1:['悬念','风险','忽略','代价','掉坑','翻车','后果'],
+  s2:['为什么','为什么别人','接不住','你却','同行','差距','免费试'],
+  s3:['数据','10倍','230%','100款','差距','效率','成本','抹平'],
+  s4:['对比','流程','笨办法','聪明办法','选模板','换素材','导出','照着做'],
+  s5:['反认知','误区','都错了','心理','愿意买单','人性'],
+  s6:['故事','逆袭','小故事','卡在哪','杠杆','理念'],
+  s7:['误区','3个坑','踩了','分类','打法','正解','打开方式'],
+  s8:['揭秘','大玩家','没明说','拆逻辑','复制'],
+  s9:['现象','危害','确定性','抓不住','热闹'],
+  s10:['行业共识','差距','行业','硬道理','承诺','拿到结果']
+};
+
+/* ===== 视频类型 · 结构偏好提示（手动标爆款时初始建议） ===== */
+const VTYPE_STRUCT_HINT={
+  shsj:'s1',  // 随手拍 → 悬念/翻车 比较多
+  xxl: 's4',  // 信息流 → 对比/流程 比较多
+  kbp: 's5'   // 真人口播 → 反认知/心理 比较多
+};
+
+/* ================== Blowout Library（爆款库模块） ================== */
+/* state.blowouts = [{ id, url, platform, videoCategory (shsj/xxl/kbp), structKey (s1-s10),
+                       script, breakdown:[], formulaTags:[], category, views, likes,
+                       source ('link'|'manual'|'video-mark'), videoId, title, createdAt }]
+   state.learnedFormulas = { updatedAt, summary, formulas:[{title, desc, example}] } */
+
+var _lastBlowoutAnalysis={};  // 缓存最近一次 AI 拆解，commit 时用（var 会被 hoist）
+
+function ensureBlowouts(){ if(!Array.isArray(state.blowouts)) state.blowouts=[]; }
+
+function populateBlowoutSelects(){
+  // 视频类型 select：复用 VIDEO_TYPES
+  const v1=$('#biVtype'); if(v1) v1.innerHTML=VIDEO_TYPES.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
+  const v2=$('#bmVtype'); if(v2) v2.innerHTML=VIDEO_TYPES.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
+  // 列表筛选中的视频类型
+  const fv=$('#bfVtype'); if(fv) fv.innerHTML='<option value="">全部类型</option>'+VIDEO_TYPES.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
+  // 结构 select
+  const fs=$('#bfStruct'); if(fs) fs.innerHTML='<option value="">全部结构</option>'+SCRIPT_STRUCTS.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
+}
+
+function switchBlowoutSource(name){
+  $$('.bst-tab').forEach(b=>b.classList.toggle('active', b.dataset.bst===name));
+  $('#bst-link').classList.toggle('hidden', name!=='link');
+  $('#bst-manual').classList.toggle('hidden', name!=='manual');
+}
+
+function showBlowoutImport(){
+  switchTab('blowout');
+  setTimeout(()=>{
+    const el=$('#biUrl');
+    if(el) el.focus({preventScroll:false});
+    document.querySelector('.blowout-grid')?.scrollIntoView({behavior:'smooth',block:'start'});
+  },100);
+}
+
+function autoMatchStruct(){
+  const vt=$('#biVtype')?.value;
+  return VTYPE_STRUCT_HINT[vt]||'s1';
+}
+
+/* ===== AI 拆解：链接导入版 ===== */
+async function analyzeBlowout(){
+  const url=$('#biUrl').value.trim();
+  const plat=$('#biPlat').value;
+  const vtype=$('#biVtype').value;
+  const cat=$('#biCat').value.trim();
+  const views=$('#biViews').value.trim();
+  const likes=$('#biLikes').value.trim();
+  const script=$('#biScript').value.trim();
+  if(!script){ toast('⚠️ 请先粘贴文案'); $('#biScript').focus(); return; }
+  const resultEl=$('#biResult');
+  resultEl.classList.add('show');
+  resultEl.innerHTML='<div class="bar-title">🤖 AI 拆解中…</div><div class="muted" style="font-size:12px">正在分析结构、匹配十个结构之一、提炼公式标签（约 5-15 秒）…</div>';
+
+  const sysPrompt=`你是「Flyelep 大黄狗运营」团队的爆款拆解专家。请对用户提供的爆款脚本做三件事：
+
+1. **结构归类**：从下面 10 个结构里选出**最匹配的一个**（只能选 1 个），返回 key：
+${SCRIPT_STRUCTS.map(s=>'- '+s.key+' = '+s.label).join('\n')}
+2. **拆解标签**（breakdown，3-6 个短标签，描述它用到的爆款技巧）：
+- 例：['3秒钩子','痛点前置','数据反差','信任案例','限时紧迫','对比演示']
+3. **公式标签**（formulaTags，2-4 个，用于跨条目检索的语义标签）：
+- 例：['开头强钩子','数字冲击','反认知','实测对比','故事化','流程化']
+4. **一句话归纳**（summary，≤30 字）：给运营同事解释这条爆款"为什么能爆"。
+
+输出严格 JSON（不要用三个反引号包裹，不要其他文字）：
+{"structKey":"s?","breakdown":["...","..."],"formulaTags":["...","..."],"summary":"..."}`;
+
+  const userPrompt=`平台：${plat}\n视频类型：${(VIDEO_TYPES.find(x=>x.key===vtype)||{}).label||vtype}\n品类：${cat||'(未填)'}\n表现：${views?views+' 万播放':''}${likes?' · '+likes+' 万点赞':''}\nURL：${url||'(无)'}\n\n=== 文案 ===\n${script.slice(0,2500)}${script.length>2500?'\n\n（文案过长已截断）':''}`;
+
+  try{
+    const r=await callZhipu([
+      {role:'system', content: sysPrompt},
+      {role:'user',   content: userPrompt}
+    ], 0);
+    const txt=r.content.trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```$/,'').trim();
+    const j=JSON.parse(txt);
+    if(!SCRIPT_STRUCTS.find(s=>s.key===j.structKey)) j.structKey='s1';
+    _cacheBlowoutAnalysis('biResult', j);
+    renderBlowoutAnalysis('biResult', j, {url,plat,vtype,cat,views,likes,script});
+  }catch(e){
+    resultEl.innerHTML='<div class="bar-title" style="color:#a8332b">❌ 拆解失败</div><div style="font-size:12px;color:#666">'+e.message+'</div><div class="muted" style="font-size:11.5px;margin-top:6px">小提示：检查智谱 Key / 后端 / 网络。你也可以点「💾 不拆解直接保存」手动指定结构。</div>';
+  }
+}
+
+/* ===== AI 拆解：纯文案录入版 ===== */
+async function analyzeBlowoutManual(){
+  const title=$('#bmTitle').value.trim();
+  const plat=$('#bmPlat').value;
+  const vtype=$('#bmVtype').value;
+  const cat=$('#bmCat').value.trim();
+  const script=$('#bmScript').value.trim();
+  if(!script){ toast('⚠️ 请先粘贴文案'); $('#bmScript').focus(); return; }
+  const resultEl=$('#bmResult');
+  resultEl.classList.add('show');
+  resultEl.innerHTML='<div class="bar-title">🤖 AI 拆解中…</div><div class="muted" style="font-size:12px">正在分析结构、匹配十个结构之一、提炼公式标签…</div>';
+  const sysPrompt=`你是「Flyelep 大黄狗运营」团队的爆款拆解专家。请对用户提供的爆款脚本做三件事：
+
+1. **结构归类**：从下面 10 个结构里选出**最匹配的一个**（只能选 1 个），返回 key：
+${SCRIPT_STRUCTS.map(s=>'- '+s.key+' = '+s.label).join('\n')}
+2. **拆解标签**（breakdown，3-6 个短标签）。
+3. **公式标签**（formulaTags，2-4 个语义标签，用于跨条目检索）。
+4. **一句话归纳**（summary，≤30 字）。
+
+输出严格 JSON（不要用三个反引号包裹，不要其他文字）：
+{"structKey":"s?","breakdown":["...","..."],"formulaTags":["...","..."],"summary":"..."}`;
+  const userPrompt=`平台：${plat}\n视频类型：${(VIDEO_TYPES.find(x=>x.key===vtype)||{}).label||vtype}\n品类：${cat||'(未填)'}\n\n=== 文案 ===\n${script.slice(0,2500)}${script.length>2500?'\n\n（文案过长已截断）':''}`;
+  try{
+    const r=await callZhipu([
+      {role:'system', content: sysPrompt},
+      {role:'user',   content: userPrompt}
+    ], 0);
+    const txt=r.content.trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```$/,'').trim();
+    const j=JSON.parse(txt);
+    if(!SCRIPT_STRUCTS.find(s=>s.key===j.structKey)) j.structKey='s1';
+    _cacheBlowoutAnalysis('bmResult', j);
+    renderBlowoutAnalysis('bmResult', j, {title,plat,vtype,cat,script});
+  }catch(e){
+    resultEl.innerHTML='<div class="bar-title" style="color:#a8332b">❌ 拆解失败</div><div style="font-size:12px;color:#666">'+e.message+'</div>';
+  }
+}
+
+/* 缓存最近一次拆解，commit 时用 */
+function _cacheBlowoutAnalysis(targetId, j){
+  _lastBlowoutAnalysis[targetId]={breakdown:j.breakdown||[], formulaTags:j.formulaTags||[], summary:j.summary||'', structKey:j.structKey};
+}
+
+/* ===== 渲染拆解结果 + 保存按钮 ===== */
+function renderBlowoutAnalysis(targetId, j, ctx){
+  const struct=SCRIPT_STRUCTS.find(s=>s.key===j.structKey)||SCRIPT_STRUCTS[0];
+  const tagsHtml=(j.formulaTags||[]).map(t=>`<span class="bar-tag">${escapeHtml(t)}</span>`).join('');
+  const breakdownHtml=(j.breakdown||[]).map(t=>`<span class="bar-tag">${escapeHtml(t)}</span>`).join('');
+  const structOptions=SCRIPT_STRUCTS.map(s=>`<option value="${s.key}" ${s.key===j.structKey?'selected':''}>${s.label}</option>`).join('');
+  const ctxStr=JSON.stringify(ctx).replace(/'/g,'&#39;');
+  const html=`
+    <div class="bar-title">✅ 拆解完成 · AI 推荐：<span class="bar-tag recommend">${escapeHtml(struct.label)}</span></div>
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:6px"><b>为什么爆：</b>${escapeHtml(j.summary||'(无)')}</div>
+    <div style="margin-bottom:6px"><b style="font-size:11.5px;color:var(--muted)">爆款技巧：</b>${breakdownHtml}</div>
+    <div style="margin-bottom:8px"><b style="font-size:11.5px;color:var(--muted)">公式标签：</b>${tagsHtml}</div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:11.5px;color:var(--muted)">若推荐不准，手动调整：</span>
+      <select id="${targetId}-structPick" style="padding:4px 8px;font-size:12px;border:1px solid #ddd;border-radius:6px">${structOptions}</select>
+      <button class="btn primary sm" onclick="commitBlowout('${targetId}','${ctxStr.replace(/'/g,"\\'")}')">💾 保存到爆款库</button>
+    </div>`;
+  $('#'+targetId).innerHTML=html;
+}
+
+/* ===== 保存爆款 ===== */
+function commitBlowout(targetId, ctxStr){
+  let ctx; try{ ctx=JSON.parse(ctxStr); }catch(e){ toast('⚠️ 参数异常'); return; }
+  const pickId=targetId+'-structPick';
+  const structKey=$('#'+pickId)?.value||'s1';
+  const resultEl=$('#'+targetId);
+  const last=_lastBlowoutAnalysis[targetId];
+  if(!last){ toast('⚠️ 已过期，请重新拆解'); return; }
+  const item={
+    id: uid(),
+    url: ctx.url||'',
+    title: ctx.title||('未命名爆款 '+(state.blowouts.length+1)),
+    platform: ctx.plat||'抖音',
+    videoCategory: ctx.vtype||'kbp',
+    structKey,
+    category: ctx.cat||'',
+    views: parseFloat(ctx.views)||0,
+    likes: parseFloat(ctx.likes)||0,
+    script: ctx.script||'',
+    breakdown: last.breakdown||[],
+    formulaTags: last.formulaTags||[],
+    summary: last.summary||'',
+    source: targetId==='biResult'?'link':'manual',
+    createdAt: Date.now()
+  };
+  ensureBlowouts();
+  state.blowouts.unshift(item);
+  save();
+  renderBlowoutList();
+  updateBlowoutStat();
+  toast('✅ 已加入爆款库 · '+(SCRIPT_STRUCTS.find(s=>s.key===structKey)||{}).label);
+  resultEl.innerHTML='<div class="bar-title" style="color:#3a7a23">✅ 已保存</div><div style="font-size:12px">这条爆款现在可用于自动学习。继续录入更多 → 越攒越准。</div>';
+}
+
+/* ===== 不拆解直接保存 ===== */
+function saveBlowoutDirect(){
+  const url=$('#biUrl').value.trim();
+  const plat=$('#biPlat').value;
+  const vtype=$('#biVtype').value;
+  const cat=$('#biCat').value.trim();
+  const views=$('#biViews').value.trim();
+  const likes=$('#biLikes').value.trim();
+  const script=$('#biScript').value.trim();
+  if(!script){ toast('⚠️ 文案不能为空'); $('#biScript').focus(); return; }
+  const item={
+    id: uid(), url, title:'未命名爆款 '+(state.blowouts.length+1),
+    platform: plat, videoCategory: vtype,
+    structKey: VTYPE_STRUCT_HINT[vtype]||'s1',
+    category: cat, views: parseFloat(views)||0, likes: parseFloat(likes)||0,
+    script, breakdown:[], formulaTags:[], summary:'',
+    source:'link', createdAt: Date.now()
+  };
+  ensureBlowouts();
+  state.blowouts.unshift(item);
+  save();
+  renderBlowoutList();
+  updateBlowoutStat();
+  toast('✅ 已保存（未拆解，默认结构）');
+  const r=$('#biResult'); r.classList.add('show');
+  r.innerHTML='<div class="bar-title" style="color:#3a7a23">✅ 已保存</div>';
+}
+function saveBlowoutManual(){
+  const title=$('#bmTitle').value.trim()||('未命名爆款 '+(state.blowouts.length+1));
+  const plat=$('#bmPlat').value;
+  const vtype=$('#bmVtype').value;
+  const cat=$('#bmCat').value.trim();
+  const script=$('#bmScript').value.trim();
+  if(!script){ toast('⚠️ 文案不能为空'); $('#bmScript').focus(); return; }
+  const item={
+    id: uid(), url:'', title,
+    platform: plat, videoCategory: vtype,
+    structKey: VTYPE_STRUCT_HINT[vtype]||'s1',
+    category: cat, views:0, likes:0,
+    script, breakdown:[], formulaTags:[], summary:'',
+    source:'manual', createdAt: Date.now()
+  };
+  ensureBlowouts();
+  state.blowouts.unshift(item);
+  save();
+  renderBlowoutList();
+  updateBlowoutStat();
+  toast('✅ 已保存（未拆解）');
+}
+
+/* ===== 列表渲染 ===== */
+function updateBlowoutStat(){
+  const cnt=(state.blowouts||[]).length;
+  const bc=$('#blowoutCount'); if(bc) bc.textContent=cnt;
+  const badge=$('#badgeBlowoutCount'); if(badge) badge.textContent=cnt;
+  const stat=$('#blowoutStat'); if(stat) stat.textContent=cnt+' 条爆款 · '+(state.learnedFormulas?'已归纳 '+state.learnedFormulas.formulas.length+' 条公式':'尚未归纳');
+}
+
+function renderBlowoutList(){
+  ensureBlowouts();
+  const list=$('#blowoutList'); if(!list) return;
+  const pf=$('#bfPlat')?.value||'';
+  const vf=$('#bfVtype')?.value||'';
+  const sf=$('#bfStruct')?.value||'';
+  let arr=[...state.blowouts];
+  if(pf) arr=arr.filter(b=>b.platform===pf);
+  if(vf) arr=arr.filter(b=>b.videoCategory===vf);
+  if(sf) arr=arr.filter(b=>b.structKey===sf);
+  arr.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  if(!arr.length){
+    list.innerHTML='<div class="blowout-empty"><span class="emo">📭</span>暂无爆款。从左侧录入第一条吧 →</div>';
+    updateBlowoutStat();
+    return;
+  }
+  list.innerHTML=arr.map(b=>{
+    const struct=SCRIPT_STRUCTS.find(s=>s.key===b.structKey)||{label:b.structKey};
+    const vt=VIDEO_TYPES.find(x=>x.key===b.videoCategory)||{label:b.videoCategory};
+    const perfTxt = (b.views||b.likes) ? `<div class="perf">${b.views?`👀 ${b.views} 万播放`:''}${b.likes?` · ❤ ${b.likes} 万点赞`:''}</div>`:'';
+    const tags=(b.formulaTags||[]).slice(0,4).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('');
+    const tagsHtml=tags?`<div class="tags"><span class="tag struct">${escapeHtml(struct.label)}</span>${tags}</div>`:`<div class="tags"><span class="tag struct">${escapeHtml(struct.label)}</span></div>`;
+    const summary=b.summary?`<div style="font-size:11.5px;color:var(--ink2);margin:4px 0"><b>为什么爆：</b>${escapeHtml(b.summary)}</div>`:'';
+    const platLabel=b.platform||'其他';
+    return `
+      <div class="blowout-card" id="bcard-${b.id}">
+        <div class="row1">
+          <div class="title">${b.url?`<a href="${escapeHtml(b.url)}" target="_blank" rel="noopener" style="color:var(--brand2);text-decoration:none">${escapeHtml(b.title)}</a>`:escapeHtml(b.title)}</div>
+        </div>
+        <div class="meta">
+          <span class="plat ${escapeHtml(platLabel)}">${escapeHtml(platLabel)}</span>
+          <span>${escapeHtml(vt.label)}</span>
+          ${b.category?`<span>📦 ${escapeHtml(b.category)}</span>`:''}
+          <span>📅 ${new Date(b.createdAt).toLocaleDateString()}</span>
+        </div>
+        ${summary}
+        ${tagsHtml}
+        ${perfTxt}
+        ${b.script?`<details style="margin-top:6px"><summary style="font-size:11.5px;color:var(--muted);cursor:pointer">查看完整文案</summary><div class="script">${escapeHtml(b.script)}</div></details>`:''}
+        <div class="ops">
+          <button class="btn sm" onclick="editBlowout('${b.id}')">✏️ 改</button>
+          <button class="btn sm" onclick="deleteBlowout('${b.id}')">🗑️ 删</button>
+        </div>
+      </div>`;
+  }).join('');
+  updateBlowoutStat();
+}
+
+function clearBlowoutFilters(){
+  const pf=$('#bfPlat'); if(pf) pf.value='';
+  const vf=$('#bfVtype'); if(vf) vf.value='';
+  const sf=$('#bfStruct'); if(sf) sf.value='';
+  renderBlowoutList();
+}
+
+function deleteBlowout(id){
+  if(!confirm('确认删除这条爆款？')) return;
+  ensureBlowouts();
+  state.blowouts=state.blowouts.filter(b=>b.id!==id);
+  save();
+  renderBlowoutList();
+  toast('已删除');
+}
+
+function editBlowout(id){
+  const b=(state.blowouts||[]).find(x=>x.id===id); if(!b) return;
+  const newStruct=prompt('修改结构（输入 s1-s10）：\n'+SCRIPT_STRUCTS.map(s=>s.key+' = '+s.label).join('\n'), b.structKey);
+  if(newStruct && /^s\d+$/.test(newStruct) && SCRIPT_STRUCTS.find(s=>s.key===newStruct)){
+    b.structKey=newStruct;
+    save();
+    renderBlowoutList();
+    toast('✅ 已更新结构');
+  }else if(newStruct!==null){
+    toast('⚠️ 输入有误，未保存');
+  }
+}
+
+/* ===== 从已发布视频标爆款 ===== */
+function markVideoAsBlowout(videoId){
+  const v=state.videos.find(x=>x.id===videoId); if(!v) return;
+  ensureBlowouts();
+  const item={
+    id: uid(),
+    url: v.url||'',
+    title: v.title||('已发布视频 '+(state.blowouts.length+1)),
+    platform: v.platform||'抖音',
+    videoCategory: v.videoCategory||'kbp',
+    structKey: VTYPE_STRUCT_HINT[v.videoCategory||'kbp']||'s1',
+    category: v.category||'',
+    views: ((v.views||0)/10000),
+    likes: ((v.likes||0)/10000),
+    script: v.script||'',
+    breakdown: [], formulaTags: [], summary: '',
+    source:'video-mark', videoId,
+    createdAt: Date.now()
+  };
+  state.blowouts.unshift(item);
+  save();
+  toast('🔥 已标记为爆款 · 进入爆款库分析');
+  switchTab('blowout');
+  setTimeout(()=>{
+    renderBlowoutList();
+    if(item.script){
+      _preFillBlowoutFromVideo(item);
+    }else{
+      toast('📝 这条视频还没填文案，去爆款库手动补充 →');
+    }
+  },100);
+}
+
+function _preFillBlowoutFromVideo(item){
+  switchBlowoutSource('link');
+  $('#biUrl').value=item.url||'';
+  $('#biPlat').value=item.platform;
+  $('#biVtype').value=item.videoCategory;
+  $('#biCat').value=item.category||'';
+  $('#biViews').value=String(item.views||'');
+  $('#biLikes').value=String(item.likes||'');
+  $('#biScript').value=item.script;
+  analyzeBlowout();
+}
+
+/* ===== 归纳爆款规律（自动学习核心） ===== */
+async function learnFormulas(){
+  ensureBlowouts();
+  if(state.blowouts.length<3){
+    toast('⚠️ 至少录入 3 条爆款才能归纳规律');
+    return;
+  }
+  const btn=$('#btnLearnFormulas'); if(btn){ btn.disabled=true; btn.textContent='🔬 归纳中…（约 10-30 秒）'; }
+  const corpus=state.blowouts.slice(0,30).map((b,i)=>{
+    const struct=(SCRIPT_STRUCTS.find(s=>s.key===b.structKey)||{}).label||b.structKey;
+    const vt=(VIDEO_TYPES.find(x=>x.key===b.videoCategory)||{}).label||b.videoCategory;
+    return '【爆款 '+(i+1)+'】平台='+b.platform+' 类型='+vt+' 品类='+(b.category||'通用')+' 结构='+struct+' 表现='+(b.views||0)+'万/'+(b.likes||0)+'万 标签='+((b.formulaTags||[]).join('/')||'(无)')+' 拆解='+((b.breakdown||[]).join('/')||'(无)')+'\n文案：'+b.script.slice(0,400);
+  }).join('\n\n---\n\n');
+
+  const sysPrompt=`你是「Flyelep 大黄狗运营」团队的爆款方法论萃取师。请阅读用户提供的 ${state.blowouts.length} 条爆款脚本（截取前 30 条），归纳出可复用的爆款规律。
+
+要求：
+1. 输出 3-6 条「公式」（formulas），每条公式一个标题 + 一段说明（说明它在什么场景下最管用、为什么有效、怎么迁移到新选题）。
+2. 公式之间要差异化，避免重复；按重要性排序。
+3. 整体再给一段「总结」（summary，≤80 字），概述这批爆款的共性 DNA。
+
+输出严格 JSON（不要用三个反引号包裹）：
+{"summary":"...","formulas":[{"title":"...","desc":"...","example":"..."},...]}
+其中 example 给一条伪造的示范性文案片段（≤60 字），让运营能直观看到公式长啥样，不要照抄原爆款。`;
+
+  try{
+    const r=await callZhipu([
+      {role:'system', content: sysPrompt},
+      {role:'user',   content: corpus}
+    ], 0);
+    const txt=r.content.trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```$/,'').trim();
+    const j=JSON.parse(txt);
+    state.learnedFormulas={updatedAt:Date.now(), summary:j.summary||'', formulas:j.formulas||[]};
+    save();
+    renderLearnedFormulasBox();
+    toast('✅ 已归纳 '+state.learnedFormulas.formulas.length+' 条公式（已写入生成提示词）');
+  }catch(e){
+    toast('❌ 归纳失败：'+e.message);
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent='🔬 归纳爆款规律'; }
+    updateBlowoutStat();
+  }
+}
+
+function renderLearnedFormulasBox(){
+  const box=$('#learnedFormulasBox'); if(!box) return;
+  const lf=state.learnedFormulas;
+  if(!lf || !lf.formulas || !lf.formulas.length){
+    box.innerHTML='<div class="empty">📭 还没有归纳过的规律。先录入一些爆款（≥3 条），再点「🔬 归纳爆款规律」让 AI 分析共性。</div>';
+    return;
+  }
+  const updated=new Date(lf.updatedAt).toLocaleString();
+  const meta='<div class="learned-formulas-meta">💡 最近归纳：'+updated+' · '+lf.formulas.length+' 条公式 · 生成新脚本时会自动引用</div>';
+  const blocks=lf.formulas.map(f=>`
+    <div class="formula-block">
+      <div class="ftitle">📐 ${escapeHtml(f.title||'(未命名公式)')}</div>
+      <div class="fdesc">${escapeHtml(f.desc||'')}</div>
+      ${f.example?'<div class="fexample">📝 示例：'+escapeHtml(f.example)+'</div>':''}
+    </div>`).join('');
+  box.innerHTML=meta+blocks+(lf.summary?'<div style="font-size:12px;color:var(--ink2);background:#fafafa;padding:8px 12px;border-radius:6px;margin-top:4px"><b>共性 DNA：</b>'+escapeHtml(lf.summary)+'</div>':'');
+}
+
+/* ===== few-shot 召回：生成脚本时被 buildZhipuPrompt 调用 ===== */
+function getFewShot(plat, videoCategory, structKey){
+  ensureBlowouts();
+  if(!state.blowouts.length) return null;
+  let pool=[...state.blowouts];
+  const sortBy=(arr)=>arr.slice().sort((a,b)=>{
+    const va=(a.views||0)+(a.likes||0)*0.3;
+    const vb=(b.views||0)+(b.likes||0)*0.3;
+    return vb-va;
+  });
+  let pick=sortBy(pool.filter(b=>b.platform===plat && b.videoCategory===videoCategory && b.structKey===structKey)).slice(0,3);
+  if(pick.length<3) pick=pick.concat(sortBy(pool.filter(b=>b.platform===plat && b.videoCategory===videoCategory)).filter(b=>!pick.includes(b)).slice(0,3-pick.length));
+  if(pick.length<3) pick=pick.concat(sortBy(pool.filter(b=>b.platform===plat)).filter(b=>!pick.includes(b)).slice(0,3-pick.length));
+  if(pick.length<3) pick=pick.concat(sortBy(pool.filter(b=>b.videoCategory===videoCategory)).filter(b=>!pick.includes(b)).slice(0,3-pick.length));
+  if(pick.length<3) pick=pick.concat(sortBy(pool).filter(b=>!pick.includes(b)).slice(0,3-pick.length));
+  if(!pick.length) return null;
+  return pick.map((b,i)=>{
+    const struct=(SCRIPT_STRUCTS.find(s=>s.key===b.structKey)||{}).label||b.structKey;
+    const summary=b.summary?'\n为什么爆：'+b.summary:'';
+    const tags=b.formulaTags.length?'\n公式标签：'+b.formulaTags.join(' / '):'';
+    return '【范例 '+(i+1)+'】（'+b.platform+' · '+((VIDEO_TYPES.find(x=>x.key===b.videoCategory)||{}).label||b.videoCategory)+' · '+struct+'）\n文案：'+b.script.slice(0,500)+(b.script.length>500?'…':'')+summary+tags;
+  }).join('\n\n---\n\n');
+}
+
+function getLearnedFormulasText(){
+  const lf=state.learnedFormulas;
+  if(!lf || !lf.formulas || !lf.formulas.length) return null;
+  const lines=lf.formulas.map(f=>'· '+f.title+'：'+(f.desc||'')).join('\n');
+  return (lf.summary?'【共性 DNA】'+lf.summary+'\n\n':'')+'【已学到的爆款公式 · '+lf.formulas.length+' 条】\n'+lines;
+}
 
 /* ===== 视频类型（3种固定，不得修改）====== */
 const VIDEO_TYPES=[
@@ -2418,7 +3051,7 @@ function importJSON(e){
 function clearAllData(){
   if(!confirm('⚠️ 确认清空所有数据？此操作不可恢复！\n\n建议先点「取消」并导出 JSON 备份。')) return;
   if(!confirm('再次确认：所有视频 / 热点 / 账号记录将被删除。')) return;
-  state={videos:[],hotspots:[],accounts:[]};
+  state={videos:[],hotspots:[],accounts:[],blowouts:[],learnedFormulas:null};
   save(); renderAll(); toast('已清空');
 }
 
@@ -2484,7 +3117,7 @@ function seedSample(){
     H({date:d1,type:'news',source:'36氪',market:'全球',platform:'',title:'2026 跨境出海报告：AI 工具渗透率突破 60%',product:'全品类',playbook:'行业大势背书，用权威数据建立信任',fn:'AI 出图',match:'low',struct:'结构三（反差数据 → 卖点）',topic:'「60% 跨境卖家在用 AI，你还在手工出图？」',script:'结构三：反差数据（60% 渗透率）→ 困境（手工出图掉队）→ 卖点（AI 工具提效）→ 钩子',material:'2026 跨境出海报告原文、渗透率数据图'}),
     H({date:d3,type:'news',source:'Amazon 卖家后台',market:'海外',platform:'Amazon',title:'亚马逊更新主图政策：强制白底 + 无水印',product:'亚马逊全部主图',playbook:'抠图换白底一条龙，批量处理老图',fn:'抠图去背景',match:'high',struct:'结构九（现象 → 危害 → 方案）',status:'used',topic:'「亚马逊主图新规，老图再不换就废了」',script:'结构九：现象（强制白底新规）→ 危害（违规下架）→ 原因（老图带水印）→ 方案（批量抠图换白底）→ 指令',material:'亚马逊政策截图、带水印老图、白底成品图'})
   ];
-  state={videos,hotspots,accounts};
+  state={videos,hotspots,accounts,blowouts:[],learnedFormulas:null};
   save();
 }
 
@@ -2502,6 +3135,11 @@ function renderAll(){
   renderHotspot();
   renderFestivalCalendar();
   renderSettings();
+  ensureBlowouts();
+  populateBlowoutSelects();
+  renderBlowoutList();
+  renderLearnedFormulasBox();
+  updateBlowoutStat();
   updateStorageBar();
 }
 
@@ -2837,7 +3475,7 @@ async function fetchNewsHN(){
             if(txt.trim()){
               const d=JSON.parse(txt);
               if(d.videos||d.hotspots||d.accounts){
-                state=Object.assign({videos:[],hotspots:[],accounts:[]},d);
+                state=Object.assign({videos:[],hotspots:[],accounts:[],blowouts:[],learnedFormulas:null},d);
                 try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
               }
             }
@@ -3031,7 +3669,7 @@ async function loadCloud(){
   try{
     const r=await api('/api/board'); if(!r.ok) return;
     const j=await r.json().catch(()=>({}));
-    if(j.state){ state=Object.assign({videos:[],hotspots:[],accounts:[],festivals:[]}, j.state); try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){} }
+    if(j.state){ state=Object.assign({videos:[],hotspots:[],accounts:[],festivals:[],blowouts:[],learnedFormulas:null}, j.state); try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){} }
   }catch(e){}
 }
 function saveCloud(){
@@ -3055,7 +3693,7 @@ function connectWS(){
       try{
         const m=JSON.parse(ev.data);
         if(m.type==='board' && m.updated_by!==myUid){
-          state=Object.assign({videos:[],hotspots:[],accounts:[],festivals:[]}, m.state);
+          state=Object.assign({videos:[],hotspots:[],accounts:[],festivals:[],blowouts:[],learnedFormulas:null}, m.state);
           try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
           renderAll(); toast('🔄 已同步队友更新'); updateBadge();
         }
@@ -3104,7 +3742,7 @@ async function initCloud(){
       if(r.ok){
         const j=await r.json().catch(()=>({}));
         myUid=localStorage.getItem('flyelep_uid'); myRole=localStorage.getItem('flyelep_role')||'member'; myEmail=localStorage.getItem('flyelep_email')||'';
-        if(j.state){ state=Object.assign({videos:[],hotspots:[],accounts:[],festivals:[]}, j.state); }
+        if(j.state){ state=Object.assign({videos:[],hotspots:[],accounts:[],festivals:[],blowouts:[],learnedFormulas:null}, j.state); }
         cloudReady=true; updateBadge(); connectWS(); renderAll();
         try{ await syncHotspotFeed(false); }catch(e){}
         return;
