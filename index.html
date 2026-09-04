@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>大黄狗运营 1.0 · 后台</title>
+<title>大黄狗运营 1.0 · 月百条爆款不是梦</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -21,12 +21,24 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .app{max-width:1280px;margin:0 auto;padding:18px}
 
 /* Hero */
-.hero{background:linear-gradient(135deg,#5c5207 0%,#9a8a14 100%);color:#fff;border-radius:16px;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;box-shadow:var(--shadow)}
-.hero .title h1{font-size:22px;margin-bottom:4px;font-weight:700}
-.hero .title .sub{font-size:12.5px;color:rgba(255,255,255,.8)}
+.hero{background:linear-gradient(135deg,#5c5207 0%,#9a8a14 100%);color:#fff;border-radius:18px;padding:24px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(255,217,138,.25),transparent 70%);pointer-events:none}
+.hero-brand{display:flex;align-items:center;gap:18px;flex:1;min-width:0}
+.hero-logo{flex-shrink:0;width:72px;height:72px;background:rgba(255,255,255,.92);border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.18);animation:logoBob 4s ease-in-out infinite}
+.hero-logo svg{display:block}
+@keyframes logoBob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-2deg)}}
+.hero-titles{min-width:0}
+.hero-titles h1{font-size:26px;margin-bottom:6px;font-weight:800;letter-spacing:.5px;text-shadow:0 2px 8px rgba(0,0,0,.15)}
+.hero-titles .slogan{font-size:15.5px;font-weight:700;color:#ffd98a;margin-bottom:4px;letter-spacing:.3px}
+.hero-titles .slogan .paw{display:inline-block;animation:pawWave 2.4s ease-in-out infinite;transform-origin:50% 70%}
+@keyframes pawWave{0%,100%{transform:rotate(0)}50%{transform:rotate(15deg)}}
+.hero-titles .sub{font-size:12.5px;color:rgba(255,255,255,.82)}
 .hero .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.hero select,.hero .btn{height:36px;border-radius:8px;border:none;font-size:13px;padding:0 12px}
+.hero select,.hero .btn{height:38px;border-radius:10px;border:none;font-size:13px;padding:0 14px}
 .hero select{background:#fff;color:var(--ink)}
+.btn.gear{width:38px;height:38px;padding:0;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);font-size:20px;font-weight:700;line-height:1}
+.btn.gear:hover{background:rgba(255,255,255,.25);transform:rotate(45deg);transition:transform .25s}
+.btn.gear[aria-expanded=true]{background:rgba(255,255,255,.32);transform:rotate(90deg)}
 .btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:13px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);transition:all .15s}
 .btn:hover{box-shadow:0 2px 6px rgba(0,0,0,.08)}
 .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
@@ -224,11 +236,26 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 /* Toast */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .2s,bottom .2s;z-index:80}
 .toast.show{opacity:1;bottom:32px}
-.zhipu-key-btn{position:fixed;bottom:20px;right:20px;z-index:90;display:flex;align-items:center;gap:6px;background:linear-gradient(180deg,#3a2f12,#574516);color:#ffd98a;border:1px solid #8a6d2a;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35);transition:transform .12s,box-shadow .12s}
-.zhipu-key-btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.4)}
-.zhipu-key-btn.set{background:linear-gradient(180deg,#10351c,#1a5230);color:#bff5cf;border-color:#2f8f55}
-.zhipu-key-btn .dot{width:8px;height:8px;border-radius:50%;background:#ffd98a}
-.zhipu-key-btn.set .dot{background:#6ee7a0}
+/* 抽屉：收纳「数据与设置」类后台操作 */
+.drawer{position:fixed;inset:0;z-index:100;pointer-events:none}
+.drawer.open{pointer-events:auto}
+.drawer-mask{position:absolute;inset:0;background:rgba(0,0,0,.35);opacity:0;transition:opacity .25s}
+.drawer.open .drawer-mask{opacity:1}
+.drawer-panel{position:absolute;top:0;right:0;bottom:0;width:min(360px,90vw);background:#fff;box-shadow:-8px 0 28px rgba(0,0,0,.18);transform:translateX(100%);transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
+.drawer.open .drawer-panel{transform:translateX(0)}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,#5c5207,#9a8a14);color:#fff}
+.drawer-head h3{font-size:16px;font-weight:700;margin:0}
+.drawer-head .close{background:transparent;border:none;color:#fff;font-size:20px;line-height:1;padding:4px 8px;border-radius:6px;cursor:pointer;opacity:.85}
+.drawer-head .close:hover{opacity:1;background:rgba(255,255,255,.18)}
+.drawer-body{flex:1;overflow-y:auto;padding:14px 12px 18px}
+.drawer-section{margin-bottom:18px}
+.drawer-title{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:1px;padding:6px 10px;text-transform:uppercase}
+.drawer-item{display:flex;align-items:center;gap:6px;width:100%;padding:10px 12px;border:none;background:transparent;color:var(--ink);font-size:14px;text-align:left;border-radius:8px;cursor:pointer;transition:background .12s}
+.drawer-item:hover{background:var(--bg);color:var(--brand)}
+.drawer-item:active{background:#f3eccb}
+.drawer-item.danger{color:var(--danger)}
+.drawer-item.danger:hover{background:#fdf2f1;color:var(--danger)}
+.drawer-foot{padding:10px 14px;margin-top:8px;font-size:11.5px;color:var(--muted);text-align:center;border-top:1px dashed var(--line)}
 
 /* Responsive */
 @media(max-width:780px){.form-grid,.form-grid.col3{grid-template-columns:1fr}.hero{flex-direction:column;align-items:stretch}.hero .actions{justify-content:flex-start}}
@@ -322,39 +349,97 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 <div class="app">
 
   <!-- Hero -->
-  <div class="hero">
-    <div class="title">
+<div class="hero">
+  <div class="hero-brand">
+    <!-- 大黄狗 logo：inline SVG（圆润笑脸黄狗头） -->
+    <div class="hero-logo" aria-hidden="true">
+      <svg viewBox="0 0 120 120" width="64" height="64">
+        <!-- 头 -->
+        <ellipse cx="60" cy="68" rx="48" ry="46" fill="#f5c026"/>
+        <!-- 左耳 -->
+        <ellipse cx="22" cy="50" rx="14" ry="22" fill="#d99c10" transform="rotate(-22 22 50)"/>
+        <!-- 右耳 -->
+        <ellipse cx="98" cy="50" rx="14" ry="22" fill="#d99c10" transform="rotate(22 98 50)"/>
+        <!-- 左眼 -->
+        <ellipse cx="44" cy="64" rx="4.5" ry="6" fill="#3a2f12"/>
+        <!-- 右眼（笑眯） -->
+        <path d="M 76 62 Q 82 58 88 62" stroke="#3a2f12" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- 鼻 -->
+        <ellipse cx="60" cy="76" rx="5" ry="3.5" fill="#3a2f12"/>
+        <!-- 嘴 -->
+        <path d="M 60 79 Q 50 86 42 80" stroke="#3a2f12" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M 60 79 Q 70 86 78 80" stroke="#3a2f12" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- 舌头 -->
+        <ellipse cx="60" cy="90" rx="7" ry="5" fill="#e87a5f"/>
+      </svg>
+    </div>
+    <div class="hero-titles">
       <h1>大黄狗运营 1.0</h1>
-      <div class="sub">账号数据 · 月度汇总 · 电商热点 — 本地存储，离线可用</div>
-    </div>
-    <div class="actions">
-      <span id="apiStatus" class="api-status probe" title="uapis.cn 热点 API 状态（免 key、6+ 平台）">⏳ 探测热点 API…</span>
-      <select id="monthPicker"></select>
-      <button class="btn ghost" onclick="exportJSON()">⬇ 导出 JSON</button>
-      <button class="btn ghost" onclick="document.getElementById('importInput').click()">⬆ 导入</button>
-      <input type="file" id="importInput" accept="application/json" class="hidden" onchange="importJSON(event)">
-      <button class="btn ghost" onclick="switchTab('add')">➕ 登记数据</button>
+      <div class="slogan">月百条爆款不是梦 <span class="paw">🐾</span></div>
+      <div class="sub">电商热点 · AI 脚本 · 数据复盘 — 一站搞定</div>
     </div>
   </div>
+  <div class="actions">
+    <span id="apiStatus" class="api-status probe" title="uapis.cn 热点 API 状态（免 key、6+ 平台）">⏳ 探测热点 API…</span>
+    <select id="monthPicker" title="切换月份"></select>
+    <button class="btn gear" id="gearBtn" onclick="toggleDrawer()" title="数据与设置">⋯</button>
+  </div>
+</div>
 
-  <!-- 访问方式检测横幅：file:// 打开会卡掉所有 API；提示用户改用 http://localhost:7788 -->
-  <div id="protoBanner" class="proto-banner" style="display:none">
-    <span class="ico">⚠️</span>
-    <span class="msg"><b>当前是 <code>file://</code> 打开方式。</b>浏览器禁止 file:// 抓取热点 API，所以「扒取失败」是浏览器安全策略，不是看板问题。改用 HTTP 地址即可：</span>
-    <a class="btn sm primary" href="http://localhost:7788/" target="_blank" rel="noopener">🚀 在 http://localhost:7788 打开</a>
-    <button class="btn sm ghost-w" onclick="this.parentNode.style.display='none'">✕</button>
-  </div>
-
-  <!-- 存储状态栏 -->
-  <div class="storage-bar warn" id="storageBar">
-    <span class="dot" id="storageDot"></span>
-    <span class="txt" id="storageText">正在检测存储方式…</span>
-    <div class="storage-actions">
-      <button class="btn sm primary" id="btnConnect" onclick="connectDataFile()">📁 连接数据文件（永久保存）</button>
-      <button class="btn sm" id="btnBackupDir" onclick="setBackupDir()">📂 自动备份目录</button>
-      <button class="btn sm" onclick="exportJSON()">⬇ 立即备份</button>
+<!-- 抽屉：收纳「数据与设置」类后台操作 -->
+<div id="drawer" class="drawer">
+  <div class="drawer-mask" onclick="toggleDrawer()"></div>
+  <div class="drawer-panel" onclick="event.stopPropagation()">
+    <div class="drawer-head">
+      <h3>⚙️ 数据与设置</h3>
+      <button class="close" onclick="toggleDrawer()" aria-label="关闭">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="drawer-section">
+        <div class="drawer-title">💾 数据管理</div>
+        <button class="drawer-item" onclick="exportJSON()">⬇ 导出全部 JSON</button>
+        <button class="drawer-item" onclick="document.getElementById('importInput').click()">⬆ 导入 JSON（合并）</button>
+        <button class="drawer-item" onclick="connectDataFile()">📁 连接数据文件（永久保存）</button>
+        <button class="drawer-item" onclick="setBackupDir()">📂 设置自动备份目录</button>
+        <button class="drawer-item" onclick="runAutoBackup(true)">🗂 立即备份一次</button>
+        <button class="drawer-item danger" onclick="clearAllData()">🗑 清空所有数据</button>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-title">📌 快速跳转</div>
+        <button class="drawer-item" onclick="switchTab('overview');toggleDrawer()">📊 总览</button>
+        <button class="drawer-item" onclick="switchTab('add');toggleDrawer()">➕ 登记今日数据</button>
+        <button class="drawer-item" onclick="switchTab('list');toggleDrawer()">📋 视频记录</button>
+        <button class="drawer-item" onclick="switchTab('hotspot');toggleDrawer()">🔥 热点库</button>
+        <button class="drawer-item" onclick="switchTab('settings');toggleDrawer()">⚙️ 完整设置页</button>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-title">🔑 高级（一般不用动）</div>
+        <button class="drawer-item" onclick="openZhipuKey()">🔑 配置智谱 Key</button>
+        <button class="drawer-item" onclick="cfgServer()">⚙️ 后端服务器地址</button>
+      </div>
+      <div class="drawer-foot">数据存在云端 / 本地浏览器 · 团队共享请登录</div>
     </div>
   </div>
+</div>
+
+<!-- 访问方式检测横幅：file:// 打开会卡掉所有 API；提示用户改用 http://localhost:7788 -->
+<div id="protoBanner" class="proto-banner" style="display:none">
+  <span class="ico">⚠️</span>
+  <span class="msg"><b>当前是 <code>file://</code> 打开方式。</b>浏览器禁止 file:// 抓取热点 API，所以「扒取失败」是浏览器安全策略，不是工具问题。改用 HTTP 地址即可：</span>
+  <a class="btn sm primary" href="http://localhost:7788/" target="_blank" rel="noopener">🚀 在 http://localhost:7788 打开</a>
+  <button class="btn sm ghost-w" onclick="this.parentNode.style.display='none'">✕</button>
+</div>
+
+<!-- 存储状态栏（默认折叠：仅在异常时弹出） -->
+<div class="storage-bar warn hidden" id="storageBar">
+  <span class="dot" id="storageDot"></span>
+  <span class="txt" id="storageText">正在检测存储方式…</span>
+  <div class="storage-actions">
+    <button class="btn sm primary" id="btnConnect" onclick="connectDataFile()">📁 连接数据文件</button>
+    <button class="btn sm" id="btnBackupDir" onclick="setBackupDir()">📂 备份目录</button>
+    <button class="btn sm" onclick="exportJSON()">⬇ 立即备份</button>
+  </div>
+</div>
 
   <!-- Tabs -->
   <div class="tabs">
@@ -637,6 +722,16 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 
   <!-- ============== TAB: SETTINGS ============== -->
   <div class="tab-pane hidden" id="pane-settings">
+    <div class="panel" style="background:linear-gradient(135deg,#fef7e0,#fdf1d6);border-color:#ecd79a">
+      <h2>🐾 大黄狗运营 1.0</h2>
+      <p style="font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:8px">
+        月百条爆款不是梦 —— 专为电商运营部打造的一站式工具：<b>扒热点 → 选商品/玩法 → AI 出脚本 → 跟数据</b>。
+      </p>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7">
+        · 数据存储、导入/导出、连接本地文件、智谱 Key 等高级设置，已收纳到右上角 <b>「⋯」</b> 按钮（数据与设置抽屉）。<br>
+        · 不登录也能用本地模式；点右上角 <b>☁️</b> 可加入团队云，多人实时共享。
+      </p>
+    </div>
     <div class="panel">
       <h2>💾 存储与备份</h2>
       <p style="font-size:13px;color:var(--ink2);margin-bottom:14px">数据默认存在浏览器里（清缓存会丢）。连接数据文件后，每次修改会<b>自动写入你本地的 JSON 文件</b>，换浏览器、换电脑都不丢。</p>
@@ -685,6 +780,9 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- 隐藏：导入文件选择器（供齿轮抽屉 / 设置页「导入」按钮调用） -->
+<input type="file" id="importInput" accept="application/json" class="hidden" onchange="importJSON(event)">
 
 <script>
 /* ================== 日期工具（必须最先定义，State 里会用到） ==================
@@ -2852,14 +2950,12 @@ function injectCloudUI(){
   document.getElementById('memClose').onclick=()=>{ document.getElementById('memberModal').style.display='none'; };
   const b=document.createElement('button'); b.id='cloudBadge'; b.className='btn ghost';
   b.textContent='☁️ 团队云：未连接'; b.onclick=showLoginModal;
-  const s=document.createElement('button'); s.id='serverBtn'; s.className='btn ghost'; s.textContent='⚙️'; s.title='配置后端服务器地址';
   let actions=document.querySelector('.hero .actions')||document.querySelector('.actions');
-  if(actions){ actions.appendChild(b); actions.appendChild(s); }
+  if(actions){ actions.appendChild(b); }
   else {
     // 兜底：找不到 actions 容器时浮动到右上角（保证一定渲染）
     b.style.cssText='position:fixed;top:14px;right:150px;z-index:9998;height:36px;border-radius:8px;padding:0 10px;background:#fff;border:1px solid #ddd;cursor:pointer;font-size:13px;color:#666';
-    s.style.cssText='position:fixed;top:14px;right:100px;z-index:9998;height:36px;width:36px;border-radius:8px;background:#fff;border:1px solid #ddd;cursor:pointer;font-size:16px;color:#666';
-    document.body.appendChild(b); document.body.appendChild(s);
+    document.body.appendChild(b);
   }
   updateBadge();
 }
@@ -2958,8 +3054,6 @@ function updateBadge(){
   const b=document.getElementById('cloudBadge'); if(!b) return;
   if(cloudReady){ b.textContent='☁️ 已连·'+(myRole==='owner'?'管理员':'成员'); b.classList.add('on'); b.onclick=()=>{ if(myRole==='owner') openMembers(); else toast('你不是管理员，无权管理成员'); }; }
   else { b.textContent='☁️ 团队云：未连接'; b.classList.remove('on'); b.onclick=showLoginModal; }
-  const sb=document.getElementById('serverBtn');
-  if(sb) sb.onclick=cfgServer;
 }
 async function initCloud(){
   injectCloudUI();
@@ -2987,17 +3081,22 @@ function showLoginNudge(){
   toast('☁️ 团队云未连接 · 右上角点「☁️」可注册/登录（不登录也能用本地模式）', 5000);
 }
 </script>
-<!-- 右下角：配置智谱 Key（线上版用浏览器直连，无需本地服务） -->
-<button id="flyelepKeyBtn" class="zhipu-key-btn" onclick="openZhipuKey()" title="配置智谱 API Key（仅存本浏览器，不上传服务器）">
-  <span class="dot"></span><span id="flyelepKeyBtnLabel">🔑 配置智谱Key</span>
-</button>
 
 <script>
+function toggleDrawer(){
+  const d=document.getElementById('drawer'); if(!d) return;
+  const open=d.classList.toggle('open');
+  const g=document.getElementById('gearBtn'); if(g) g.setAttribute('aria-expanded', open?'true':'false');
+}
+// 点抽屉内部不关闭（已用 onclick=event.stopPropagation 阻止）；ESC 关闭
+document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ const d=document.getElementById('drawer'); if(d) d.classList.remove('open'); } });
+
+/* 智谱 Key 配置：仅在齿轮抽屉「高级」里点开（团队云已默认走后端代理免配） */
 function openZhipuKey(){
   const cur=(localStorage.getItem('flyelep_zhipu_key')||'').trim();
   const tip=cur
     ? '已检测到已有 Key（前几位：'+cur.slice(0,6)+'…）。\n\n粘贴新的智谱 API Key 以覆盖（仅存本浏览器）：'
-    : '粘贴你的智谱 API Key（仅存本浏览器，不上传任何服务器）：\n\nBigModel 控制台 https://open.bigmodel.cn/usercenter/apikeys';
+    : '粘贴你的智谱 API Key（仅存本浏览器，不上传任何服务器）：\n\nBigModel 控制台 https://open.bigmodel.cn/usercenter/apikeys\n\n（团队云已默认走后端代理，一般不用填）';
   const v=prompt(tip, cur);
   if(v===null) return;
   const key=v.trim();
@@ -3006,15 +3105,7 @@ function openZhipuKey(){
     localStorage.setItem('flyelep_zhipu_key', key);
     toast('✅ 已保存智谱 Key（浏览器直连已就绪）');
   }
-  refreshKeyBtn();
   probeZhipuStatus();
-}
-function refreshKeyBtn(){
-  const btn=$('#flyelepKeyBtn'); if(!btn) return;
-  const has=(localStorage.getItem('flyelep_zhipu_key')||'').trim();
-  btn.classList.toggle('set', !!has);
-  const lb=$('#flyelepKeyBtnLabel'); if(lb) lb.textContent = has ? '🟢 智谱Key已配置' : '🔑 配置智谱Key';
-  btn.title = has ? '智谱 Key 已配置（浏览器直连）· 点击可修改/清除' : '配置智谱 API Key（仅存本浏览器）';
 }
 </script>
 </body>
