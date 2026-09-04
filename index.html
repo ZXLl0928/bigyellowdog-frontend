@@ -144,6 +144,14 @@ tr:hover td{background:#fbfaf7}
 .hs-cb input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--brand)}
 tbody tr.selected td{background:#fff5d0}
 tbody tr.selected:hover td{background:#ffefb8}
+/* 热点表格-标题 2 行省略 */
+.hs-title{display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;word-break:break-word;line-height:1.4;color:var(--ink);text-decoration:none}
+a.hs-title{color:var(--brand)}
+a.hs-title:hover{text-decoration:underline}
+/* AI 推荐小按钮（商品/玩法为空时的兜底入口） */
+.ai-mini{display:inline-flex;align-items:center;gap:3px;height:24px;padding:0 8px;font-size:11.5px;border-radius:6px;border:1px dashed var(--brand);background:#fff8e1;color:var(--brand);cursor:pointer;font-weight:600;white-space:nowrap}
+.ai-mini:hover{background:#f3eccb;border-style:solid}
+.ai-mini:disabled{opacity:.55;cursor:wait}
 
 /* 营销日历 */
 .cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px;margin-top:12px}
@@ -2018,18 +2026,21 @@ function renderHotspot(){
       <td style="white-space:nowrap">${h.date}</td>
       <td><span class="pill ${tCls}">${tEmo} ${tTxt}</span></td>
       <td style="font-size:12px;white-space:nowrap">${h.market?`<span class="pill ${mCls}">${mTxt}</span>`:''}${h.platform?` <span class="pill plat">${h.platform}</span>`:''}${!h.market&&!h.platform?'—':''}</td>
-      <td style="max-width:230px">
-        <div>${h.url?`<a href="${h.url}" target="_blank" style="color:var(--brand)">${h.title}</a>`:h.title}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">来源：${h.source}</div>
+      <td style="max-width:230px" title="${escapeHtml(h.title)}">
+        ${h.url
+          ? `<a href="${h.url}" target="_blank" class="hs-title">${escapeHtml(h.title)}</a>`
+          : `<div class="hs-title">${escapeHtml(h.title)}</div>`}
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">来源：${escapeHtml(h.source||'')}</div>
       </td>
       <td style="max-width:170px;font-size:12.5px">
-        <b>${h.product||'—'}</b>
-        ${h.category?`<div style="font-size:11px;color:var(--muted)">${h.category}</div>`:''}
-        ${h.sales?`<div style="font-size:11px;color:var(--accent);font-weight:600">${h.sales}${h.price?' · '+h.price:''}</div>`:''}
+        ${h.product
+          ? `<b>${escapeHtml(h.product)}</b>${h.category?`<div style="font-size:11px;color:var(--muted)">${escapeHtml(h.category)}</div>`:''}${h.sales?`<div style="font-size:11px;color:var(--accent);font-weight:600">${escapeHtml(h.sales)}${h.price?' · '+escapeHtml(h.price):''}</div>`:''}`
+          : `<button class="ai-mini" data-airow="${h.id}" onclick="aiSuggestRow('${h.id}')">⚡ AI推荐</button>`}
       </td>
       <td style="max-width:240px;font-size:12px;color:var(--ink2)">
-        ${h.playbook||'—'}
-        ${h.fn?`<div style="margin-top:3px"><span class="pill fn">${h.fn}</span></div>`:''}
+        ${h.playbook
+          ? `${escapeHtml(h.playbook)}${h.fn?`<div style="margin-top:3px"><span class="pill fn">${escapeHtml(h.fn)}</span></div>`:''}`
+          : `<button class="ai-mini" onclick="aiSuggestRow('${h.id}')">⚡ AI推荐</button>`}
       </td>
       <td style="white-space:nowrap;font-size:12px">
         <span class="pill ${ecCls}">${ecTxt}</span>
@@ -2055,6 +2066,58 @@ function renderHotspot(){
 }
 function toggleHsDetail(id){
   const el=$('#hsd-'+id); if(el) el.classList.toggle('hidden');
+}
+
+// AI 推荐「可挂钩商品 + 内容玩法」——基于热点标题调智谱 GLM 给出带货角度
+async function aiSuggestRow(id){
+  const h=state.hotspots.find(x=>x.id===id);
+  if(!h) return;
+  // 没有 Key 的话引导用户先去配置
+  const key=(localStorage.getItem('flyelep_zhipu_key')||'').trim();
+  if(!key){
+    toast('请先在右上角配置智谱 Key',4000);
+    if(typeof openZhipuKey==='function'){ setTimeout(()=>openZhipuKey(), 600); }
+    return;
+  }
+  // 锁定这一行所有 AI 按钮，避免重复点击
+  const btns=document.querySelectorAll(`[data-airow="${id}"]`);
+  btns.forEach(b=>{ b.disabled=true; b.textContent='⏳ 推荐中…'; });
+  try{
+    const prompt=`你是一名电商短视频带货运营。请基于下面这条热点，给出"可挂钩商品"和"内容玩法"两个具体建议（要可落地、能直接开拍）。
+
+【热点标题】${h.title||''}
+【热点来源】${h.source||h.platform||'未知'}
+
+请严格按下面的 JSON 格式输出（不要任何额外文字、不要 markdown 代码块、不要前后缀）：
+{"product":"一句话商品建议（≤18字，要含品类词）","category":"品类（如3C/美妆/家居/服饰/食品/数码/家电/母婴/其他）","playbook":"一句话内容玩法（≤40字，包含具体拍法/形式/钩子，如『真人实拍开箱+价格对比+真实评测』）","sales":"参考销售卖点（≤18字，可留空字符串）"}
+
+要求：
+1. product 必须是主流电商平台能买到的常见商品，不要虚构奇葩商品
+2. playbook 要可直接执行，告诉用户怎么拍
+3. 不要照抄热点标题字面，要顺着热点情绪/事件带出带货角度`;
+    const r=await callZhipu([
+      {role:'system', content:'你是电商短视频运营专家，只输出 JSON。'},
+      {role:'user', content:prompt}
+    ]);
+    let txt=r.content||'';
+    const m=txt.match(/\{[\s\S]*\}/);
+    if(!m) throw new Error('AI 返回格式异常：'+txt.slice(0,80));
+    const obj=JSON.parse(m[0]);
+    if(!h.product && obj.product) h.product=String(obj.product).slice(0,30);
+    if(!h.category && obj.category) h.category=String(obj.category).slice(0,10);
+    if(!h.playbook && obj.playbook) h.playbook=String(obj.playbook).slice(0,60);
+    if(!h.sales && obj.sales) h.sales=String(obj.sales).slice(0,30);
+    evalHotspot(h); // 重算挂钩度
+    save();
+    renderHotspot();
+    const filled=[];
+    if(h.product) filled.push('商品');
+    if(h.playbook) filled.push('玩法');
+    toast(filled.length? '✅ AI 已补全：'+filled.join(' + '):'⚠️ AI 返回为空', 3500);
+  }catch(e){
+    toast('❌ AI 推荐失败：'+e.message, 5000);
+    btns.forEach(b=>{ b.disabled=false; b.textContent='⚡ AI推荐'; });
+  }
 }
 
 /* ================== Render Settings ================== */
