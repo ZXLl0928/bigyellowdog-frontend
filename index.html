@@ -835,28 +835,37 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <button class="bst-tab" data-bst="manual" onclick="switchBlowoutSource('manual')">✍️ 纯文案录入</button>
         </div>
         <div class="blowout-source-pane" id="bst-link">
-          <label class="fld"><span>爆款视频链接（可选，抖音/小红书/B站/视频号 链接）</span>
-            <input id="biUrl" placeholder="https://www.douyin.com/video/xxxx 或留空" />
+          <label class="fld"><span>爆款视频链接（可选，抖音/小红书/B站/视频号 链接，粘贴后点右侧自动识别）</span>
+            <div style="display:flex;gap:8px">
+              <input id="biUrl" placeholder="https://www.douyin.com/video/xxxx 或分享文本" style="flex:1" />
+              <button class="btn sm" onclick="autoParseBlowoutUrl()" id="btnParseUrl" style="white-space:nowrap">🔍 自动识别文案</button>
+            </div>
           </label>
-          <label class="fld"><span>平台</span>
-            <select id="biPlat">
-              <option>抖音</option><option>小红书</option><option>视频号</option><option>B站</option><option>TikTok</option><option>其他</option>
-            </select>
-          </label>
+          <div style="display:flex;gap:8px">
+            <label class="fld" style="flex:1"><span>平台</span>
+              <select id="biPlat">
+                <option>抖音</option><option>小红书</option><option>视频号</option><option>B站</option><option>TikTok</option><option>其他</option>
+              </select>
+            </label>
+            <label class="fld" style="flex:1"><span>作品名称</span>
+              <input id="biTitle" placeholder="如：xxx 的科普拆解" />
+            </label>
+          </div>
           <label class="fld"><span>视频类型</span>
             <select id="biVtype" onchange="autoMatchStruct()"></select>
           </label>
-          <label class="fld"><span>品类（美妆/3C/食品…）</span>
-            <input id="biCat" placeholder="如：美妆、3C 数码、食品饮料、家居、服饰…" />
+          <label class="fld"><span>主推内容（Flyelep 17 个功能）</span>
+            <select id="biMainContent"></select>
           </label>
-          <label class="fld"><span>表现数据（可选）</span>
+          <label class="fld"><span>表现数据（3 个选填，留空跳过）</span>
             <div style="display:flex;gap:8px">
-              <input id="biViews" placeholder="播放量（万）" style="flex:1" />
-              <input id="biLikes" placeholder="点赞（万）" style="flex:1" />
+              <input id="biLikes" placeholder="❤ 点赞（万）" style="flex:1" />
+              <input id="biComments" placeholder="💬 评论（条）" style="flex:1" />
+              <input id="biFavorites" placeholder="⭐ 收藏（条）" style="flex:1" />
             </div>
           </label>
           <label class="fld"><span>完整文案（粘贴）</span>
-            <textarea id="biScript" rows="6" placeholder="把视频的口播/字幕/分镜文案完整粘贴到这里…"></textarea>
+            <textarea id="biScript" rows="6" placeholder="把视频的口播/字幕/分镜文案完整粘贴到这里…（点上方「自动识别文案」可自动填）"></textarea>
           </label>
           <div class="blowout-btns">
             <button class="btn primary" onclick="analyzeBlowout()">🤖 AI 拆解并匹配结构</button>
@@ -865,15 +874,19 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <div class="blowout-analyze-result" id="biResult"></div>
         </div>
         <div class="blowout-source-pane hidden" id="bst-manual">
-          <label class="fld"><span>标题</span>
+          <label class="fld"><span>作品名称</span>
             <input id="bmTitle" placeholder="给这条爆款起个名字便于查找" />
           </label>
-          <label class="fld"><span>平台 / 类型 / 品类</span>
-            <div style="display:flex;gap:8px">
-              <select id="bmPlat" style="flex:1"><option>抖音</option><option>小红书</option><option>视频号</option><option>B站</option><option>TikTok</option></select>
-              <select id="bmVtype" style="flex:1"></select>
-              <input id="bmCat" placeholder="品类" style="flex:1" />
-            </div>
+          <div style="display:flex;gap:8px">
+            <label class="fld" style="flex:1"><span>平台</span>
+              <select id="bmPlat"><option>抖音</option><option>小红书</option><option>视频号</option><option>B站</option><option>TikTok</option></select>
+            </label>
+            <label class="fld" style="flex:1"><span>视频类型</span>
+              <select id="bmVtype" style="width:100%"></select>
+            </label>
+          </div>
+          <label class="fld"><span>主推内容（Flyelep 17 个功能）</span>
+            <select id="bmMainContent"></select>
           </label>
           <label class="fld"><span>完整文案</span>
             <textarea id="bmScript" rows="8" placeholder="粘贴文案…"></textarea>
@@ -2271,12 +2284,29 @@ const VTYPE_STRUCT_HINT={
 
 var _lastBlowoutAnalysis={};  // 缓存最近一次 AI 拆解，commit 时用（var 会被 hoist）
 
-function ensureBlowouts(){ if(!Array.isArray(state.blowouts)) state.blowouts=[]; }
+function ensureBlowouts(){
+  if(!Array.isArray(state.blowouts)) state.blowouts=[];
+  // 字段迁移（旧 → 新）：category → mainContent；views/likes(万) → likes(万)
+  for(const b of state.blowouts){
+    if(b.mainContent==null && b.category!=null) b.mainContent=b.category;
+    if(b.likes==null && typeof b.views==='number'){ b.likes=b.views; }
+    delete b.category; delete b.views;
+    if(!('workName' in b)) b.workName=b.title||'';
+    if(typeof b.likes!=='number') b.likes=0;
+    if(typeof b.comments!=='number') b.comments=0;
+    if(typeof b.favorites!=='number') b.favorites=0;
+  }
+}
+
+/* Flyelep 17 个 AI 功能（"主推内容"选项）— 注意：常量定义在文件下方，本模块只引用 */
 
 function populateBlowoutSelects(){
   // 视频类型 select：复用 VIDEO_TYPES
   const v1=$('#biVtype'); if(v1) v1.innerHTML=VIDEO_TYPES.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
   const v2=$('#bmVtype'); if(v2) v2.innerHTML=VIDEO_TYPES.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
+  // 主推内容 select：Flyelep 17 个功能
+  const mc1=$('#biMainContent'); if(mc1) mc1.innerHTML=FLYELEP_FEATURES.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
+  const mc2=$('#bmMainContent'); if(mc2) mc2.innerHTML=FLYELEP_FEATURES.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
   // 列表筛选中的视频类型
   const fv=$('#bfVtype'); if(fv) fv.innerHTML='<option value="">全部类型</option>'+VIDEO_TYPES.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
   // 结构 select
@@ -2307,12 +2337,14 @@ function autoMatchStruct(){
 async function analyzeBlowout(){
   const url=$('#biUrl').value.trim();
   const plat=$('#biPlat').value;
+  const workName=$('#biTitle').value.trim();
   const vtype=$('#biVtype').value;
-  const cat=$('#biCat').value.trim();
-  const views=$('#biViews').value.trim();
+  const mainContent=$('#biMainContent').value;
   const likes=$('#biLikes').value.trim();
+  const comments=$('#biComments').value.trim();
+  const favorites=$('#biFavorites').value.trim();
   const script=$('#biScript').value.trim();
-  if(!script){ toast('⚠️ 请先粘贴文案'); $('#biScript').focus(); return; }
+  if(!script){ toast('⚠️ 请先粘贴文案（可点「自动识别文案」尝试自动获取）'); $('#biScript').focus(); return; }
   const resultEl=$('#biResult');
   resultEl.classList.add('show');
   resultEl.innerHTML='<div class="bar-title">🤖 AI 拆解中…</div><div class="muted" style="font-size:12px">正在分析结构、匹配十个结构之一、提炼公式标签（约 5-15 秒）…</div>';
@@ -2330,7 +2362,8 @@ ${SCRIPT_STRUCTS.map(s=>'- '+s.key+' = '+s.label).join('\n')}
 输出严格 JSON（不要用三个反引号包裹，不要其他文字）：
 {"structKey":"s?","breakdown":["...","..."],"formulaTags":["...","..."],"summary":"..."}`;
 
-  const userPrompt=`平台：${plat}\n视频类型：${(VIDEO_TYPES.find(x=>x.key===vtype)||{}).label||vtype}\n品类：${cat||'(未填)'}\n表现：${views?views+' 万播放':''}${likes?' · '+likes+' 万点赞':''}\nURL：${url||'(无)'}\n\n=== 文案 ===\n${script.slice(0,2500)}${script.length>2500?'\n\n（文案过长已截断）':''}`;
+  const mcLabel=(FLYELEP_FEATURES.find(x=>x.key===mainContent)||{}).label||mainContent;
+  const userPrompt=`平台：${plat}\n作品名称：${workName||'(未填)'}\n视频类型：${(VIDEO_TYPES.find(x=>x.key===vtype)||{}).label||vtype}\n主推内容：${mcLabel||'(未选)'}\n表现：${likes?likes+' 万点赞':''}${comments?' · '+comments+' 条评论':''}${favorites?' · '+favorites+' 条收藏':''}\nURL：${url||'(无)'}\n\n=== 文案 ===\n${script.slice(0,2500)}${script.length>2500?'\n\n（文案过长已截断）':''}`;
 
   try{
     const r=await callZhipu([
@@ -2341,7 +2374,7 @@ ${SCRIPT_STRUCTS.map(s=>'- '+s.key+' = '+s.label).join('\n')}
     const j=JSON.parse(txt);
     if(!SCRIPT_STRUCTS.find(s=>s.key===j.structKey)) j.structKey='s1';
     _cacheBlowoutAnalysis('biResult', j);
-    renderBlowoutAnalysis('biResult', j, {url,plat,vtype,cat,views,likes,script});
+    renderBlowoutAnalysis('biResult', j, {url,plat,workName,vtype,mainContent,likes,comments,favorites,script});
   }catch(e){
     resultEl.innerHTML='<div class="bar-title" style="color:#a8332b">❌ 拆解失败</div><div style="font-size:12px;color:#666">'+e.message+'</div><div class="muted" style="font-size:11.5px;margin-top:6px">小提示：检查智谱 Key / 后端 / 网络。你也可以点「💾 不拆解直接保存」手动指定结构。</div>';
   }
@@ -2349,10 +2382,10 @@ ${SCRIPT_STRUCTS.map(s=>'- '+s.key+' = '+s.label).join('\n')}
 
 /* ===== AI 拆解：纯文案录入版 ===== */
 async function analyzeBlowoutManual(){
-  const title=$('#bmTitle').value.trim();
+  const workName=$('#bmTitle').value.trim();
   const plat=$('#bmPlat').value;
   const vtype=$('#bmVtype').value;
-  const cat=$('#bmCat').value.trim();
+  const mainContent=$('#bmMainContent').value;
   const script=$('#bmScript').value.trim();
   if(!script){ toast('⚠️ 请先粘贴文案'); $('#bmScript').focus(); return; }
   const resultEl=$('#bmResult');
@@ -2368,7 +2401,8 @@ ${SCRIPT_STRUCTS.map(s=>'- '+s.key+' = '+s.label).join('\n')}
 
 输出严格 JSON（不要用三个反引号包裹，不要其他文字）：
 {"structKey":"s?","breakdown":["...","..."],"formulaTags":["...","..."],"summary":"..."}`;
-  const userPrompt=`平台：${plat}\n视频类型：${(VIDEO_TYPES.find(x=>x.key===vtype)||{}).label||vtype}\n品类：${cat||'(未填)'}\n\n=== 文案 ===\n${script.slice(0,2500)}${script.length>2500?'\n\n（文案过长已截断）':''}`;
+  const mcLabel=(FLYELEP_FEATURES.find(x=>x.key===mainContent)||{}).label||mainContent;
+  const userPrompt=`平台：${plat}\n作品名称：${workName||'(未填)'}\n视频类型：${(VIDEO_TYPES.find(x=>x.key===vtype)||{}).label||vtype}\n主推内容：${mcLabel||'(未选)'}\n\n=== 文案 ===\n${script.slice(0,2500)}${script.length>2500?'\n\n（文案过长已截断）':''}`;
   try{
     const r=await callZhipu([
       {role:'system', content: sysPrompt},
@@ -2378,7 +2412,7 @@ ${SCRIPT_STRUCTS.map(s=>'- '+s.key+' = '+s.label).join('\n')}
     const j=JSON.parse(txt);
     if(!SCRIPT_STRUCTS.find(s=>s.key===j.structKey)) j.structKey='s1';
     _cacheBlowoutAnalysis('bmResult', j);
-    renderBlowoutAnalysis('bmResult', j, {title,plat,vtype,cat,script});
+    renderBlowoutAnalysis('bmResult', j, {workName,plat,vtype,mainContent,script});
   }catch(e){
     resultEl.innerHTML='<div class="bar-title" style="color:#a8332b">❌ 拆解失败</div><div style="font-size:12px;color:#666">'+e.message+'</div>';
   }
@@ -2395,7 +2429,8 @@ function renderBlowoutAnalysis(targetId, j, ctx){
   const tagsHtml=(j.formulaTags||[]).map(t=>`<span class="bar-tag">${escapeHtml(t)}</span>`).join('');
   const breakdownHtml=(j.breakdown||[]).map(t=>`<span class="bar-tag">${escapeHtml(t)}</span>`).join('');
   const structOptions=SCRIPT_STRUCTS.map(s=>`<option value="${s.key}" ${s.key===j.structKey?'selected':''}>${s.label}</option>`).join('');
-  const ctxStr=JSON.stringify(ctx).replace(/'/g,'&#39;');
+  // 用 base64 把 ctx 编码进 dataset attribute，避免内嵌 JSON 的引号 / 换行 / 中文符号被 HTML 属性解析破坏（这是「保存无反应」bug 的根因）
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(ctx))));
   const html=`
     <div class="bar-title">✅ 拆解完成 · AI 推荐：<span class="bar-tag recommend">${escapeHtml(struct.label)}</span></div>
     <div style="font-size:12px;color:var(--ink2);margin-bottom:6px"><b>为什么爆：</b>${escapeHtml(j.summary||'(无)')}</div>
@@ -2404,29 +2439,35 @@ function renderBlowoutAnalysis(targetId, j, ctx){
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       <span style="font-size:11.5px;color:var(--muted)">若推荐不准，手动调整：</span>
       <select id="${targetId}-structPick" style="padding:4px 8px;font-size:12px;border:1px solid #ddd;border-radius:6px">${structOptions}</select>
-      <button class="btn primary sm" onclick="commitBlowout('${targetId}','${ctxStr.replace(/'/g,"\\'")}')">💾 保存到爆款库</button>
+      <button class="btn primary sm" data-bctx="${b64}" onclick="commitBlowout(this,'${targetId}')">💾 保存到爆款库</button>
     </div>`;
   $('#'+targetId).innerHTML=html;
 }
 
-/* ===== 保存爆款 ===== */
-function commitBlowout(targetId, ctxStr){
-  let ctx; try{ ctx=JSON.parse(ctxStr); }catch(e){ toast('⚠️ 参数异常'); return; }
+/* ===== 保存爆款（从 dataset 读 ctx，绕开内嵌 JSON bug） ===== */
+function commitBlowout(btn, targetId){
+  let ctx={};
+  try{
+    ctx = JSON.parse(decodeURIComponent(escape(atob(btn.dataset.bctx||''))));
+  }catch(e){ toast('⚠️ 参数异常：'+e.message); return; }
   const pickId=targetId+'-structPick';
   const structKey=$('#'+pickId)?.value||'s1';
   const resultEl=$('#'+targetId);
   const last=_lastBlowoutAnalysis[targetId];
   if(!last){ toast('⚠️ 已过期，请重新拆解'); return; }
+  ensureBlowouts();
   const item={
     id: uid(),
     url: ctx.url||'',
-    title: ctx.title||('未命名爆款 '+(state.blowouts.length+1)),
+    title: ctx.workName||('未命名爆款 '+(state.blowouts.length+1)),
+    workName: ctx.workName||'',
     platform: ctx.plat||'抖音',
     videoCategory: ctx.vtype||'kbp',
     structKey,
-    category: ctx.cat||'',
-    views: parseFloat(ctx.views)||0,
-    likes: parseFloat(ctx.likes)||0,
+    mainContent: ctx.mainContent||'',
+    likes:    parseFloat(ctx.likes)||0,
+    comments: parseFloat(ctx.comments)||0,
+    favorites:parseFloat(ctx.favorites)||0,
     script: ctx.script||'',
     breakdown: last.breakdown||[],
     formulaTags: last.formulaTags||[],
@@ -2434,7 +2475,6 @@ function commitBlowout(targetId, ctxStr){
     source: targetId==='biResult'?'link':'manual',
     createdAt: Date.now()
   };
-  ensureBlowouts();
   state.blowouts.unshift(item);
   save();
   renderBlowoutList();
@@ -2447,17 +2487,24 @@ function commitBlowout(targetId, ctxStr){
 function saveBlowoutDirect(){
   const url=$('#biUrl').value.trim();
   const plat=$('#biPlat').value;
+  const workName=$('#biTitle').value.trim();
   const vtype=$('#biVtype').value;
-  const cat=$('#biCat').value.trim();
-  const views=$('#biViews').value.trim();
+  const mainContent=$('#biMainContent').value;
   const likes=$('#biLikes').value.trim();
+  const comments=$('#biComments').value.trim();
+  const favorites=$('#biFavorites').value.trim();
   const script=$('#biScript').value.trim();
   if(!script){ toast('⚠️ 文案不能为空'); $('#biScript').focus(); return; }
   const item={
-    id: uid(), url, title:'未命名爆款 '+(state.blowouts.length+1),
+    id: uid(), url,
+    title: workName||('未命名爆款 '+(state.blowouts.length+1)),
+    workName: workName||'',
     platform: plat, videoCategory: vtype,
     structKey: VTYPE_STRUCT_HINT[vtype]||'s1',
-    category: cat, views: parseFloat(views)||0, likes: parseFloat(likes)||0,
+    mainContent: mainContent||'',
+    likes: parseFloat(likes)||0,
+    comments: parseFloat(comments)||0,
+    favorites: parseFloat(favorites)||0,
     script, breakdown:[], formulaTags:[], summary:'',
     source:'link', createdAt: Date.now()
   };
@@ -2471,17 +2518,20 @@ function saveBlowoutDirect(){
   r.innerHTML='<div class="bar-title" style="color:#3a7a23">✅ 已保存</div>';
 }
 function saveBlowoutManual(){
-  const title=$('#bmTitle').value.trim()||('未命名爆款 '+(state.blowouts.length+1));
+  const workName=$('#bmTitle').value.trim();
   const plat=$('#bmPlat').value;
   const vtype=$('#bmVtype').value;
-  const cat=$('#bmCat').value.trim();
+  const mainContent=$('#bmMainContent').value;
   const script=$('#bmScript').value.trim();
   if(!script){ toast('⚠️ 文案不能为空'); $('#bmScript').focus(); return; }
   const item={
-    id: uid(), url:'', title,
+    id: uid(), url:'',
+    title: workName||('未命名爆款 '+(state.blowouts.length+1)),
+    workName: workName||'',
     platform: plat, videoCategory: vtype,
     structKey: VTYPE_STRUCT_HINT[vtype]||'s1',
-    category: cat, views:0, likes:0,
+    mainContent: mainContent||'',
+    likes:0, comments:0, favorites:0,
     script, breakdown:[], formulaTags:[], summary:'',
     source:'manual', createdAt: Date.now()
   };
@@ -2491,6 +2541,54 @@ function saveBlowoutManual(){
   renderBlowoutList();
   updateBlowoutStat();
   toast('✅ 已保存（未拆解）');
+}
+
+/* ===== 链接自动识别文案（调后端 /api/blowout/parse；当前后端能力：提取视频元数据 desc + 标题 + 作者） ===== */
+async function autoParseBlowoutUrl(){
+  const url=($('#biUrl').value||'').trim();
+  if(!url){ toast('⚠️ 请先粘贴视频链接或分享文本'); $('#biUrl').focus(); return; }
+  const btn=$('#btnParseUrl'); const old=btn?.textContent;
+  if(btn){ btn.disabled=true; btn.textContent='⏳ 识别中…'; }
+  try{
+    // 多源尝试：先调后端（解决跨域 + 服务端反爬代码可升级），fetch 失败再降级
+    const apiBase=(typeof API_BASE!=='undefined' && API_BASE) ? API_BASE : '';
+    let res=null;
+    if(apiBase){
+      try{
+        const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(), 15000);
+        const r=await fetch(`${apiBase}/api/blowout/parse?url=${encodeURIComponent(url)}`, { signal: ctrl.signal });
+        clearTimeout(t);
+        if(r.ok){ const j=await r.json(); res=j.ok?j.data:null; }
+      }catch(e){ /* 降级 */ }
+    }
+    // 降级：本地正则从分享文本里提 videoId，让用户自己粘文案（兜底至少能填一些字段）
+    if(!res){
+      const m=url.match(/(?:video|note|item|live)\/(\d{10,})/) || url.match(/https?:\/\/[\w.-]+\/(?:video|note|item|live)\/(\w+)/);
+      const vid=m?m[1]:'';
+      // 平台判断
+      let plat='其他';
+      if(/douyin|iesdouyin|抖音/.test(url)) plat='抖音';
+      else if(/xiaohongshu|xhsl|小红书/.test(url)) plat='小红书';
+      else if(/bilibili|bili\.|b23\.tv/.test(url)) plat='B站';
+      else if(/视频号|weixin|mp\.weixin/.test(url)) plat='视频号';
+      else if(/tiktok/.test(url)) plat='TikTok';
+      $('#biPlat').value = plat;
+      toast('⚠️ 后端未配置，只能识别平台（'+plat+'）和 videoId，文案请手动粘');
+      if(vid) $('#biTitle').placeholder = `（识别到 videoId: ${vid}）`;
+      return;
+    }
+    // 填字段
+    if(res.platform){ try{ $('#biPlat').value=res.platform; }catch(e){} }
+    if(res.title)    $('#biTitle').value = res.title;
+    if(res.script)   { $('#biScript').value = res.script; }
+    if(res.author)   { /* 暂不做作者字段，先放着 */ }
+    const filled=[res.platform?'平台':null, res.title?'作品名称':null, res.script?'文案':null].filter(Boolean).join('·');
+    toast(filled?('✅ 已自动识别：'+filled+'（数据来源：'+res.source+'；文案由后端从视频元数据/分享描述提取，如不全请手动补）'):'⚠️ 后端返回空结果，可手动粘文案');
+  }catch(e){
+    toast('识别失败：'+(e.message||'未知错误')+' — 请手动粘文案');
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent=old||'🔍 自动识别文案'; }
+  }
 }
 
 /* ===== 列表渲染 ===== */
@@ -2520,7 +2618,12 @@ function renderBlowoutList(){
   list.innerHTML=arr.map(b=>{
     const struct=SCRIPT_STRUCTS.find(s=>s.key===b.structKey)||{label:b.structKey};
     const vt=VIDEO_TYPES.find(x=>x.key===b.videoCategory)||{label:b.videoCategory};
-    const perfTxt = (b.views||b.likes) ? `<div class="perf">${b.views?`👀 ${b.views} 万播放`:''}${b.likes?` · ❤ ${b.likes} 万点赞`:''}</div>`:'';
+    const mc=(FLYELEP_FEATURES.find(x=>x.key===b.mainContent)||{}).label||b.mainContent||'';
+    const perfParts=[];
+    if(b.likes)    perfParts.push(`<span title="点赞">❤ ${b.likes>10000?(b.likes/10000).toFixed(1)+' 万':b.likes+' 条'}</span>`);
+    if(b.comments) perfParts.push(`<span title="评论">💬 ${b.comments>10000?(b.comments/10000).toFixed(1)+' 万':b.comments+' 条'}</span>`);
+    if(b.favorites)perfParts.push(`<span title="收藏">⭐ ${b.favorites>10000?(b.favorites/10000).toFixed(1)+' 万':b.favorites+' 条'}</span>`);
+    const perfTxt = perfParts.length ? `<div class="perf" style="display:flex;gap:10px;flex-wrap:wrap">${perfParts.join('')}</div>`:'';
     const tags=(b.formulaTags||[]).slice(0,4).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('');
     const tagsHtml=tags?`<div class="tags"><span class="tag struct">${escapeHtml(struct.label)}</span>${tags}</div>`:`<div class="tags"><span class="tag struct">${escapeHtml(struct.label)}</span></div>`;
     const summary=b.summary?`<div style="font-size:11.5px;color:var(--ink2);margin:4px 0"><b>为什么爆：</b>${escapeHtml(b.summary)}</div>`:'';
@@ -2528,12 +2631,12 @@ function renderBlowoutList(){
     return `
       <div class="blowout-card" id="bcard-${b.id}">
         <div class="row1">
-          <div class="title">${b.url?`<a href="${escapeHtml(b.url)}" target="_blank" rel="noopener" style="color:var(--brand2);text-decoration:none">${escapeHtml(b.title)}</a>`:escapeHtml(b.title)}</div>
+          <div class="title">${b.url?`<a href="${escapeHtml(b.url)}" target="_blank" rel="noopener" style="color:var(--brand2);text-decoration:none">${escapeHtml(b.title||'(未命名)')}</a>`:escapeHtml(b.title||'(未命名)')}</div>
         </div>
         <div class="meta">
           <span class="plat ${escapeHtml(platLabel)}">${escapeHtml(platLabel)}</span>
           <span>${escapeHtml(vt.label)}</span>
-          ${b.category?`<span>📦 ${escapeHtml(b.category)}</span>`:''}
+          ${mc?`<span style="background:#fff3d6;color:#7a5b1a;padding:2px 7px;border-radius:4px;font-weight:500">${escapeHtml(mc)}</span>`:''}
           <span>📅 ${new Date(b.createdAt).toLocaleDateString()}</span>
         </div>
         ${summary}
@@ -2586,12 +2689,14 @@ function markVideoAsBlowout(videoId){
     id: uid(),
     url: v.url||'',
     title: v.title||('已发布视频 '+(state.blowouts.length+1)),
+    workName: v.title||'',
     platform: v.platform||'抖音',
     videoCategory: v.videoCategory||'kbp',
     structKey: VTYPE_STRUCT_HINT[v.videoCategory||'kbp']||'s1',
-    category: v.category||'',
-    views: ((v.views||0)/10000),
-    likes: ((v.likes||0)/10000),
+    mainContent: v.mainContent||'',
+    likes:    v.likes||0,
+    comments: v.comments||0,
+    favorites:v.favorites||v.fav||0,
     script: v.script||'',
     breakdown: [], formulaTags: [], summary: '',
     source:'video-mark', videoId,
@@ -2615,10 +2720,12 @@ function _preFillBlowoutFromVideo(item){
   switchBlowoutSource('link');
   $('#biUrl').value=item.url||'';
   $('#biPlat').value=item.platform;
+  $('#biTitle').value=item.workName||item.title||'';
   $('#biVtype').value=item.videoCategory;
-  $('#biCat').value=item.category||'';
-  $('#biViews').value=String(item.views||'');
+  if(item.mainContent){ try{ $('#biMainContent').value=item.mainContent; }catch(e){} }
   $('#biLikes').value=String(item.likes||'');
+  $('#biComments').value=String(item.comments||'');
+  $('#biFavorites').value=String(item.favorites||'');
   $('#biScript').value=item.script;
   analyzeBlowout();
 }
@@ -2634,7 +2741,8 @@ async function learnFormulas(){
   const corpus=state.blowouts.slice(0,30).map((b,i)=>{
     const struct=(SCRIPT_STRUCTS.find(s=>s.key===b.structKey)||{}).label||b.structKey;
     const vt=(VIDEO_TYPES.find(x=>x.key===b.videoCategory)||{}).label||b.videoCategory;
-    return '【爆款 '+(i+1)+'】平台='+b.platform+' 类型='+vt+' 品类='+(b.category||'通用')+' 结构='+struct+' 表现='+(b.views||0)+'万/'+(b.likes||0)+'万 标签='+((b.formulaTags||[]).join('/')||'(无)')+' 拆解='+((b.breakdown||[]).join('/')||'(无)')+'\n文案：'+b.script.slice(0,400);
+    const mc=(FLYELEP_FEATURES.find(x=>x.key===b.mainContent)||{}).label||b.mainContent||'通用';
+    return '【爆款 '+(i+1)+'】平台='+b.platform+' 类型='+vt+' 主推='+mc+' 结构='+struct+' 表现=点赞'+(b.likes||0)+'/评论'+(b.comments||0)+'/收藏'+(b.favorites||0)+' 标签='+((b.formulaTags||[]).join('/')||'(无)')+' 拆解='+((b.breakdown||[]).join('/')||'(无)')+'\n文案：'+b.script.slice(0,400);
   }).join('\n\n---\n\n');
 
   const sysPrompt=`你是「Flyelep 大黄狗运营」团队的爆款方法论萃取师。请阅读用户提供的 ${state.blowouts.length} 条爆款脚本（截取前 30 条），归纳出可复用的爆款规律。
@@ -2690,9 +2798,10 @@ function getFewShot(plat, videoCategory, structKey){
   ensureBlowouts();
   if(!state.blowouts.length) return null;
   let pool=[...state.blowouts];
+  // 热度分 = 点赞 + 评论*0.5 + 收藏*0.8（收藏权重最高，电商场景收藏=转化意向）
   const sortBy=(arr)=>arr.slice().sort((a,b)=>{
-    const va=(a.views||0)+(a.likes||0)*0.3;
-    const vb=(b.views||0)+(b.likes||0)*0.3;
+    const va=(a.likes||0)+(a.comments||0)*0.5+(a.favorites||0)*0.8;
+    const vb=(b.likes||0)+(b.comments||0)*0.5+(b.favorites||0)*0.8;
     return vb-va;
   });
   let pick=sortBy(pool.filter(b=>b.platform===plat && b.videoCategory===videoCategory && b.structKey===structKey)).slice(0,3);
