@@ -662,7 +662,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 </div>
 
 <!-- Modal -->
-<div class="modal-mask" id="modalMask">
+<div class="modal-mask" id="modalMask" style="display:none">
   <div class="modal" id="modalBody"></div>
 </div>
 
@@ -2630,7 +2630,7 @@ function injectCloudUI(){
   if(document.getElementById('cloudWrap')) return;
   const css=document.createElement('style'); css.id='cloudStyle';
   css.textContent=`
-  .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999}
+  .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:9999}
   .modal{background:#fff;border-radius:16px;padding:24px;width:360px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.3)}
   .modal-h{font-size:18px;font-weight:700;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
   .modal-x{border:none;background:transparent;font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:0 6px;border-radius:6px}
