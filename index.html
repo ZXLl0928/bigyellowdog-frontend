@@ -2632,7 +2632,9 @@ function injectCloudUI(){
   css.textContent=`
   .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999}
   .modal{background:#fff;border-radius:16px;padding:24px;width:360px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-  .modal-h{font-size:18px;font-weight:700;margin-bottom:4px}
+  .modal-h{font-size:18px;font-weight:700;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+  .modal-x{border:none;background:transparent;font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:0 6px;border-radius:6px}
+  .modal-x:hover{background:#f3f4f6;color:var(--ink)}
   .modal-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
   .modal input{width:100%;height:40px;border:1px solid var(--line);border-radius:8px;padding:0 12px;margin-bottom:10px;font-size:14px}
   .sb-msg{font-size:12px;color:var(--accent);min-height:18px;margin-bottom:8px}
@@ -2652,8 +2654,8 @@ function injectCloudUI(){
   wrap.innerHTML=`
     <div id="loginModal" class="modal-mask" style="display:none">
       <div class="modal">
-        <div class="modal-h">☁️ 团队云端 · 登录</div>
-        <div class="modal-sub">大黄狗运营看板 · 5 人团队共享 · 实时同步<br/><span style="color:#d6336c">首次请先填下方「服务器地址」</span></div>
+        <div class="modal-h">☁️ 团队云端 · 登录<button class="modal-x" id="loginCloseX" title="关闭（仅本地）">×</button></div>
+        <div class="modal-sub">大黄狗运营看板 · 5 人团队共享 · 实时同步</div>
         <input id="sbServer" type="text" placeholder="服务器地址（如 https://xxx.onrender.com）" autocomplete="off" />
         <input id="sbEmail" type="email" placeholder="邮箱（团队成员）" autocomplete="username" />
         <input id="sbPwd" type="password" placeholder="密码（≥6位）" autocomplete="current-password" />
@@ -2676,6 +2678,11 @@ function injectCloudUI(){
   document.getElementById('sbLogin').onclick=()=>handleAuth('login');
   document.getElementById('sbSignup').onclick=()=>handleAuth('signup');
   document.getElementById('sbLater').onclick=hideLoginModal;
+  // 多重关闭兜底：X按钮、点遮罩、ESC键，确保永远关得掉
+  document.getElementById('loginCloseX').onclick=hideLoginModal;
+  const _loginM=document.getElementById('loginModal');
+  _loginM.addEventListener('click',(e)=>{ if(e.target===_loginM) hideLoginModal(); });
+  document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ hideLoginModal(); const mm=document.getElementById('memberModal'); if(mm) mm.style.display='none'; } });
   document.getElementById('memClose').onclick=()=>{ document.getElementById('memberModal').style.display='none'; };
   const b=document.createElement('button'); b.id='cloudBadge'; b.className='btn ghost';
   b.textContent='☁️ 团队云：未连接'; b.onclick=showLoginModal;
