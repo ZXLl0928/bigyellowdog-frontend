@@ -398,8 +398,9 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .blowout-analyze-result .bar-title{font-size:12px;color:var(--brand2);font-weight:600;margin-bottom:6px}
 .bar-tag{display:inline-block;padding:3px 9px;background:#fff5d0;color:#7a5b1a;border:1px solid #f0c674;border-radius:999px;font-size:11.5px;margin:2px 4px 2px 0}
 .bar-tag.recommend{background:#d4ecff;color:#1d4f7c;border-color:#7ab5db;font-weight:600}
-.blowout-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.blowout-filters select{padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;background:#fff}
+.blowout-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.blowout-filters select{padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;background:#fff;min-width:84px;width:fit-content;max-width:100%}
+.blowout-filters button{font-size:12px}
 .blowout-list{display:flex;flex-direction:column;gap:10px;max-height:680px;overflow:auto;padding-right:4px}
 .blowout-card{border:1px solid #f0c674;background:#fffdf5;border-radius:10px;padding:12px;transition:box-shadow .15s}
 .blowout-card:hover{box-shadow:0 4px 14px rgba(202,141,33,.18)}
@@ -859,9 +860,9 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           </label>
           <label class="fld"><span>表现数据（3 个选填，留空跳过）</span>
             <div style="display:flex;gap:8px">
-              <input id="biLikes" placeholder="❤ 点赞（万）" style="flex:1" />
-              <input id="biComments" placeholder="💬 评论（条）" style="flex:1" />
-              <input id="biFavorites" placeholder="⭐ 收藏（条）" style="flex:1" />
+              <input id="biLikes" placeholder="❤ 点赞" style="flex:1" />
+              <input id="biComments" placeholder="💬 评论" style="flex:1" />
+              <input id="biFavorites" placeholder="⭐ 收藏" style="flex:1" />
             </div>
           </label>
           <label class="fld"><span>完整文案（粘贴）</span>
@@ -2543,14 +2544,21 @@ function saveBlowoutManual(){
   toast('✅ 已保存（未拆解）');
 }
 
-/* ===== 链接自动识别文案（调后端 /api/blowout/parse；当前后端能力：提取视频元数据 desc + 标题 + 作者） ===== */
+/* ===== 链接自动识别文案（调后端 /api/blowout/parse；返回数据后把"骨架"输出到 biScript 让用户继续填） ===== */
 async function autoParseBlowoutUrl(){
   const url=($('#biUrl').value||'').trim();
   if(!url){ toast('⚠️ 请先粘贴视频链接或分享文本'); $('#biUrl').focus(); return; }
   const btn=$('#btnParseUrl'); const old=btn?.textContent;
   if(btn){ btn.disabled=true; btn.textContent='⏳ 识别中…'; }
+  const stamp=new Date().toLocaleString('zh-CN',{hour12:false});
+  // 把"已识别到的信息"格式化输出到 textarea 的辅助函数（永远不让文案框空着）
+  const writeSkeleton=(parts, header)=>{
+    if(!parts.length){ return false; }
+    const txt = (header?header+'\n':'')+ '—'.repeat(20) + '\n' + parts.join('\n\n');
+    $('#biScript').value = ($('#biScript').value||'') ? $('#biScript').value + '\n\n' + txt : txt;
+    return true;
+  };
   try{
-    // 多源尝试：先调后端（解决跨域 + 服务端反爬代码可升级），fetch 失败再降级
     const apiBase=(typeof API_BASE!=='undefined' && API_BASE) ? API_BASE : '';
     let res=null;
     if(apiBase){
@@ -2561,29 +2569,47 @@ async function autoParseBlowoutUrl(){
         if(r.ok){ const j=await r.json(); res=j.ok?j.data:null; }
       }catch(e){ /* 降级 */ }
     }
-    // 降级：本地正则从分享文本里提 videoId，让用户自己粘文案（兜底至少能填一些字段）
-    if(!res){
-      const m=url.match(/(?:video|note|item|live)\/(\d{10,})/) || url.match(/https?:\/\/[\w.-]+\/(?:video|note|item|live)\/(\w+)/);
-      const vid=m?m[1]:'';
-      // 平台判断
-      let plat='其他';
-      if(/douyin|iesdouyin|抖音/.test(url)) plat='抖音';
-      else if(/xiaohongshu|xhsl|小红书/.test(url)) plat='小红书';
-      else if(/bilibili|bili\.|b23\.tv/.test(url)) plat='B站';
-      else if(/视频号|weixin|mp\.weixin/.test(url)) plat='视频号';
-      else if(/tiktok/.test(url)) plat='TikTok';
-      $('#biPlat').value = plat;
-      toast('⚠️ 后端未配置，只能识别平台（'+plat+'）和 videoId，文案请手动粘');
-      if(vid) $('#biTitle').placeholder = `（识别到 videoId: ${vid}）`;
+    // 通用正则 — 即便后端没响应，也能从链接里识别平台 + videoId
+    let plat='', vid='';
+    const m=url.match(/(?:video|note|item|live)\/(\d{10,})/) || url.match(/https?:\/\/[\w.-]+\/(?:video|note|item|live)\/(\w+)/);
+    vid = m?m[1]:'';
+    if(/douyin|iesdouyin|抖音/.test(url))             plat='抖音';
+    else if(/xiaohongshu|xhsl|小红书/.test(url))       plat='小红书';
+    else if(/bilibili|bili\.|b23\.tv/.test(url))       plat='B站';
+    else if(/视频号|weixin|mp\.weixin/.test(url))      plat='视频号';
+    else if(/tiktok/.test(url))                        plat='TikTok';
+    else if(res?.platform && res.platform!=='其他')     plat=res.platform;
+    if(plat && !$('#biPlat').value) $('#biPlat').value = plat;
+    // 优先使用 res 数据
+    if(res){
+      if(res.platform && res.platform!=='其他') try{ $('#biPlat').value=res.platform; }catch(e){}
+      if(res.title)    $('#biTitle').value = res.title;
+    }
+    // ---- A. 真正拿到 script → 直接覆盖式填入 ----
+    if(res && res.script && res.script.trim().length > 30){
+      $('#biScript').value = `【${res.platform||plat||'抖音'} · 自动识别于 ${stamp}】\n`+
+                             (res.title?`📌 ${res.title}\n`:'')+
+                             (res.author?`👤 ${res.author}\n`:'')+
+                             '-'.repeat(30)+'\n'+res.script+
+                             `\n\n（注：以上文案由后端 ${res.source||'share 页'} 提取自视频描述/分享文本，如不完整请在下方补充完整口播再保存）`;
+      toast('✅ 已自动识别完整文案，请检查后保存');
       return;
     }
-    // 填字段
-    if(res.platform){ try{ $('#biPlat').value=res.platform; }catch(e){} }
-    if(res.title)    $('#biTitle').value = res.title;
-    if(res.script)   { $('#biScript').value = res.script; }
-    if(res.author)   { /* 暂不做作者字段，先放着 */ }
-    const filled=[res.platform?'平台':null, res.title?'作品名称':null, res.script?'文案':null].filter(Boolean).join('·');
-    toast(filled?('✅ 已自动识别：'+filled+'（数据来源：'+res.source+'；文案由后端从视频元数据/分享描述提取，如不全请手动补）'):'⚠️ 后端返回空结果，可手动粘文案');
+    // ---- B. 只拿到 title/author → 输出"AI 待补全骨架"（让 biScript 永远不空） ----
+    const parts=[];
+    if(res?.title)   parts.push(`📌 视频标题：${res.title}`);
+    if(res?.author)  parts.push(`👤 作者：${res.author}`);
+    if(res?.cover)   parts.push(`🖼 封面：${res.cover}`);
+    if(vid)          parts.push(`🆔 视频ID：${vid}`);
+    if(plat)         parts.push(`📱 平台：${plat}`);
+    parts.push(`⚠️ 文案未自动提取（原因：${res?.msg||'反爬或链接受限'}）`);
+    parts.push(`\n请在此处粘贴完整口播/分镜文案，或继续点 🤖 AI 拆解并匹配结构 —— AI 会基于以上骨架做归类。`);
+    const filled = writeSkeleton(parts, `【AI 补全骨架 · 自动识别于 ${stamp}】`);
+    if(filled){
+      toast('⚠️ 仅识别到基本信息（'+plat+'） — 文案骨架已填到下方，请在下方补充完整文案后再点 AI 拆解');
+    } else {
+      toast('⚠️ 后端未配置且链接无法识别，请手动粘文案');
+    }
   }catch(e){
     toast('识别失败：'+(e.message||'未知错误')+' — 请手动粘文案');
   }finally{
