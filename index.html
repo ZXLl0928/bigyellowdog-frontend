@@ -49,6 +49,10 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .btn.sm{height:30px;font-size:12.5px;padding:0 10px}
 .btn.icon{padding:0 8px}
 
+/* 未登录提示脉冲动画（云端按钮） */
+@keyframes cloudPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,53,108,.45)}50%{box-shadow:0 0 0 10px rgba(220,53,108,0)}}
+.btn.pulse{animation:cloudPulse 1.2s ease-in-out infinite;border-color:#d6336c!important;color:#d6336c!important}
+
 /* Tabs */
 .tabs{display:flex;gap:4px;margin:16px 0;border-bottom:2px solid var(--line);overflow-x:auto}
 .tab{padding:10px 16px;border:none;background:transparent;color:var(--ink2);font-weight:600;font-size:13.5px;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap}
@@ -261,15 +265,22 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .gen-panel{background:linear-gradient(180deg,#fffdf6,#fff);border-color:#f0e2bd}
 .gen-panel h2{margin-bottom:4px}
 .gen-intro{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.55}
-.gen-steps{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end;margin-bottom:14px}
-.gen-step{display:flex;flex-direction:column;gap:6px;flex:1 1 130px;min-width:130px}
-.gen-step label{font-size:13px;font-weight:600;color:var(--ink2);display:flex;align-items:center;gap:6px;white-space:nowrap}
-.gen-step .step-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#fff4d4;color:#a87412;font-size:12px;font-weight:700;border:1px solid #f0dfae;flex-shrink:0}
-.gen-step .req{color:#d6336c;font-weight:700}
-.gen-step select{width:100%;min-width:0}
-.gen-arrow{align-self:center;flex:0 0 auto;font-size:18px;color:#c4b58a;line-height:1;padding:0 2px;margin-bottom:6px}
-.gen-step-info{font-size:11px;color:var(--muted);margin-top:-2px;line-height:1.4;min-height:14px}
+.gen-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.gen-step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px 10px;display:flex;flex-direction:column;gap:8px;transition:all .15s;position:relative}
+.gen-step:hover{border-color:#e6c98a;box-shadow:0 2px 8px rgba(184,134,11,.08)}
+.gen-step.filled{border-color:#82b366;background:linear-gradient(180deg,#f6fbf3,#fff)}
+.gen-step.filled::after{content:"✓";position:absolute;top:8px;right:10px;color:#82b366;font-weight:700;font-size:14px}
+.gen-step .step-head{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--ink2)}
+.gen-step .step-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#fce5a8,#f3c971);color:#7a5400;font-size:13px;font-weight:700;flex-shrink:0;box-shadow:inset 0 -1px 0 rgba(0,0,0,.06)}
+.gen-step.filled .step-num{background:linear-gradient(135deg,#aedb9c,#82b366);color:#fff}
+.gen-step .req{color:#d6336c;font-weight:700;margin-left:1px}
+.gen-step select{width:100%;min-width:0;font-size:13px;padding:7px 10px;border-radius:8px;background:#fafafa}
+.gen-step.filled select{background:#fff}
+.gen-arrow{display:none}
+.gen-step-info{font-size:11.5px;color:var(--muted);line-height:1.45;min-height:16px;padding:2px 0 0}
 .gen-step-info b{color:var(--brand2);font-weight:600}
+@media(max-width:900px){.gen-steps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.gen-steps{grid-template-columns:1fr}}
 .gen-actionbar{display:flex;align-items:center;gap:14px;padding:12px 16px;background:#fffdf5;border:1px dashed #f0e2bd;border-radius:10px;flex-wrap:wrap}
 .gen-actionbar .gen-primary-btn{font-weight:600;font-size:13.5px;padding:9px 20px}
 .gen-actionbar .gen-engine-select{margin-left:0;padding:7px 10px;font-size:12.5px;border-radius:8px}
@@ -309,7 +320,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       <div class="sub">账号数据 · 月度汇总 · 电商热点 — 本地存储，离线可用</div>
     </div>
     <div class="actions">
-      <span id="apiStatus" class="api-status probe" title="DailyHotApi 服务状态">⏳ 探测热点 API…</span>
+      <span id="apiStatus" class="api-status probe" title="uapis.cn 热点 API 状态（免 key、6+ 平台）">⏳ 探测热点 API…</span>
       <select id="monthPicker"></select>
       <button class="btn ghost" onclick="exportJSON()">⬇ 导出 JSON</button>
       <button class="btn ghost" onclick="document.getElementById('importInput').click()">⬆ 导入</button>
@@ -504,7 +515,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         </div>
       </div>
       <div class="sync-bar">
-        <button class="btn sm hot" id="btnScrape" onclick="scrapeHotFromApi()">🔥 一键扒热点（DailyHotApi）</button>
+        <button class="btn sm hot" id="btnScrape" onclick="scrapeHotFromApi()">🔥 一键扒热点（uapis）</button>
         <button class="btn sm primary" onclick="syncHotspotFeed(true)">🔄 同步热点源（拉取最新一周）</button>
         <button class="btn sm" onclick="document.getElementById('feedFileInput').click()">📂 导入热点源文件</button>
         <input type="file" id="feedFileInput" accept=".json,application/json" hidden onchange="importFeedFile(this)">
@@ -520,37 +531,35 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       <h2>🎬 生成脚本</h2>
       <p class="gen-intro">按 6 步串起来 → 一键出可拍的带货脚本（含分镜、秒数、台词、素材清单、CTA）。</p>
       <div class="gen-steps" id="genSteps">
-        <div class="gen-step">
-          <label><span class="step-num">1</span>选热点 <span class="req">*</span></label>
+        <div class="gen-step" data-step="hotspot">
+          <div class="step-head"><span class="step-num">1</span>选热点 <span class="req">*</span></div>
           <select id="genHotspot" onchange="genOnHotspotChange()"><option value="">— 选择要拍的热点（按挂钩度排序）—</option></select>
+          <div class="gen-step-info" id="infoHotspot"></div>
         </div>
-        <div class="gen-arrow">→</div>
-        <div class="gen-step">
-          <label><span class="step-num">2</span>选账号 <span class="req">*</span></label>
+        <div class="gen-step" data-step="account">
+          <div class="step-head"><span class="step-num">2</span>选账号 <span class="req">*</span></div>
           <select id="genAccount" onchange="renderGenStepInfo()"><option value="">— 选择发布账号 —</option></select>
+          <div class="gen-step-info" id="infoAccount"></div>
         </div>
-        <div class="gen-arrow">→</div>
-        <div class="gen-step">
-          <label><span class="step-num">3</span>视频类型 <span class="req">*</span></label>
+        <div class="gen-step" data-step="vidType">
+          <div class="step-head"><span class="step-num">3</span>视频类型 <span class="req">*</span></div>
           <select id="genVidType" onchange="renderGenStepInfo()"><option value="">— 选视频类型 —</option></select>
           <div class="gen-step-info" id="infoVidType"></div>
         </div>
-        <div class="gen-arrow">→</div>
-        <div class="gen-step">
-          <label><span class="step-num">4</span>视频时长 <span class="req">*</span></label>
+        <div class="gen-step" data-step="vidDur">
+          <div class="step-head"><span class="step-num">4</span>视频时长 <span class="req">*</span></div>
           <select id="genVidDur" onchange="renderGenStepInfo()"><option value="">— 选时长 —</option></select>
           <div class="gen-step-info" id="infoVidDur"></div>
         </div>
-        <div class="gen-arrow">→</div>
-        <div class="gen-step">
-          <label><span class="step-num">5</span>选主推功能 <span class="req">*</span></label>
-          <select id="genFeature" onchange="renderGenStepInfo()"><option value="">— 本次主推哪个 Flyelep 功能 —</option></select>
+        <div class="gen-step" data-step="feature">
+          <div class="step-head"><span class="step-num">5</span>主推功能 <span class="req">*</span></div>
+          <select id="genFeature" onchange="renderGenStepInfo()"><option value="">— 选功能 —</option></select>
           <div class="gen-step-info" id="infoFeature"></div>
         </div>
-        <div class="gen-arrow">→</div>
-        <div class="gen-step">
-          <label><span class="step-num">6</span>选结构 <span class="req">*</span></label>
-          <select id="genStruct"><option value="">— 选择脚本结构 —</option></select>
+        <div class="gen-step" data-step="struct">
+          <div class="step-head"><span class="step-num">6</span>选结构 <span class="req">*</span></div>
+          <select id="genStruct" onchange="renderGenStepInfo()"><option value="">— 选择脚本结构 —</option></select>
+          <div class="gen-step-info" id="infoStruct"></div>
         </div>
       </div>
       <div class="gen-actionbar">
@@ -711,7 +720,7 @@ const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const fmtNum = n => Number(n||0).toLocaleString('zh-CN');
 const fmtPct = n => (n===''||n==null||isNaN(n))?'—':Number(n).toFixed(1)+'%';
 const fmtDate = d => { if(!d) return ''; const [y,m,dd]=d.split('-'); return `${m}/${dd}`; };
-const toast = (msg) => { const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); };
+const toast = (msg, ms) => { const t=$('#toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'), ms||2200); };
 
 const supportsFS = () => typeof window.showSaveFilePicker === 'function';
 
@@ -1216,7 +1225,7 @@ function populateGenSelects(){
   if(vd) vd.innerHTML='<option value="">— 选时长 —</option>'+VIDEO_DURATIONS.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
   // Flyelep 功能（17 项，来自平台说明文档）
   const vf=$('#genFeature');
-  if(vf) vf.innerHTML='<option value="">— 本次主推哪个 Flyelep 功能 —</option>'+FLYELEP_FEATURES.map(x=>`<option value="${x.key}">${x.label} · ${x.desc.slice(0,18)}…</option>`).join('');
+  if(vf) vf.innerHTML='<option value="">— 本次主推哪个 Flyelep 功能 —</option>'+FLYELEP_FEATURES.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
   // 结构（原有）
   const s=$('#genStruct');
   if(s) s.innerHTML='<option value="">— 选择脚本结构 —</option>'+SCRIPT_STRUCTS.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
@@ -1224,12 +1233,34 @@ function populateGenSelects(){
 }
 /* 实时显示每个 step 的辅助说明，帮用户决策 */
 function renderGenStepInfo(){
+  const setFilled=(step,val)=>{ const el=document.querySelector('.gen-step[data-step="'+step+'"]'); if(el) el.classList.toggle('filled',!!val); };
+
+  const hid=$('#genHotspot')?.value;
+  if(hid){ const h=state.hotspots.find(x=>x.id===hid); $('#infoHotspot').innerHTML = h?`<b>${escapeHtml(h.title||'').slice(0,30)}</b> · 挂钩度 ${h.hook||0}`:''; }
+  else $('#infoHotspot').innerHTML='';
+  setFilled('hotspot',hid);
+
+  const aid=$('#genAccount')?.value;
+  if(aid){ const a=state.accounts.find(x=>x.id===aid); $('#infoAccount').innerHTML = a?`<b>${escapeHtml(a.platform||'')}</b> · ${escapeHtml(a.name||'')}`:''; }
+  else $('#infoAccount').innerHTML='';
+  setFilled('account',aid);
+
   const vt=VIDEO_TYPES.find(x=>x.key===$('#genVidType')?.value);
   $('#infoVidType').innerHTML = vt?`<b>${vt.shoot}</b> · ${vt.suggestion}`:'';
+  setFilled('vidType',$('#genVidType')?.value);
+
   const vd=VIDEO_DURATIONS.find(x=>x.key===$('#genVidDur')?.value);
   $('#infoVidDur').innerHTML = vd?`<b>${vd.pace}</b> · ${vd.desc}`:'';
+  setFilled('vidDur',$('#genVidDur')?.value);
+
   const vf=FLYELEP_FEATURES.find(x=>x.key===$('#genFeature')?.value);
   $('#infoFeature').innerHTML = vf?`<b>要点：</b>${escapeHtml(vf.desc)}`:'';
+  setFilled('feature',$('#genFeature')?.value);
+
+  const sk=$('#genStruct')?.value;
+  const struct=SCRIPT_STRUCTS.find(x=>x.key===sk);
+  $('#infoStruct').innerHTML = struct?`<b>${struct.label}</b>${struct.tip?' · '+struct.tip:''}`:'';
+  setFilled('struct',sk);
 }
 /* 选热点后，若其自带结构/主推功能则自动带入（用户可手动改） */
 function genOnHotspotChange(){
@@ -1550,7 +1581,7 @@ function showEngineInfo(){
 【第 3 步】视频类型（三选一）：
   🎥 随手拍（实拍 + 录屏 + AI 成片）
   🖥 信息流（全程录屏 + 口播）
-  🧑 真有口播（真人出镜）
+  🧑 真人口播（真人出镜）
 
 【第 4 步】视频时长（四选一）：
   10-30s · 30-60s · 60-120s · 2min+
@@ -1878,7 +1909,7 @@ const VIDEO_TYPES=[
    desc:'全程以电脑录屏为主。一边录操作一边口播，重点演示 Flyelep 后台界面、功能按钮、出图前后的对比',
    shoot:'OBS/QuickTime 全程录屏 + 鼠标高亮 + 字幕',
    suggestion:'讲解清楚、节奏稍慢，适合 B 端客户/工具型视频号'},
-  {key:'kbp', label:'🧑 真有口播',
+  {key:'kbp', label:'🧑 真人口播',
    desc:'有真人出镜，固定/半固定机位，面对镜头讲解。中间穿插 Flyelep 出图/出视频的效果展示',
    shoot:'人物正面 / 斜侧机位 + 商品特写 + Flyelep 出图截屏',
    suggestion:'有信任感，适合小红书种草/抖音人设号'}
@@ -2264,7 +2295,7 @@ const API_ROUTES=[
   {r:'kuaishou',type:'dy',platform:'快手',market:'国内'},
   {r:'weibo',type:'ent',platform:'微博',market:'国内'},
   {r:'bilibili',type:'ent',platform:'哔哩哔哩',market:'国内'},
-  {r:'douban-group',type:'ent',platform:'豆瓣',market:'国内'},
+  {r:'douban',type:'ent',platform:'豆瓣',market:'国内'},
   {r:'zhihu',type:'hot',platform:'知乎',market:'国内'},
   {r:'toutiao',type:'news',platform:'今日头条',market:'国内'},
   {r:'baidu',type:'hot',platform:'百度',market:'国内'},
@@ -2461,7 +2492,7 @@ async function scrapeHotFromApi(){
   }catch(e){ /* 不影响 DailyHotApi 结果 */ }
   if(btn){ btn.disabled=false; btn.textContent='🔥 一键扒取热点（DailyHotApi + NewsAPI）'; }
   if(usedBase){
-    const srcMap={local:'本机 server.js 反代', api:'团队云后端代理', imsyy:'公共实例 api-hot.imsyy.top', NewsAPI:'NewsAPI', 'Hacker News':'Hacker News'};
+    const srcMap={local:'本机 server.js 反代', api:'团队云后端代理（uapis）', imsyy:'公共实例 api-hot.imsyy.top', NewsAPI:'NewsAPI', 'Hacker News':'Hacker News'};
     const src=srcMap[usedBase]||usedBase||'本地/云端';
     const all=state.hotspots;
     const strong=all.filter(h=>h.ecom==='strong').length;
@@ -2472,9 +2503,9 @@ async function scrapeHotFromApi(){
     el.className='feed-status ok';
     toast('扒取到 '+total+' 条新热点');
   }else{
-    el.textContent='⚠️ 扒取失败：本看板已自动尝试「服务端代理 → 本机 server → 公共实例」三级兜底，全部不可达。建议：① 等几秒重试（公共实例偶发波动）；② 若你是用 file:// 双击打开本文件，请改用 https://bigyellowdog.netlify.app 在线版；③ 检查网络。';
+    el.textContent='⚠️ 扒取失败：服务端代理 + 本机 server + 公共实例三级兜底全部不可达。建议：① 等几秒重试（公共实例偶发波动）；② 检查网络。';
     el.className='feed-status warn';
-    toast('扒取失败：请先启动 DailyHotApi 本地服务');
+    toast('扒取失败：三级兜底均不可达，请稍后重试');
   }
 }
 async function importFeedFile(input){
@@ -2722,6 +2753,7 @@ async function handleAuth(mode){
     try{ await syncHotspotFeed(false); }catch(e){}
     renderAll(); connectWS();
     msg.textContent='';
+    toast('✅ 已登录（30 天内自动保持）');
   }catch(e){ msg.textContent='❌ 网络错误：'+(e&&e.message||e); }
 }
 async function loadCloud(){
@@ -2810,7 +2842,14 @@ async function initCloud(){
       }
     }catch(e){}
   }
-  showLoginModal();
+  // 无 token → 软提示（不弹模态框，避免打扰同事浏览；想同步就点右上角 ☁️ 按钮）
+  showLoginNudge();
+}
+function showLoginNudge(){
+  const b=document.getElementById('cloudBadge');
+  if(b){ b.classList.add('pulse'); b.onclick=showLoginModal; }
+  setTimeout(()=>{ const b=document.getElementById('cloudBadge'); if(b) b.classList.remove('pulse'); }, 6000);
+  toast('☁️ 团队云未连接 · 右上角点「☁️」可注册/登录（不登录也能用本地模式）', 5000);
 }
 </script>
 <!-- 右下角：配置智谱 Key（线上版用浏览器直连，无需本地服务） -->
