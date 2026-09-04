@@ -1212,6 +1212,11 @@ function resetHotspotFilters(){
 function populateGenSelects(){
   // 默认按挂钩度降序：高等级热点排前面，优先做
   const hs=[...state.hotspots].sort((a,b)=>(b.hook||0)-(a.hook||0) || (b.date||'').localeCompare(a.date||''));
+  // 先记住当前已选（修复「筛选 / 重渲染后生成脚本配置消失」的 bug）
+  const keep={};
+  ['genHotspot','genAccount','genVidType','genVidDur','genFeature','genStruct'].forEach(id=>{
+    const el=document.getElementById(id); if(el) keep[id]=el.value;
+  });
   const g=$('#genHotspot');
   if(g) g.innerHTML='<option value="">— 选择要拍的热点（按挂钩度排序）—</option>'+hs.map(h=>{
     const t=HOT_TYPES[h.type]?HOT_TYPES[h.type][2]:'热点';
@@ -1237,6 +1242,12 @@ function populateGenSelects(){
   // 结构（原有）
   const s=$('#genStruct');
   if(s) s.innerHTML='<option value="">— 选择脚本结构 —</option>'+SCRIPT_STRUCTS.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
+  // 重建后恢复已选（仅当该 option 仍存在，否则放过让它回到未选，避免脏值）
+  Object.keys(keep).forEach(id=>{
+    if(!keep[id]) return;
+    const el=document.getElementById(id); if(!el) return;
+    if(el.querySelector('option[value="'+keep[id]+'"]')) el.value=keep[id];
+  });
   renderGenStepInfo();
 }
 /* 实时显示每个 step 的辅助说明，帮用户决策 */
@@ -1339,39 +1350,56 @@ async function generateScript(){
 
 function buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf){
   const tone=PLAT_TONE[plat]||PLAT_TONE['默认'];
+  const rules=(PLAT_RULES[plat]||PLAT_RULES['默认']||[]).join('\n');
   const sys = `你是「Flyelep 大黄狗运营」团队的资深短视频脚本编剧，专门给电商/带货账号写口播脚本。
 
 【你的风格】
-- 严格中文输出，懂带货、懂平台调性、懂 Flyelep（AI 出图 / 抠图 / 换背景 / 多语言翻译 / 商品复刻 / 局部重绘 / 一键出海 等电商工具矩阵）
+- 严格中文输出（TikTok 用对应外语），懂带货、懂平台调性、懂 Flyelep（AI 出图 / 抠图 / 换背景 / 多语言翻译 / 商品复刻 / 局部重绘 / 一键出海 等电商工具矩阵）
 - 一切为「能直接开拍」服务：标题、短视频钩子、分镜/分节、台词、视觉、CTA、必须钩某款商品或脚本模版全部具体化
-- 平台调性优先：抖音节奏快／小红书种草／视频号稳重／TikTok 国际化
 - 输出**纯 Markdown**，**不要**用三个反引号包裹（用户是直接粘贴到剪贴板用的），结尾自动结束
+
+【平台调性 · ${plat}】
+调性：${tone}
+平台专属写法（必须逐条遵守，否则脚本不像这个平台的号）：
+${rules}
 
 【重要 · 直接成稿】
 - 你的最终输出就是脚本本身，**不要在回复中包含任何思考、规划、分析过程**
 - 不要输出"好的我来分析""下面是我的方案"这类前置废话，直接开始 【视频标题】 段
 - 你的回复 100% 都是最终脚本文本
 
+【重要 · 去 AI 味（必须做到）】
+- 像真人创作者写的，不是机器生成的：口语、自然、有情绪起伏，句子长短交错
+- 禁止出现这些"AI 腔"词与结构：总之 / 值得一提的是 / 首先…其次…最后 / 我们需要 / 在当今社会 / 作为 AI / 综上所述 / 不难发现 / 不言而喻 / 显而易见 / 由此可见 / 可以说 / 一方面…另一方面 / 毋庸置疑
+- 不要写排比式工整小标题、不要过度对仗，不要每句都带总结词
+- 少用空话套话，多给具体画面、具体动作、具体数字；能说"这玩意儿"就别写"该产品"
+
+【重要 · 违禁词规避（必须做到，否则会被限流或下架）】
+- 绝对化用语禁用：最 / 最佳 / 第一 / 国家级 / 顶级 / 极致 / 绝对 / 100% / 全网 / 永久 / 史上 / guaranteed / No.1 / best
+- 诱导导流禁用：私信我 / 加微信 / 加我 / 点击下方链接 / 点击主页链接 / 免费送 / 秒杀 / 领取 / 关注领 / DM me / add my WeChat / click my link
+- 功效夸大禁用：治疗 / 治愈 / 防癌 / 保证涨粉 / 保证销量 / 100% 有效
+- 涉及商品功效时，用"我用时""个人感受"代替绝对承诺
+
 【输出格式】（严格按这个 5 段式，不要加额外段落）
 **【视频标题】**
 给 2-3 个备选，每条 ≤ 24 字，含数字 / 情绪词 / 钩子点
 
 **【开头 3 秒钩子】**
-一句口语化、有冲击力的开场
+一句口语化、有冲击力的开场（必须符合 ${plat} 调性）
 
 **【正文 / 分镜】（核心，分 ${vd.beats} 段，严格对应总时长 ${vd.label}）**
 每段格式：⏱ 秒 XX｜👀 画面（按 ${vt.shoot} 描述）｜🎙 台词｜🎯 卖点什么
 节奏公式：${vd.pace}
 
 **【平台调性 & CTA】**
-针对 ${plat} 的发布技巧 + 收尾引导语
+针对 ${plat} 的发布技巧 + 收尾引导语（必须合规，不踩违禁词）
 
 **【Flyelep 落地工具】（必须以「${vf.label}」为核心）**
 - 必须先说明怎么用「${vf.label}」一键完成本脚本的视觉（说明用途、${vf.desc}）
 - 再补充 1-2 个搭配的次要功能，覆盖"出图 → 优化 → 翻译 / 延展 / 抠图"的完整链路
 - 字数控制在 350-${vd.beats*100} 字之间。`;
 
-  const user = `请按你的设定给我写一份可直接开拍的脚本。
+  const user = `请按你的设定给我写一份可直接开拍的脚本（平台：${plat}，必须贴合上面【平台调性 · ${plat}】的写法和违禁词要求，且不能有任何 AI 腔）。
 
 【热点信息】
 - 标题：${h.title||'(无)'}
@@ -1410,12 +1438,14 @@ async function callZhipu(messages, retry=0){
   // 优先：浏览器内已配置智谱 Key → 直连 BigModel（线上版无需本地服务）
   const clientKey=(localStorage.getItem('flyelep_zhipu_key')||'').trim();
   if(clientKey) return callZhipuDirect(messages, clientKey, retry);
-  // 否则走本地服务端反代（需 node server.js 在跑）
+  // 否则走团队云后端代理（后端需配 ZHIPU_KEY 环境变量，owner 一次配置全团队免配 Key）
+  if(!API_BASE) throw new Error('未配置智谱 Key，且未连接团队云后端');
+  const base=API_BASE.replace(/\/$/,'');
   const body={messages, model:'glm-5.3', temperature:0.8, max_tokens:4000};
   const ctrl=new AbortController();
   const tid=setTimeout(()=>ctrl.abort(), 50000);
   try{
-    const resp=await fetch(window.location.origin+'/api/zhipu/v4/chat/completions',{
+    const resp=await fetch(base+'/api/zhipu/v4/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(body),
@@ -1563,21 +1593,29 @@ async function probeZhipuStatus(){
     el.title='使用浏览器内配置的智谱 Key 直连 BigModel';
     return;
   }
+  const base=(API_BASE||'').replace(/\/$/,'');
+  if(!base){
+    el.textContent='⚠️ 未连接团队云（可用「配置智谱Key」直连）';
+    el.className='api-status err';
+    el.title='未连接后端，可点右下角「配置智谱Key」填入 Key 后直连 BigModel';
+    return;
+  }
   try{
-    const r=await fetch(window.location.origin+'/api/zhipu/ping');
+    const r=await fetch(base+'/api/zhipu/ping');
     const j=await r.json();
     if(j.ok && j.configured){
-      el.textContent='🤖 智谱就绪 · '+j.models[0];
+      el.textContent='🤖 智谱就绪（团队云共享）· '+j.models[0];
       el.className='api-status ok';
-      el.title='已加载 '+j.models.length+' 个候选模型';
+      el.title='后端 ZHIPU_KEY 已配置，全团队免配 Key 即可用';
     }else{
-      el.textContent='⚠️ Key 未配置';
+      el.textContent='⚠️ 团队云未配 Key（可选「配置智谱Key」直连）';
       el.className='api-status err';
+      el.title='后端未设 ZHIPU_KEY；可点右下角「配置智谱Key」直连 BigModel';
     }
   }catch(_){
-    el.textContent='⚠️ 智谱离线（线上请用「配置智谱Key」直连）';
+    el.textContent='⚠️ 团队云智谱离线';
     el.className='api-status err';
-    el.title='线上版可点右下角「配置智谱Key」填入 Key 后直连 BigModel';
+    el.title='后端 /api/zhipu 不可达，可点右下角「配置智谱Key」直连 BigModel';
   }
 }
 
@@ -1953,10 +1991,44 @@ const FLYELEP_FEATURES=[
 ];
 
 const PLAT_TONE={
-  '抖音':'前 3 秒必须抛钩子，节奏快、口语化，多用"你 / 咱们"，结尾强引导点击主页 / 私信。',
-  '小红书':'种草清单风，多 emoji、痛点前置、强调"省时省钱省力"，标题带数字与情绪词。',
-  '视频号':'信任感优先，多用真实案例与数据，口播克制专业，适合讲"怎么做才稳"。',
+  '抖音':'节奏极快、口语炸裂、前 3 秒必须抛钩子或制造冲突；全程多用"你 / 咱们 / 家人们"，像跟朋友唠嗑；情绪拉满、画面切得快；结尾强引导点主页 / 进橱窗。',
+  '小红书':'种草清单风、真实分享口吻；多用 emoji 把段落切小，标题带数字 + 痛点 + 情绪词（踩坑 / 亲测 / 后悔没早买）；像闺蜜安利，强调省时省钱省力。',
+  '视频号':'信任感优先、稳重专业，像行业老炮在讲课；多用真实案例与数据，口播克制不浮夸；讲"怎么做才稳 / 避坑"，适合 B 端与工具型内容。',
+  'TikTok':'International & native: fast hook in target language, trend-aware, authentic creator voice, short punchy lines, CTA to profile / bio.',
   '默认':'前 3 秒抛钩子，痛点前置，给出可落地的 Flyelep 解法，结尾引导行动。'
+};
+// 各平台专属写法规则 + 违禁词规避（注入到脚本提示词，保证"平台风格对、不踩雷、不 AI 味"）
+const PLAT_RULES={
+  '抖音':[
+    '前 3 秒必须出钩子或制造冲突（"别再…""我敢说…""就这？"）',
+    '短句为主、口语、感叹与反问穿插，制造紧迫感',
+    '用"家人们 / 姐妹们 / 兄弟们"拉近距离',
+    'CTA 指主页 / 橱窗 / 评论区扣 1，绝不说"加微信 / 私信我 / 点击下方链接"',
+    '违禁词规避：禁用"最 / 第一 / 国家级 / 顶级 / 绝对 / 100% / 全网 / 永久 / 秒杀 / 免费送 / guaranteed / No.1 / click my link"等绝对化与诱导导流词'
+  ],
+  '小红书':[
+    '标题带数字 + 情绪词，像笔记种草，不写新闻稿',
+    '正文分段、多 emoji、第一人称"我 / 姐妹 / 亲测"',
+    '强调使用场景与前后对比，真实测评感',
+    'CTA 用"主页 / 收藏 / 评论区"，避免"私信 / 加微信 / 链接"',
+    '违禁词规避：禁用"最有效 / 第一 / 国家级 / 绝对 / 100% / 私信领取 / 加微信"等绝对化与导流词'
+  ],
+  '视频号':[
+    '开头亮身份 / 痛点，用真实案例 + 数据背书',
+    '语言专业克制不夸张，讲方法论与长期价值',
+    'CTA 指"关注 / 主页 / 服务"，不走擦边引导',
+    '违禁词规避：不夸大功效、不承诺收益（"保证涨粉 / guaranteed / 100% 有效"），不用绝对化用语'
+  ],
+  'TikTok':[
+    'First 2s hook in the target language, trend-aware and native',
+    'Authentic creator voice, no corporate or AI tone',
+    'CTA: "check my profile / link in bio" — never "DM me / add my WeChat / click my link"',
+    'Avoid absolute claims: "best / No.1 / 100% / guaranteed"'
+  ],
+  '默认':[
+    '前 3 秒钩子 → 痛点 → 方案 → 证据 → CTA，口语化不端着',
+    '违禁词规避：禁用"最 / 第一 / 绝对 / 100% / guaranteed / 秒杀 / 免费"等绝对化与诱导词'
+  ]
 };
 
 function renderHotspot(){
