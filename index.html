@@ -3866,20 +3866,20 @@ async function scrapeHotFromApi(){
       newsGot += got;
       if(got>0 && !usedBase) usedBase='Hacker News';
     }catch(_){}
-    // Reddit AI 趋势：8 个 AI 相关 subreddit（机器学习 / AI 工具 / ChatGPT / Sora 等）
+    // 国内 AI 资讯 RSS（机器之心）：AI 模型 / 大模型 / 生成式 AI 进展 —— 可结合 Flyelep 全部 17 功能
     try{
-      const got=await fetchRedditAI();
-      if(got>0){ newsGot += got; if(!usedBase) usedBase='Reddit AI'; }
+      const got=await fetchAIRSS();
+      if(got>0){ newsGot += got; if(!usedBase) usedBase='机器之心'; }
     }catch(_){}
-    // Reddit 跨境电商趋势：8 个电商相关 subreddit（AmazonFBA / shopify / dropship / Temu 等）
+    // Hacker News Show HN：专门展示新 AI 工具 / 项目（AI 主图 / AI 视频 / AI 翻译 等角度）
     try{
-      const got=await fetchRedditEcom();
-      if(got>0){ newsGot += got; if(!usedBase) usedBase='Reddit Ecom'; }
+      const got=await fetchShowHN();
+      if(got>0){ newsGot += got; if(!usedBase) usedBase='HN Show'; }
     }catch(_){}
   }catch(e){ /* 不影响 DailyHotApi 结果 */ }
   if(btn){ btn.disabled=false; btn.textContent='🔥 一键扒热点（Yellow Dog Hot 1.0）'; }
   if(usedBase){
-    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', 'Reddit AI':'Reddit AI', 'Reddit Ecom':'Reddit 跨境'};
+    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心 AI 资讯', 'HN Show':'HN Show HN'};
     const src=srcMap[usedBase]||usedBase||'本地/云端';
     const all=state.hotspots;
     const strong=all.filter(h=>h.ecom==='strong').length;
@@ -3944,14 +3944,44 @@ async function fetchNewsHN(){
   return added;
 }
 
-/* Reddit 通过后端 /api/reddit 代理（解决浏览器 CORS；后端 Render 美国节点可访问 Reddit） */
-const REDDIT_AI_SUBS=['MachineLearning','artificial','aivideo','ChatGPT','StableDiffusion','singularity','LocalLLaMA','sora'];
-const REDDIT_ECOM_SUBS=['ecommerce','AmazonFBA','shopify','dropship','Flipping','aliexpress','TemuSeller','TikTokShopHelp'];
-async function fetchRedditTop(sub, limit=8){
+/* 国内 AI 资讯 RSS（机器之心 / 新智元）通过后端 /api/rss 代理 */
+const AI_RSS_SOURCES=[
+  {url:'https://www.jiqizhixin.com/rss', name:'机器之心'},
+  {url:'https://www.qbitai.com/feed', name:'量子位'}
+];
+async function fetchAIRSS(){
+  if(!API_BASE) return 0;
+  let total=0;
+  for(const src of AI_RSS_SOURCES){
+    try{
+      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),12000);
+      const r=await fetch(API_BASE.replace(/\/$/,'')+'/api/rss?url='+encodeURIComponent(src.url),{signal:ctrl.signal});
+      clearTimeout(to);
+      if(!r.ok) continue;
+      const j=await r.json();
+      const items=(j.data||[]); if(!items.length) continue;
+      const today=todayStr();
+      for(const d of items.slice(0,15)){
+        const o={
+          date:today, type:'news', source:src.name, market:'国内', platform:src.name,
+          title:String(d.title||'').slice(0,140), url:d.url||'',
+          product:'', category:'', price:'', sales:'',
+          playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
+          status:'pending', note:'AI 资讯'
+        };
+        total += mergeFeed([evalHotspot(o)]);
+      }
+    }catch(_){}
+  }
+  return total;
+}
+
+/* HN showHN 标签 —— Hacker News 专门展示新 AI 工具/项目 */
+async function fetchShowHN(){
   if(!API_BASE) return 0;
   try{
     const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),12000);
-    const r=await fetch(API_BASE.replace(/\/$/,'')+'/api/reddit?sub='+encodeURIComponent(sub)+'&limit='+limit,{signal:ctrl.signal});
+    const r=await fetch(API_BASE.replace(/\/$/,'')+'/api/hn?query=&limit=15&tag=show_hn',{signal:ctrl.signal});
     clearTimeout(to);
     if(!r.ok) return 0;
     const j=await r.json();
@@ -3960,28 +3990,18 @@ async function fetchRedditTop(sub, limit=8){
     let added=0;
     for(const d of items){
       const o={
-        date:today, type:REDDIT_ECOM_SUBS.includes(sub)?'hot':'news',
-        source:'Reddit/r/'+sub, market:'海外', platform:'Reddit',
-        title:String(d.title||'').slice(0,140), url:d.url,
+        date:today, type:'news', source:'HN Show', market:'海外', platform:'Hacker News',
+        title:String(d.title||'').slice(0,140), url:d.url||('https://news.ycombinator.com/item?id='+d.id),
         product:'', category:'', price:'', sales:'',
         playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
-        status:'pending', note:'👍 '+(d.score||0)+' · 💬 '+(d.num_comments||0)
+        status:'pending', note:'🆕 Show HN · 👍 '+(d.score||0)
       };
       added += mergeFeed([evalHotspot(o)]);
     }
     return added;
   }catch(_){ return 0; }
 }
-async function fetchRedditAI(){
-  let total=0;
-  for(const s of REDDIT_AI_SUBS){ total += await fetchRedditTop(s, 6); }
-  return total;
-}
-async function fetchRedditEcom(){
-  let total=0;
-  for(const s of REDDIT_ECOM_SUBS){ total += await fetchRedditTop(s, 6); }
-  return total;
-}
+
 
 /* ================== Init ================== */
 (async function init(){
