@@ -1638,7 +1638,7 @@ async function generateScript(){
   const prompt=buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid);
   const btn=$('#genGoBtn'); if(btn) btn.disabled=true;
   let lastFull='';
-  const onToken=(delta, full)=>{ lastFull=full; renderStreamingScript(h, full, engineLabel(engine)); };
+  const onToken=(delta, full)=>{ lastFull=full; streamRender(h, full, engineLabel(engine)); };
   try{
     let r;
     if(engine==='siliconflow'){
@@ -1918,6 +1918,17 @@ function engineLabel(e){
 }
 
 // 流式打字机：每收到一个 token 即更新 #genScriptText（带闪烁光标 ▋）
+/* 打字机渲染节流：避免每个 token 都全量 markdown 解析 + innerHTML 重绘（长脚本会卡死）。
+   合并为最多每 ~90ms 重绘一次（约 11 次/秒），终版仍由 renderAiScript 完整渲染不丢字。 */
+let _strLast=0, _strTimer=null, _strFull='', _strH=null, _strLabel='';
+function streamRender(h, full, label){
+  _strFull=full; _strH=h; _strLabel=label;
+  const now=Date.now(), elapsed=now-_strLast;
+  if(elapsed>=90){ _strLast=now; renderStreamingScript(h, full, label); return; }
+  if(_strTimer) return;
+  _strTimer=setTimeout(()=>{ _strTimer=null; _strLast=Date.now(); renderStreamingScript(_strH, _strFull, _strLabel); }, 90-elapsed);
+}
+
 function renderStreamingScript(h, full, modelLabel){
   const box=$('#genResult');
   if(!box) return;
@@ -1948,6 +1959,7 @@ function showGenLoading(h, engine, ctx){
 }
 
 function renderAiScript(h, r, fallbackError, fallbackScript){
+  if(_strTimer){ clearTimeout(_strTimer); _strTimer=null; } // 清掉挂起的节流帧，避免终版前闪烁
   const box=$('#genResult');
   const content=r?r.content:(fallbackScript||'(空)');
   const badge=r?`<span class="badge-grade g-A" title="由 ${r.model_used} 生成">🤖 ${r.model_used}</span>`
