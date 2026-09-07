@@ -199,26 +199,26 @@ tr.hs-cant .hs-title{color:#9a958c;text-decoration:line-through}
 /* filter-bar 加 .fill 占位 */
 .filter-bar .fill{flex:1}
 /* 表格列宽与排版（重设计版） */
-.hs-title-col{font-size:13px;line-height:1.55;padding:8px 0}
+.hs-title-col{font-size:13px;line-height:1.45;padding:6px 0}
 .hs-title-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.hs-title-row .hs-title{font-size:13.5px;font-weight:600}
+.hs-title-row .hs-title{font-size:13.5px;font-weight:600;line-height:1.35}
 .hs-title-row .hs-title:not(a){color:var(--ink)}
-/* 表格整体行高压缩：原 14px→10px 上下 padding，文字 12.5px→12px */
-#hotspotTable tbody td{padding:7px 8px;vertical-align:middle;line-height:1.4}
-#hotspotTable tbody td.hs-title-col{padding:8px 10px}
-.hs-title-col .hs-title{font-size:13.5px;line-height:1.4;font-weight:600;color:var(--ink)}
-.hs-meta-row{display:flex;gap:8px;align-items:center;font-size:11.5px;color:var(--muted);margin-top:3px;flex-wrap:wrap}
+/* 表格整体行高压缩 */
+#hotspotTable tbody td{padding:6px 8px;vertical-align:middle;line-height:1.35}
+#hotspotTable tbody td.hs-title-col{padding:7px 10px}
+.hs-title-col .hs-title{font-size:13.5px;line-height:1.35;font-weight:600;color:var(--ink)}
+.hs-meta-row{display:flex;gap:7px;align-items:center;font-size:11px;color:var(--muted);margin-top:2px;flex-wrap:wrap}
 .hs-meta-row .hs-date{font-feature-settings:"tnum";color:#9a8b6e}
-.hs-meta-row .hs-mkt{display:inline-block;padding:0 6px;border-radius:4px;font-size:10.5px;font-weight:600}
+.hs-meta-row .hs-mkt{display:inline-block;padding:0 6px;border-radius:4px;font-size:10px;font-weight:600}
 .hs-meta-row .hs-mkt-cn{background:#e6f7ed;color:#1a6e3f}
 .hs-meta-row .hs-mkt-overseas{background:#e6f0fa;color:#1a56a3}
 .hs-meta-row .hs-mkt-global{background:#f5f0fa;color:#5b2d8a}
-.hs-meta-row .hs-src{color:var(--muted)}
+.hs-meta-row .hs-src{color:var(--muted);display:none}
 .hs-meta-row .hs-status{margin-left:auto}
 .hs-meta-row .hs-status .pill{padding:1px 7px;font-size:10.5px}
-/* Flyelep 角度行（在标题列下方，独立成段，行高宽） */
-.hs-angle{display:flex;align-items:flex-start;gap:8px;margin-top:5px;padding:5px 9px;background:linear-gradient(90deg,#faf5ff 0%,#fff 100%);border:1px solid #e9d5ff;border-left:3px solid #a855f7;border-radius:6px;font-size:11.5px;line-height:1.55;color:#4a3a6e;word-break:break-word}
-.hs-angle-tag{flex-shrink:0;display:inline-block;padding:1px 8px;border-radius:100px;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-size:10.5px;font-weight:600;line-height:1.5}
+/* Flyelep 角度行：紧凑小灰条 */
+.hs-angle{display:flex;align-items:center;gap:6px;margin-top:3px;padding:3px 8px;background:#f5f5f0;border:1px solid #e6e4dc;border-left:2px solid #a855f7;border-radius:5px;font-size:11px;line-height:1.45;color:#5b6470;word-break:break-word}
+.hs-angle-tag{flex-shrink:0;display:inline-block;padding:0 7px;border-radius:100px;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:600;line-height:1.6}
 /* 新增 + 翻译角标 */
 .new-badge{display:inline-flex;align-items:center;height:18px;padding:0 6px;background:#15803d;color:#fff;border-radius:5px;font-size:10.5px;font-weight:700;letter-spacing:.3px;box-shadow:0 1px 2px rgba(21,128,61,.25)}
 .i18n-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:18px;background:#dbeafe;color:#1e40af;border-radius:5px;font-size:12px;font-weight:700;cursor:help}
@@ -236,16 +236,16 @@ tr.hs-cant .hs-title{color:#9a958c;text-decoration:line-through}
 .hs-value-num{font-size:11px;color:var(--muted);margin-left:5px;font-feature-settings:"tnum";font-weight:600}
 /* 操作列 — 横排紧凑（节省 30%+ 行高） */
 /* 操作列：3 按钮水平紧凑，强制 1 行（grid 3 列，固定等宽） */
-.hs-act{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;align-items:center;min-width:148px}
-.hs-act .btn{font-size:10.5px;padding:3px 4px;white-space:nowrap;line-height:1.2;width:100%;text-align:center}
-.hs-act .btn.danger{padding:3px 4px}
+.hs-act{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;align-items:center;min-width:142px}
+.hs-act .btn{font-size:10px;padding:2px 3px;white-space:nowrap;line-height:1.3;width:100%;text-align:center;letter-spacing:0}
+.hs-act .btn.danger{padding:2px 3px}
 /* Fit pill 颜色 */
 .pill.fit-strong{background:#e0fbe6;color:#0e7a3a;border:1px solid #b8ecc7}
 .pill.fit-mid{background:#fff3d6;color:#9a6b00;border:1px solid #ecd79a}
 .pill.fit-weak{background:#eef0f3;color:#7c8493;border:1px solid #dde0e6}
 /* 表格综合指标 chip 行（玩法 / 热度 / 结合度 / AI 推荐 一行排） */
-.hs-chips{display:flex;align-items:center;gap:7px;margin-top:5px;flex-wrap:wrap}
-.hs-chips .heat-bar{width:90px;flex:0 0 90px;height:6px;background:#eef0f3;border-radius:100px;overflow:hidden}
+.hs-chips{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap}
+.hs-chips .heat-bar{width:80px;flex:0 0 80px;height:5px;background:#eef0f3;border-radius:100px;overflow:hidden}
 .hs-chips .heat-bar span{display:block;height:100%;border-radius:100px;transition:width .2s}
 .hs-heat-num-inline{font-size:11.5px;font-weight:700;color:var(--ink);font-feature-settings:"tnum"}
 .hs-chips .ai-mini{height:22px;font-size:11px;padding:0 7px}
@@ -288,6 +288,10 @@ tr:hover td{background:#fbfaf7}
 .filter-bar .spacer{flex:1}
 .filter-bar .reset{font-size:11px;color:var(--muted);cursor:pointer;background:none;border:none;text-decoration:underline;padding:4px 6px}
 .filter-bar .reset:hover{color:var(--brand)}
+.filter-bar .translate-all{font-size:12px;padding:5px 11px;border:1px solid #d6e3fb;background:#eef4ff;color:#1a56a3;border-radius:6px;cursor:pointer;font-weight:600;transition:all .15s}
+.filter-bar .translate-all:hover{background:#d6e3fb;box-shadow:0 1px 4px rgba(26,86,163,.18)}
+.filter-bar .archive-toggle{font-size:12px;padding:5px 11px;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:6px;cursor:pointer;font-weight:600;transition:all .15s}
+.filter-bar .archive-toggle:hover{background:#f5f5f0;color:var(--ink)}
 /* 批量操作条（仅当选中 ≥1 时浮现） */
 .bulk-bar{position:sticky;top:0;z-index:5;display:none;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding:8px 12px;background:#fff5f0;border:1px solid #f1c0b0;border-radius:10px;box-shadow:0 4px 12px rgba(193,74,43,.08);font-size:13px;color:var(--ink)}
 .bulk-bar.show{display:flex}
@@ -865,6 +869,8 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         </select>
         <button class="reset" onclick="resetHotspotFilters()" title="清空所有筛选">清空筛选</button>
         <span class="fill"></span>
+        <button class="archive-toggle" onclick="toggleArchivedView()" id="showArchivedBtn" title="显示已归档的旧热点（库内 > 500 条时自动归档）">📦 已归档 (<span id="archivedCount">0</span>)</button>
+        <button class="translate-all" onclick="translateAllForeign()" title="一键翻译库内所有未翻译的外文标题">🌐 翻译外文</button>
         <button class="advanced-toggle" id="advToggleBtn" onclick="toggleAdvancedFilters()" title="展开/收起高级筛选（玩法 / 市场 / 结合度）">⚙ 高级筛选 ▾</button>
       </div>
       <!-- 高级筛选抽屉（默认收起） -->
@@ -3497,14 +3503,23 @@ function renderHotspot(){
 
   // ===== Tab 数量徽章（用全量 state.hotspots） =====
   const all=state.hotspots||[];
+  const visibleAll = all.filter(h => !h.archived);
   [['htCountAll','all'],['htCountEcom','ecom'],['htCountWeb','web'],['htCountProduct','product'],['htCountFestival','festival'],['htCountAi','ai']].forEach(([id,t])=>{
     const el=$('#'+id);
-    if(el) el.textContent= t==='all' ? all.length : all.filter(h=>tabOfHot(h)===t).length;
+    if(el) el.textContent= t==='all' ? visibleAll.length : visibleAll.filter(h=>tabOfHot(h)===t).length;
   });
+  try{ updateArchivedBadge(); }catch(_){}
 
   const now=Date.now();
   const ts=h=>h.addedAt||Date.parse((h.date||'').replace(/-/g,'/'))||0;
   let arr=[...all];
+
+  // 0) 🆕 归档过滤：默认不显示 archived；点「📦 已归档」按钮时反过来只看 archived
+  if(_showArchived){
+    arr = arr.filter(h => h.archived);
+  }else{
+    arr = arr.filter(h => !h.archived);
+  }
 
   // 1) Tab 过滤（用户硬性需求：点 Tab 看到对应分类的排行榜）
   if(_hotTab && _hotTab!=='all') arr=arr.filter(h=>tabOfHot(h)===_hotTab);
@@ -3549,11 +3564,13 @@ function renderHotspot(){
   const sa=arr.filter(h=>['S','A'].includes(h.grade)).length;
   const new24=arr.filter(h=>(h.addedAt||0)>=now-86400000).length;
   const bindable=arr.filter(h=>h.angle!=='其他' && h.flyelepFit!=='弱').length;
+  const archivedCount = (state.hotspots||[]).filter(h=>h.archived).length;
+  const liveCount = (state.hotspots||[]).filter(h=>!h.archived).length;
   $('#hotspotKpiGrid').innerHTML=`
-    <div class="kpi"><span class="glow"></span><div class="lbl"><span class="ico">📋</span>显示条数</div><div class="num">${arr.length}<span class="kpi-cap">/ 20</span></div><div class="sub">本分类综合 Top · ${onlyBindable?'已隐藏 C 级':'含 C 级'}</div></div>
+    <div class="kpi"><span class="glow"></span><div class="lbl"><span class="ico">📋</span>显示条数</div><div class="num">${arr.length}<span class="kpi-cap">/ 20</span></div><div class="sub">${_showArchived?'归档视图':'本分类综合 Top'} · 库内 ${liveCount}${archivedCount>0?` · 已归档 <b style="color:#b45309">${archivedCount}</b>`:''}</div></div>
     <div class="kpi b2"><span class="glow"></span><div class="lbl"><span class="ico">🔥</span>可挂钩商品</div><div class="num">${bindable}</div><div class="sub">能挂 Flyelep 17 功能</div></div>
     <div class="kpi b3"><span class="glow"></span><div class="lbl"><span class="ico">⭐</span>S / A 级</div><div class="num">${sa}</div><div class="sub">${arr.length} 条中的高价值</div></div>
-    <div class="kpi b4"><span class="glow"></span><div class="lbl"><span class="ico">🆕</span>24h 新增</div><div class="num">${new24}</div><div class="sub">本 Tab 内</div></div>
+    <div class="kpi b4"><span class="glow"></span><div class="lbl"><span class="ico">🆕</span>24h 新增</div><div class="num">${new24}</div><div class="sub">${_showArchived?'归档中新增':'本 Tab 内'}</div></div>
   `;
 
   const tbody=$('#hotspotTable tbody');
@@ -3582,6 +3599,15 @@ function renderHotspot(){
         <div style="font-size:14px;font-weight:600;margin:8px 0 4px">电商热点为空</div>
         <div class="muted" style="margin-bottom:14px">「电商热点」只展示有电商平台信号的内容（Amazon/淘宝/京东/拼多多/Temu 等）。其他社会新闻归到「网络热点」</div>
         <div class="muted" style="margin-top:8px;font-size:11.5px">先点「🔥 一键扒热点」抓一批</div>
+      </td></tr>`;
+    }else if(_showArchived){
+      const archCount = (state.hotspots||[]).filter(h=>h.archived).length;
+      emptyHtml=`<tr><td colspan="5" class="empty">
+        <div class="big">📦</div>
+        <div style="font-size:14px;font-weight:600;margin:8px 0 4px">已归档 ${archCount} 条</div>
+        <div class="muted" style="margin-bottom:14px">这些是库内超过 500 条时被自动归档的旧热点。可恢复最近 50 条继续查看。</div>
+        ${archCount>0?`<button class="btn primary" onclick="restoreRecentArchived(50)" style="padding:8px 18px">↩️ 恢复最近 50 条归档</button>`:''}
+        <div class="muted" style="margin-top:12px;font-size:11.5px">点击上方「📦 已归档」按钮可切回正常视图</div>
       </td></tr>`;
     }else{
       emptyHtml='<tr><td colspan="5" class="empty"><div class="big">🔥</div>这个 Tab 下没有热点，先点「🔥 一键扒热点」抓一批，或切换 Tab</td></tr>';
@@ -3992,8 +4018,70 @@ function mergeFeed(list){
     // 累积本次抓取的 ID（去重） —— 一次抓取可能多次调用 mergeFeed（不同数据源），需要聚合
     _lastMergeIds=Array.from(new Set([...(_lastMergeIds||[]), ...ids]));
     save(); renderHotspot(); updateBadges(); renderTodayTodo();
+    autoArchiveHotspots();   // 🆕 内存护栏：库内 > 500 自动归档旧的
   }
   return n;
+}
+
+/* 🆕 内存护栏：当库内热点超过 MAX_HOTSPOTS 自动把最旧的非新非高价值标记为 archived:true
+ * - 默认 MAX_HOTSPOTS = 500（每个 hotspot ≈ 0.5KB，500 条 ≈ 250KB localStorage，几乎不占内存）
+ * - 保留：未用 + S/A 级 + 24h 新增；归档：已用 + C 级 + 旧日期
+ * - 已归档的不在主列表显示，但「📦 已归档」按钮可恢复
+ */
+const MAX_HOTSPOTS = 500;
+function autoArchiveHotspots(){
+  if(!Array.isArray(state.hotspots)) return 0;
+  const live = state.hotspots.filter(h => !h.archived);
+  if(live.length <= MAX_HOTSPOTS) { try{ updateArchivedBadge(); }catch(_){} return 0; }
+  // 排序：未用 + S/A 级优先保留；其余按 addedAt 升序（最旧先归档）
+  const sortKey = h => {
+    const keepPenalty = (h.status==='pending' && ['S','A'].includes(h.grade)) ? -1e15
+                       : (h.status==='pending') ? -1e12
+                       : 0;
+    return keepPenalty - (h.addedAt||0);
+  };
+  const sorted = [...live].sort((a,b) => sortKey(a) - sortKey(b));
+  const need = live.length - MAX_HOTSPOTS;
+  let archived = 0;
+  for(let i=0; i<sorted.length && archived<need; i++){
+    const h = sorted[i];
+    // 跳过 24h 内新增（保护新数据）
+    if((h.addedAt||0) >= Date.now() - 86400000) continue;
+    // 跳过未用 + S/A 级（保护高价值未处理）
+    if(h.status==='pending' && ['S','A'].includes(h.grade)) continue;
+    h.archived = true;
+    archived++;
+  }
+  if(archived>0){
+    try{ save(); }catch(_){}
+    try{ updateArchivedBadge(); }catch(_){}
+  }
+  return archived;
+}
+
+function updateArchivedBadge(){
+  const c = (state.hotspots||[]).filter(h => h.archived).length;
+  const el = $('#archivedCount');
+  if(el) el.textContent = c;
+}
+
+let _showArchived = false;
+function toggleArchivedView(){
+  _showArchived = !_showArchived;
+  const btn = $('#showArchivedBtn');
+  if(btn) btn.style.background = _showArchived ? '#1f2937' : '';
+  if(btn) btn.style.color = _showArchived ? '#fff' : '';
+  renderHotspot();
+}
+
+/* 恢复最近 N 条归档（默认 50） */
+function restoreRecentArchived(n=50){
+  const arch = (state.hotspots||[]).filter(h => h.archived).sort((a,b) => (b.addedAt||0) - (a.addedAt||0));
+  const toRestore = arch.slice(0, n);
+  if(!toRestore.length){ toast('✅ 没有已归档的热点',2400); return; }
+  toRestore.forEach(h => { h.archived = false; });
+  save(); renderHotspot(); updateBadges(); renderTodayTodo();
+  toast(`↩️ 已恢复 ${toRestore.length} 条归档热点`,3000);
 }
 // 用 <script> 动态加载热点源（file:// 双击打开也能用，不依赖 fetch / 本地服务器）
 function loadFeedViaScript(){
@@ -4432,7 +4520,7 @@ async function importFeedFile(input){
  */
 async function translateNewHotspots(ids){
   if(!Array.isArray(ids) || !ids.length) return;
-  const newHs=(state.hotspots||[]).filter(h=>ids.includes(h.id) && h.title && !h.titleOrig);
+  const newHs=(state.hotspots||[]).filter(h=>ids.includes(h.id) && h.title && !h.titleOrig && !h.archived);
   const foreign=newHs.filter(h=>{
     const t=String(h.title||'');
     if(!t) return false;
@@ -4442,25 +4530,73 @@ async function translateNewHotspots(ids){
   if(!foreign.length) return;
   const base=(typeof API_BASE==='string' && API_BASE) ? API_BASE.replace(/\/$/,'') : '';
   if(!base) return;
-  try{
-    const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),30000);
-    const resp=await fetch(base+'/api/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texts:foreign.map(h=>h.title)}),signal:ctrl.signal});
-    clearTimeout(t);
-    if(!resp.ok) return;
-    const j=await resp.json();
-    if(!j.translated || j.translated.length!==foreign.length) return;
-    let changed=0;
-    foreign.forEach((h,i)=>{
-      const orig=h.title;
-      const translated=String(j.translated[i]||'').trim();
-      if(translated && translated!==orig){
-        h.titleOrig=orig;
-        h.title=translated;
-        changed++;
-      }
-    });
-    if(changed>0){ try{ save(); }catch(_){} renderHotspot(); toast(`🌐 已自动翻译 ${changed} 条外文标题`,3000); }
-  }catch(_){ /* 静默失败 */ }
+  // 分批：每批 30 条
+  const BATCH=30;
+  let totalChanged=0;
+  for(let i=0;i<foreign.length;i+=BATCH){
+    const batch=foreign.slice(i,i+BATCH);
+    try{
+      const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),45000);
+      const resp=await fetch(base+'/api/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texts:batch.map(h=>h.title)}),signal:ctrl.signal});
+      clearTimeout(t);
+      if(!resp.ok) continue;
+      const j=await resp.json();
+      if(!j.translated || j.translated.length!==batch.length) continue;
+      batch.forEach((h,k)=>{
+        const orig=h.title;
+        // 兜底清理模型返回的序号前缀（"0 "/"[1]"/"<i>2</i>"等）
+        let translated=String(j.translated[k]||'').trim().replace(/^(?:<i>\d+<\/i>|\[\d+\]|\(\d+\)|\d+[\.\)、])\s*/,'');
+        if(translated && translated!==orig){
+          h.titleOrig=orig;
+          h.title=translated;
+          totalChanged++;
+        }
+      });
+    }catch(_){ /* 静默失败 */ }
+  }
+  if(totalChanged>0){ try{ save(); }catch(_){} renderHotspot(); toast(`🌐 已自动翻译 ${totalChanged} 条外文标题`,3000); }
+}
+
+/* 🆕 一键翻译库内全部外文标题（适用于历史 992 条数据） */
+async function translateAllForeign(){
+  const all=(state.hotspots||[]).filter(h=>!h.archived && h.title && !h.titleOrig);
+  const foreign=all.filter(h=>{
+    const t=String(h.title||'');
+    if(!t) return false;
+    const cn=(t.match(/[一-龥]/g)||[]).length;
+    return cn/Math.max(1,t.length) < 0.3;
+  });
+  if(!foreign.length){ toast('✅ 库内没有需要翻译的外文标题',2400); return; }
+  if(!confirm(`将翻译库内 ${foreign.length} 条外文标题（分批请求，可能需要 30-60 秒）。\n\n按「确定」开始翻译。`)) return;
+  const base=(typeof API_BASE==='string' && API_BASE) ? API_BASE.replace(/\/$/,'') : '';
+  if(!base){ toast('❌ 未配置后端 API_BASE',3000); return; }
+  const BATCH=30;
+  let totalChanged=0;
+  toast(`🌐 开始翻译 ${foreign.length} 条外文标题（分 ${Math.ceil(foreign.length/BATCH)} 批）…`,5000);
+  for(let i=0;i<foreign.length;i+=BATCH){
+    const batch=foreign.slice(i,i+BATCH);
+    try{
+      const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),60000);
+      const resp=await fetch(base+'/api/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texts:batch.map(h=>h.title)}),signal:ctrl.signal});
+      clearTimeout(t);
+      if(!resp.ok) continue;
+      const j=await resp.json();
+      if(!j.translated || j.translated.length!==batch.length) continue;
+      batch.forEach((h,k)=>{
+        const orig=h.title;
+        // 兜底清理模型返回的序号前缀（"0 "/"[1]"/"<i>2</i>"等）
+        let translated=String(j.translated[k]||'').trim().replace(/^(?:<i>\d+<\/i>|\[\d+\]|\(\d+\)|\d+[\.\)、])\s*/,'');
+        if(translated && translated!==orig){
+          h.titleOrig=orig;
+          h.title=translated;
+          totalChanged++;
+        }
+      });
+    }catch(_){}
+  }
+  try{ save(); }catch(_){}
+  renderHotspot();
+  toast(`🌐 已翻译 ${totalChanged}/${foreign.length} 条外文标题${totalChanged<foreign.length?'（部分失败，可重试）':''}`,4000);
 }
 
 // 线上回退：Hacker News Algolia（CORS 开放）按电商关键词检索，映射成热点对象
@@ -4684,6 +4820,9 @@ async function fetchShowHN(){
   if(!state.videos.length && !state.hotspots.length && !state.accounts.length){
     if(confirm('检测到无数据。是否载入示例数据（24 条视频 + 15 条热点 + 4 个账号）方便预览效果？')) seedSample();
   }
+  // 🆕 启动时跑一次归档护栏（库内 > 500 自动归档旧热点，释放 localStorage）
+  const archived0 = autoArchiveHotspots();
+  if(archived0>0) console.log(`🗄️ 已自动归档 ${archived0} 条旧热点（库内 > 500）`);
   await syncHotspotFeed(false);   // 打开看板自动拉取最新热点源
   renderAll();
   updateStorageBar();
