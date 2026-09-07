@@ -3860,18 +3860,26 @@ async function scrapeHotFromApi(){
       total += newsGot;
       if(newsGot>0 && !usedBase) usedBase='NewsAPI';
     }
-    // 线上无本地反代（NewsAPI 抓不到）时，回退 Hacker News 拉电商相关动态
-    if(newsGot===0){
-      try{
-        const got=await fetchNewsHN();
-        newsGot += got;
-        if(got>0 && !usedBase) usedBase='Hacker News';
-      }catch(_){}
-    }
+    // 通用补抓：Hacker News 50+ 关键词（跨境电商 + AI 工具）
+    try{
+      const got=await fetchNewsHN();
+      newsGot += got;
+      if(got>0 && !usedBase) usedBase='Hacker News';
+    }catch(_){}
+    // Reddit AI 趋势：8 个 AI 相关 subreddit（机器学习 / AI 工具 / ChatGPT / Sora 等）
+    try{
+      const got=await fetchRedditAI();
+      if(got>0){ newsGot += got; if(!usedBase) usedBase='Reddit AI'; }
+    }catch(_){}
+    // Reddit 跨境电商趋势：8 个电商相关 subreddit（AmazonFBA / shopify / dropship / Temu 等）
+    try{
+      const got=await fetchRedditEcom();
+      if(got>0){ newsGot += got; if(!usedBase) usedBase='Reddit Ecom'; }
+    }catch(_){}
   }catch(e){ /* 不影响 DailyHotApi 结果 */ }
-  if(btn){ btn.disabled=false; btn.textContent='🔥 一键扒取热点（DailyHotApi + NewsAPI）'; }
+  if(btn){ btn.disabled=false; btn.textContent='🔥 一键扒热点（Yellow Dog Hot 1.0）'; }
   if(usedBase){
-    const srcMap={local:'本机 server.js 反代', api:'团队云后端代理', imsyy:'公共实例 api-hot.imsyy.top', NewsAPI:'NewsAPI', 'Hacker News':'Hacker News'};
+    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', 'Reddit AI':'Reddit AI', 'Reddit Ecom':'Reddit 跨境'};
     const src=srcMap[usedBase]||usedBase||'本地/云端';
     const all=state.hotspots;
     const strong=all.filter(h=>h.ecom==='strong').length;
@@ -3899,39 +3907,80 @@ async function importFeedFile(input){
 }
 
 // 线上回退：Hacker News Algolia（CORS 开放）按电商关键词检索，映射成热点对象
+/* Hacker News 通过后端 /api/hn 代理（统一走 Render 美国节点，绕 CORS / 网络限制） */
 async function fetchNewsHN(){
-  /* 关键词分两组：① 跨境电商平台/玩法 ② AI 工具/模型 进展 —— 两组都能结合 Flyelep 17 个功能 */
+  if(!API_BASE) return 0;
   const terms=[
     // 跨境电商（结合 Flyelep 主图/详情/翻译/视频 等）
     'shopify','amazon','"direct to consumer"','"cross-border"','"tiktok shop"','ecommerce','dropshipping','fulfillment','"Black Friday"','"Cyber Monday"','temu','shein','mercadolibre','"amazon fba"','shopee','lazada','ozon','"amazon listing"','"amazon seo"','"product listing"','"conversion rate"',
     // AI 工具/模型（结合 Flyelep 全部 17 个功能，"用 AI 工具做电商"的趋势）
     '"AI image generator"','"AI video"','"AI tools"','"generative AI"','"AI ecommerce"','"AI for sellers"','"AI product photo"','"AI background removal"','"AI image editing"','"AI upscaler"','"AI translation"','"AI copywriting"','"AI listing"','"AI product photography"','"AI marketing tools"','"AI content creation"','"AI for amazon sellers"','"AI for shopify"','"AI for dropshippers"','"AI for ecommerce"','midjourney','"stable diffusion"','"sora"','"kling"','"runway"','"pika"','"dall-e"','"claude"','"chatgpt"','"llm"','"agent"','"AIGC"'
   ];
+  const today=todayStr();
   const seen=new Set(); let added=0;
   for(const t of terms){
     try{
-      const url='https://hn.algolia.com/api/v1/search?query='+encodeURIComponent(t)+'&tags=story&hitsPerPage=4';
-      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),10000);
-      const r=await fetch(url,{signal:ctrl.signal}); clearTimeout(to);
+      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),12000);
+      const r=await fetch(API_BASE.replace(/\/$/,'')+'/api/hn?query='+encodeURIComponent(t)+'&limit=4',{signal:ctrl.signal});
+      clearTimeout(to);
       if(!r.ok) continue;
       const j=await r.json();
-      for(const h of (j.hits||[])){
-        if(!h.title || seen.has(h.objectID)) continue;
-        seen.add(h.objectID);
+      for(const h of (j.data||[])){
+        if(!h.title || seen.has(h.id)) continue;
+        seen.add(h.id);
         const o={
           date:today, type:'news', source:'Hacker News',
           market:'海外', platform:'Hacker News',
           title:h.title.trim(),
-          url:h.url||('https://news.ycombinator.com/item?id='+h.objectID),
+          url:h.url||('https://news.ycombinator.com/item?id='+h.id),
           product:'', category:'', price:'', sales:'',
           playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
-          status:'pending', note:'HN 热度 '+(h.points||0)
+          status:'pending', note:'HN 热度 '+(h.score||0)
         };
         added += mergeFeed([evalHotspot(o)]);
       }
     }catch(_){}
   }
   return added;
+}
+
+/* Reddit 通过后端 /api/reddit 代理（解决浏览器 CORS；后端 Render 美国节点可访问 Reddit） */
+const REDDIT_AI_SUBS=['MachineLearning','artificial','aivideo','ChatGPT','StableDiffusion','singularity','LocalLLaMA','sora'];
+const REDDIT_ECOM_SUBS=['ecommerce','AmazonFBA','shopify','dropship','Flipping','aliexpress','TemuSeller','TikTokShopHelp'];
+async function fetchRedditTop(sub, limit=8){
+  if(!API_BASE) return 0;
+  try{
+    const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),12000);
+    const r=await fetch(API_BASE.replace(/\/$/,'')+'/api/reddit?sub='+encodeURIComponent(sub)+'&limit='+limit,{signal:ctrl.signal});
+    clearTimeout(to);
+    if(!r.ok) return 0;
+    const j=await r.json();
+    const items=(j.data||[]); if(!items.length) return 0;
+    const today=todayStr();
+    let added=0;
+    for(const d of items){
+      const o={
+        date:today, type:REDDIT_ECOM_SUBS.includes(sub)?'hot':'news',
+        source:'Reddit/r/'+sub, market:'海外', platform:'Reddit',
+        title:String(d.title||'').slice(0,140), url:d.url,
+        product:'', category:'', price:'', sales:'',
+        playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
+        status:'pending', note:'👍 '+(d.score||0)+' · 💬 '+(d.num_comments||0)
+      };
+      added += mergeFeed([evalHotspot(o)]);
+    }
+    return added;
+  }catch(_){ return 0; }
+}
+async function fetchRedditAI(){
+  let total=0;
+  for(const s of REDDIT_AI_SUBS){ total += await fetchRedditTop(s, 6); }
+  return total;
+}
+async function fetchRedditEcom(){
+  let total=0;
+  for(const s of REDDIT_ECOM_SUBS){ total += await fetchRedditTop(s, 6); }
+  return total;
 }
 
 /* ================== Init ================== */
