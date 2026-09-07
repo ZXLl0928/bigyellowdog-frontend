@@ -1776,6 +1776,7 @@ async function callZhipu(messages, retry=0){
 
 // 浏览器直连智谱 BigModel（CORS 已验证可用）。候选模型自动回退：glm-5.3 → glm-4-flash → glm-4-plus → glm-4-air
 async function callZhipuDirect(messages, key, retry=0){
+  key=(key||'').replace(/^Bearer\s*/i,'').trim();   // 清除用户可能误填的 Bearer 前缀 / 空格
   const models=['glm-5.3','glm-4-flash','glm-4-plus','glm-4-air'];
   for(let i=0;i<models.length;i++){
     const model=models[i];
@@ -1915,9 +1916,27 @@ async function probeZhipuStatus(){
     const r=await fetch(base+'/api/zhipu/ping');
     const j=await r.json();
     if(j.ok && j.configured){
-      el.textContent='🤖 智谱就绪（团队云共享）· '+j.models[0];
-      el.className='api-status ok';
-      el.title='后端 ZHIPU_KEY 已配置，全团队免配 Key 即可用';
+      // 真实验证一次：后端虽然配了 Key，但 Key 可能失效/被拒 → 必须真正发一条请求确认
+      try{
+        const t=await fetch(base+'/api/zhipu/v4/chat/completions',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({messages:[{role:'user',content:'回复一个字：好'}], model:'glm-4-flash'})
+        });
+        const tj=await t.json();
+        if(tj && tj.ok){
+          el.textContent='🤖 智谱就绪（团队云共享）· '+j.models[0];
+          el.className='api-status ok';
+          el.title='后端 ZHIPU_KEY 已配置且调用正常，全团队免配 Key 即可用';
+        }else{
+          el.textContent='⚠️ 团队云 Key 失效（'+((tj&&tj.error)||'调用失败')+'）';
+          el.className='api-status err';
+          el.title='后端 ZHIPU_KEY 配了但智谱拒绝，请 owner 到 Render 更新为有效 Key，或用「配置智谱Key」直连';
+        }
+      }catch(_){
+        el.textContent='⚠️ 团队云 Key 失效（调用异常）';
+        el.className='api-status err';
+        el.title='后端 Key 调用失败，请用「配置智谱Key」直连';
+      }
     }else{
       el.textContent='⚠️ 团队云未配 Key（可选「配置智谱Key」直连）';
       el.className='api-status err';
@@ -3905,7 +3924,7 @@ function toggleDrawer(){
 document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ const d=document.getElementById('drawer'); if(d) d.classList.remove('open'); } });
 
 /* 智谱 Key 配置：仅在齿轮抽屉「高级」里点开（团队云已默认走后端代理免配） */
-function openZhipuKey(){
+async function openZhipuKey(){
   const cur=(localStorage.getItem('flyelep_zhipu_key')||'').trim();
   const tip=cur
     ? '已检测到已有 Key（前几位：'+cur.slice(0,6)+'…）。\n\n粘贴新的智谱 API Key 以覆盖（仅存本浏览器）：'
@@ -3913,10 +3932,21 @@ function openZhipuKey(){
   const v=prompt(tip, cur);
   if(v===null) return;
   const key=v.trim();
-  if(!key){ localStorage.removeItem('flyelep_zhipu_key'); toast('已清除智谱 Key'); }
-  else{
-    localStorage.setItem('flyelep_zhipu_key', key);
-    toast('✅ 已保存智谱 Key（浏览器直连已就绪）');
+  if(!key){ localStorage.removeItem('flyelep_zhipu_key'); toast('已清除智谱 Key'); probeZhipuStatus(); return; }
+  localStorage.setItem('flyelep_zhipu_key', key);
+  toast('🔄 已保存，正在测试 Key 是否有效…');
+  // 立即发一条最小请求验证 Key 真实性（避免填错/失效的 Key 直到真正拆解才报错）
+  try{
+    const r=await callZhipuDirect([{role:'user',content:'回复一个字：好'}], key);
+    if(r && r.content){
+      toast('✅ 智谱 Key 有效 · 直连已就绪（'+(r.model_used||'GLM')+'）');
+    }else{
+      toast('⚠️ Key 已保存但返回异常，请重新获取');
+    }
+  }catch(e){
+    const msg=(e.message||'');
+    toast('❌ Key 无效：'+(msg.length>40?msg.slice(0,40)+'…':msg)+' — 请到 BigModel 重新获取');
+    localStorage.removeItem('flyelep_zhipu_key');   // 无效 Key 不留存，避免误导
   }
   probeZhipuStatus();
 }
