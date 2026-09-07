@@ -1754,7 +1754,7 @@ async function callZhipu(messages, retry=0){
   const base=API_BASE.replace(/\/$/,'');
   const body={messages, model:'glm-5.3', temperature:0.8, max_tokens:4000};
   const ctrl=new AbortController();
-  const tid=setTimeout(()=>ctrl.abort(), 50000);
+  const tid=setTimeout(()=>ctrl.abort(), 120000)  // 长生成（4000 tokens + system 长 prompt）最多 ~80-100s，120s 留 buffer;
   try{
     const resp=await fetch(base+'/api/zhipu/v4/chat/completions',{
       method:'POST',
@@ -1768,7 +1768,7 @@ async function callZhipu(messages, retry=0){
     if(!txt) throw new Error('智谱返回内容为空');
     return {content: txt, model_used: j.model_used};
   }catch(e){
-    if(e.name==='AbortError') throw new Error('超时 50s');
+    if(e.name==='AbortError') throw new Error('超时 120s');
     if(retry<1){ await new Promise(r=>setTimeout(r,1500)); return callZhipu(messages,retry+1); }
     throw e;
   }finally{ clearTimeout(tid); }
@@ -1781,7 +1781,7 @@ async function callZhipuDirect(messages, key, retry=0){
   for(let i=0;i<models.length;i++){
     const model=models[i];
     const ctrl=new AbortController();
-    const tid=setTimeout(()=>ctrl.abort(), 50000);
+    const tid=setTimeout(()=>ctrl.abort(), 120000)  // 长生成（4000 tokens + system 长 prompt）最多 ~80-100s，120s 留 buffer;
     try{
       const resp=await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions',{
         method:'POST',
@@ -1799,7 +1799,7 @@ async function callZhipuDirect(messages, key, retry=0){
       if(!txt){ if(i<models.length-1) continue; throw new Error('智谱返回内容为空'); }
       return {content: txt, model_used: model};
     }catch(e){
-      if(e.name==='AbortError') throw new Error('超时 50s');
+      if(e.name==='AbortError') throw new Error('超时 120s');
       if(i<models.length-1) continue;
       if(retry<1){ await new Promise(r=>setTimeout(r,1500)); return callZhipuDirect(messages, key, retry+1); }
       throw e;
