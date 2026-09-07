@@ -192,7 +192,11 @@ td .pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:100px
 .hs-title-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .hs-title-row .hs-title{font-size:13.5px;font-weight:600}
 .hs-title-row .hs-title:not(a){color:var(--ink)}
-.hs-meta-row{display:flex;gap:8px;align-items:center;font-size:11.5px;color:var(--muted);margin-top:4px;flex-wrap:wrap}
+/* 表格整体行高压缩：原 14px→10px 上下 padding，文字 12.5px→12px */
+#hotspotTable tbody td{padding:7px 8px;vertical-align:middle;line-height:1.4}
+#hotspotTable tbody td.hs-title-col{padding:8px 10px}
+.hs-title-col .hs-title{font-size:13.5px;line-height:1.4;font-weight:600;color:var(--ink)}
+.hs-meta-row{display:flex;gap:8px;align-items:center;font-size:11.5px;color:var(--muted);margin-top:3px;flex-wrap:wrap}
 .hs-meta-row .hs-date{font-feature-settings:"tnum";color:#9a8b6e}
 .hs-meta-row .hs-mkt{display:inline-block;padding:0 6px;border-radius:4px;font-size:10.5px;font-weight:600}
 .hs-meta-row .hs-mkt-cn{background:#e6f7ed;color:#1a6e3f}
@@ -202,7 +206,7 @@ td .pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:100px
 .hs-meta-row .hs-status{margin-left:auto}
 .hs-meta-row .hs-status .pill{padding:1px 7px;font-size:10.5px}
 /* Flyelep 角度行（在标题列下方，独立成段，行高宽） */
-.hs-angle{display:flex;align-items:flex-start;gap:8px;margin-top:6px;padding:7px 10px;background:linear-gradient(90deg,#faf5ff 0%,#fff 100%);border:1px solid #e9d5ff;border-left:3px solid #a855f7;border-radius:6px;font-size:12px;line-height:1.65;color:#4a3a6e;word-break:break-word}
+.hs-angle{display:flex;align-items:flex-start;gap:8px;margin-top:5px;padding:5px 9px;background:linear-gradient(90deg,#faf5ff 0%,#fff 100%);border:1px solid #e9d5ff;border-left:3px solid #a855f7;border-radius:6px;font-size:11.5px;line-height:1.55;color:#4a3a6e;word-break:break-word}
 .hs-angle-tag{flex-shrink:0;display:inline-block;padding:1px 8px;border-radius:100px;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-size:10.5px;font-weight:600;line-height:1.5}
 /* 新增 + 翻译角标 */
 .new-badge{display:inline-flex;align-items:center;height:18px;padding:0 6px;background:#15803d;color:#fff;border-radius:5px;font-size:10.5px;font-weight:700;letter-spacing:.3px;box-shadow:0 1px 2px rgba(21,128,61,.25)}
@@ -218,10 +222,11 @@ td .pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:100px
 .hs-heat-num{font-size:13px;font-weight:700;color:var(--ink);line-height:1.2;font-feature-settings:"tnum"}
 .hs-heat-cap{font-size:10px;color:var(--muted);font-weight:500}
 /* 评级列 */
-.hs-value-num{font-size:11px;color:var(--muted);margin-top:2px;font-feature-settings:"tnum"}
-/* 操作列 */
-.hs-act{display:flex;flex-direction:column;gap:4px;align-items:flex-start;min-width:90px}
-.hs-act .btn{font-size:11.5px;padding:4px 9px}
+.hs-value-num{font-size:11px;color:var(--muted);margin-left:5px;font-feature-settings:"tnum";font-weight:600}
+/* 操作列 — 横排紧凑（节省 30%+ 行高） */
+.hs-act{display:flex;flex-direction:row;flex-wrap:wrap;gap:4px;align-items:center;min-width:170px}
+.hs-act .btn{font-size:11px;padding:3px 7px;white-space:nowrap}
+.hs-act .btn.danger{padding:3px 7px}
 /* Fit pill 颜色 */
 .pill.fit-strong{background:#e0fbe6;color:#0e7a3a;border:1px solid #b8ecc7}
 .pill.fit-mid{background:#fff3d6;color:#9a6b00;border:1px solid #ecd79a}
@@ -829,6 +834,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <option value="discard">✗ 弃用</option>
         </select>
         <button class="reset" onclick="resetHotspotFilters()" title="清空所有筛选">清空筛选</button>
+        <button class="seed-btn" onclick="seedAllSamples()" title="一键补全 9 条选品/AI工具示例 + 27 个电商节日" style="background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;border:0;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600">🧪 一键补全示例</button>
         <span class="fill"></span>
         <button class="advanced-toggle" id="advToggleBtn" onclick="toggleAdvancedFilters()" title="展开/收起高级筛选（玩法 / 市场 / 结合度）">⚙ 高级筛选 ▾</button>
       </div>
@@ -2640,7 +2646,97 @@ const HOT_TABS=[
   {key:'festival', icon:'🎉', label:'电商节日', desc:'大促 / 节日（前 20）'}
 ];
 let _hotTab='all';   // 当前 Tab
-function tabOfHot(h){ return HOT_TAB_OF[h.type]||'web'; }
+/* 智能 tab 路由：type 字段只作粗分类，落到 4 大 Tab 前先看内容是否真有电商信号
+   - festival/product 直接归类
+   - hot/dy/ent/news：用 classifyEcom 看标题/来源/平台是否命中电商关键词（Amazon/淘宝/京东/拼多多/Temu/TikTok Shop...）
+   - 命中 strong/weak → 电商热点；未命中或仅 no → 网络热点（社会新闻/娱乐/纯热搜归这里）
+*/
+function tabOfHot(h){
+  if(h.type==='festival') return 'festival';
+  if(h.type==='product')  return 'product';
+  if(h.type==='hot' || h.type==='dy' || h.type==='ent' || h.type==='news'){
+    const text=((h.title||'')+' '+(h.note||'')+' '+(h.source||'')+' '+(h.platform||'')+' '+(h.market||'')).toLowerCase();
+    try{
+      const ev=classifyEcom(text);
+      if(ev.ecom==='strong' || ev.ecom==='weak') return 'ecom';
+    }catch(_){}
+  }
+  return 'web';
+}
+
+/* ================== 一键补全示例：热门选品 + AI 工具新品 ================== */
+const SAMPLE_PRODUCT_HOTSPOTS=[
+  /* ── 🤖 AI 工具新品（可挂电商带货视频 / 详情图 / 海报） ── */
+  {title:'Seedance 2.5 视频生成模型发布，15 秒带货视频一键出',source:'AI 工具新品',market:'全球',platform:'AI 视频',product:'AI 视频生成',category:'AI工具',price:'按量计费',sales:'新发布',playbook:'用 Seedance 2.5 给一款商品生成 15 秒电商带货视频，演示「1 张产品图 → 15 秒口播短视频」流程',fn:'AI 视频',struct:'结构三（反差数据 → 卖点）',topic:'「1 张图变 15 秒带货视频，Seedance 2.5 实测」',script:'结构三：反差（拍 1 支视频要 3 天 vs AI 1 分钟）→ 痛点（短视频产出跟不上热点）→ 卖点（Seedance 2.5 一键出片）→ 钩子（免费测款）',material:'产品图 1 张、Seedance 2.5 出片样张'},
+  {title:'Midjourney v8 公测：文生图 + 一致性大幅提升',source:'AI 工具新品',market:'海外',platform:'AI 图像',product:'AI 主图 / 详情图生成',category:'AI工具',playbook:'用 Midjourney v8 给 3 款商品分别生成主图，对比 v7 的一致性差距',fn:'AI 出图',struct:'结构四（对比 → 流程）',topic:'「Midjourney v8 vs v7，3 张主图实测一致性」',script:'结构四：对比（v7 跑 5 次还跑不准 vs v8 一次到位）→ 流程（3 步出图）→ 收口',material:'v7 / v8 对比主图 6 张'},
+  {title:'Claude 5 Sonnet 上线：跨境 listing 翻译质量逼近人工',source:'AI 工具新品',market:'全球',platform:'AI 文案',product:'跨境多语言 listing',category:'AI工具',playbook:'用 Claude 5 把一款商品 listing 翻成 5 国语言，对比老模型差距',fn:'多语言翻译',struct:'结构三（反差数据 → 卖点）',topic:'「5 国语言 listing，AI 5 分钟搞定」Claude 5 实测',script:'结构三：反差（人工翻译 1 份 50 元 vs AI 1 份 0.1 元）→ 痛点（多站点运营成本）→ 卖点（Claude 5 翻译质量）→ 钩子',material:'5 国语 listing 截图、对比图'},
+  {title:'Kling 3.0 视频模型：电商场景运镜更稳',source:'AI 工具新品',market:'国内',platform:'AI 视频',product:'电商带货短视频',category:'AI工具',playbook:'用 Kling 3.0 给家居 / 美妆商品分别生成 3 种运镜（推/拉/摇）对比',fn:'AI 视频',struct:'结构四（对比 → 流程）',topic:'「Kling 3.0 运镜稳了，电商带货视频终于能用了」',script:'结构四：对比（2.0 运镜抖动 vs 3.0 稳定）→ 3 步流程（上传图→选运镜→导出）→ 收口',material:'2.0 / 3.0 对比视频 3 组'},
+  {title:'Stable Diffusion 4 开放商用：可画册 / 主图 / 详情页',source:'AI 工具新品',market:'全球',platform:'AI 图像',product:'电商全品类图片',category:'AI工具',playbook:'演示 SD4 给同一商品出主图 / 详情图 / 场景图 3 类商用图',fn:'AI 出图',struct:'结构十（行业认知 → 承诺）',topic:'「SD4 商用开放，1 张商品图变 30 张电商图」',script:'结构十：行业认知（图片成本 = 电商最大开支）→ 同行对比（外包 vs SD4）→ 效果（30 张 vs 3 张）→ 承诺',material:'SD4 出图样张 30 张'},
+  /* ── 🛍️ 平台爆款（原有 4 条保留） ── */
+  {title:'LED 感应夜光手机壳 月销 8w+ 爆款拆解',source:'TikTok 热销榜',market:'海外',platform:'TikTok Shop',product:'LED 感应夜光手机壳',category:'3C数码',price:'$8-15',sales:'月销 8w+',playbook:'复刻这款手机壳，一键换 12 种颜色批量出图测款',fn:'批量换色',struct:'结构二（发问 → 差异 → 案例）',topic:'「爆款手机壳怎么快速测 12 个颜色？」',script:'结构二：发问 → 差异 → 案例 → 引导'},
+  {title:'折叠洗衣机 冲上淘宝热搜 TOP3',source:'淘宝热搜',market:'国内',platform:'淘宝/天猫',product:'折叠洗衣机',category:'家居家电',price:'¥199-399',sales:'月销 3w+',playbook:'把洗衣机放进宿舍/租房小场景，出场景图 + 详情页长图',fn:'换背景',struct:'结构三（反差数据 → 卖点）',topic:'「小空间神器，场景图怎么拍都嫌假？」',script:'结构三：反差数据 → 困境 → 卖点 → 钩子'},
+  {title:'宠物自动饮水器 周销 2w+ 爆款拆解',source:'Amazon Best Seller',market:'海外',platform:'Amazon',product:'宠物自动饮水器',category:'宠物用品',price:'$25-45',sales:'周销 2w+',playbook:'出多语言详情页，一套图适配 5 个站点',fn:'多语言翻译',struct:'结构二（发问 → 差异 → 案例）',topic:'「一套图卖 5 国，跨境宠物用品怎么搞？」',script:'结构二：发问 → 差异 → 案例 → 引导'},
+  {title:'便携榨汁杯 东南亚爆款复刻',source:'Shopee 热卖榜',market:'海外',platform:'Shopee',product:'便携榨汁杯',category:'家居家电',price:'$10-25',sales:'月销 5w+',playbook:'本地化场景图 + 多语言翻译，适配东南亚 6 国',fn:'多语言翻译',struct:'结构十（行业认知 → 承诺）',topic:'「东南亚爆款，照搬国内图为什么卖不动？」',script:'结构十：行业认知 → 同行对比 → 效果 → 承诺'}
+];
+
+function seedProductExamples(){
+  const H=(o)=>({id:uid(),url:'',note:'',price:'',sales:'',category:'',playbook:'',fn:'',struct:'',status:'pending',match:'high',topic:'',script:'',material:'',...o,createdAt:Date.now(),addedAt:Date.now()});
+  const existing=new Set((state.hotspots||[]).map(h=>(h.title+'|'+(h.type||'')).trim()));
+  const today=todayStr();
+  let n=0;
+  SAMPLE_PRODUCT_HOTSPOTS.forEach((it,i)=>{
+    const k=(it.title+'|product').trim();
+    if(existing.has(k)) return;
+    // 根据类目智能给一个基础热度（AI 工具 90，平台爆款 75-85）
+    const isAITool=(it.category||'').includes('AI工具');
+    const heat= isAITool? Math.max(75,90-i*2) : Math.max(70,82-i*3);
+    state.hotspots.push(H({date:today, type:'product', heat, ...it}));
+    existing.add(k); n++;
+  });
+  if(n>0){ save(); }
+  // 切到 product tab 让用户看到
+  _hotTab='product';
+  $$('#hotTabs .hot-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab==='product'));
+  renderHotspot();
+  toast(n>0? `已添加 ${n} 条选品 / AI 工具示例` : '示例已存在，无需重复添加');
+}
+
+function seedAllFestivals(){
+  const existing=new Set((state.hotspots||[]).filter(h=>h.type==='festival').map(h=>(h.title+'|festival').trim()));
+  let n=0;
+  FESTIVAL_PRESET.forEach(f=>{
+    const k=(f.name+'|festival').trim();
+    if(existing.has(k)) return;
+    // 根据距今天数给个热度（越近越高）
+    const d=daysUntil(f.date);
+    const heat= d<0? 60 : d<=7? 95 : d<=30? 88 : d<=90? 78 : 68;
+    state.hotspots.push({
+      id:uid(), date:f.date, type:'festival', source:'营销日历',
+      market:f.market, platform:f.platform||'全平台',
+      title:f.name, product:f.product||'', playbook:f.playbook||'',
+      fn:f.fn||'', heat, lead:f.lead,
+      status:'pending', match:'mid', createdAt:Date.now(), addedAt:Date.now(),
+      url:'', note:'', price:'', sales:'', category:'', struct:'', topic:'', script:'', material:''
+    });
+    existing.add(k); n++;
+  });
+  if(n>0){ save(); }
+  _hotTab='festival';
+  $$('#hotTabs .hot-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab==='festival'));
+  renderHotspot();
+  toast(n>0? `已添加 ${n} 个电商节日到热点库` : '节日已存在，无需重复添加');
+}
+
+function seedAllSamples(){
+  // 一次性补全 选品 + 节日
+  const beforeP=(state.hotspots||[]).filter(h=>h.type==='product').length;
+  const beforeF=(state.hotspots||[]).filter(h=>h.type==='festival').length;
+  seedProductExamples();
+  seedAllFestivals();
+  const afterP=(state.hotspots||[]).filter(h=>h.type==='product').length;
+  const afterF=(state.hotspots||[]).filter(h=>h.type==='festival').length;
+  toast(`已补全：选品 +${afterP-beforeP} 条，节日 +${afterF-beforeF} 个`);
+}
 function switchHotTab(tab){
   _hotTab=tab;
   $$('#hotTabs .hot-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
@@ -3423,7 +3519,34 @@ function renderHotspot(){
   const saSel=$('#hsSelectAll');
   if(saSel){ saSel.indeterminate=false; saSel.checked=false; }
   if(!arr.length){
-    tbody.innerHTML='<tr><td colspan="8" class="empty"><div class="big">🔥</div>这个 Tab 下没有热点，先点「🔥 一键扒热点」抓一批，或切换 Tab</td></tr>';
+    let emptyHtml='';
+    if(_hotTab==='product'){
+      emptyHtml=`<tr><td colspan="8" class="empty">
+        <div class="big">🛍️</div>
+        <div style="font-size:14px;font-weight:600;margin:8px 0 4px">热门选品为空</div>
+        <div class="muted" style="margin-bottom:14px">点下面按钮一键添加 9 条选品 / AI 工具示例（含 Seedance 2.5 视频模型）</div>
+        <button class="btn primary" onclick="seedProductExamples()" style="padding:8px 18px">📦 一键添加 AI 选品示例（含 Seedance 2.5）</button>
+        <div class="muted" style="margin-top:12px;font-size:11.5px">或先点「🔥 一键扒热点」抓一批真实爆品</div>
+      </td></tr>`;
+    }else if(_hotTab==='festival'){
+      emptyHtml=`<tr><td colspan="8" class="empty">
+        <div class="big">🎉</div>
+        <div style="font-size:14px;font-weight:600;margin:8px 0 4px">电商节日为空</div>
+        <div class="muted" style="margin-bottom:14px">点下面按钮一键同步 27 个 2026-2027 电商节日（双十一/618/黑五/圣诞等）</div>
+        <button class="btn primary" onclick="seedAllFestivals()" style="padding:8px 18px">📅 一键同步 27 个电商节日到热点库</button>
+        <div class="muted" style="margin-top:12px;font-size:11.5px">或到「📅 电商节日营销日历」逐个加入</div>
+      </td></tr>`;
+    }else if(_hotTab==='ecom'){
+      emptyHtml=`<tr><td colspan="8" class="empty">
+        <div class="big">📊</div>
+        <div style="font-size:14px;font-weight:600;margin:8px 0 4px">电商热点为空</div>
+        <div class="muted" style="margin-bottom:14px">「电商热点」只展示有电商平台信号的内容（Amazon/淘宝/京东/拼多多/Temu等），其他社会新闻归到「网络热点」</div>
+        <div class="muted" style="margin-top:8px;font-size:11.5px">先点「🔥 一键扒热点」抓一批含电商关键词的内容</div>
+      </td></tr>`;
+    }else{
+      emptyHtml='<tr><td colspan="8" class="empty"><div class="big">🔥</div>这个 Tab 下没有热点，先点「🔥 一键扒热点」抓一批，或切换 Tab</td></tr>';
+    }
+    tbody.innerHTML=emptyHtml;
     updateBulkBar(); return;
   }
   const statusMap={used:['st-used','已用'],pending:['st-pending','未用'],discard:['st-discard','弃用']};
@@ -3474,9 +3597,9 @@ function renderHotspot(){
         <div class="hs-heat-num">${heat}<span class="hs-heat-cap">/100</span></div>
       </td>
       <td><span class="pill ${fCls}">${fTxt}</span></td>
-      <td>
+      <td class="hs-grade">
         <span class="badge-grade ${gCls}">${gTxt}级</span>
-        <div class="hs-value-num">价值 ${h.value||0}</div>
+        <span class="hs-value-num" title="综合价值">${h.value||0}</span>
       </td>
       <td class="hs-act">
         ${hasDetail?`<button class="btn sm" onclick="toggleHsDetail('${h.id}')" title="查看评级理由 / 选题 / 脚本要点 / 素材清单">详情 ▾</button> `:''}
