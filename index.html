@@ -168,6 +168,17 @@ td .pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:100px
 .badge-grade.g-C{background:#cfcdc4;color:#54534e}
 .pill.mkt-cn{background:#e6f7ed;color:#1a6e3f} .pill.mkt-overseas{background:#e6f0fa;color:#1a56a3} .pill.mkt-global{background:#f5f0fa;color:#5b2d8a}
 .pill.plat{background:#f0efea;color:var(--ink2);border:1px solid #e0ddd6}
+/* 玩法类型徽章（带货 / 蹭热 / 痛点规则 / 节日 / 其他） */
+.pill.an-dai{background:#fff0e0;color:#b45309;border:1px solid #f2d2ab}
+.pill.an-ride{background:#e7f0ff;color:#1c5fc9;border:1px solid #c3d8f7}
+.pill.an-rule{background:#fdecec;color:#c0392b;border:1px solid #f3c6c6}
+.pill.an-fest{background:#fff3d6;color:#a06a00;border:1px solid #ecd79a}
+.pill.an-other{background:#eef0f3;color:#5b6470;border:1px solid #e0ddd6}
+/* 热度进度条 */
+.heat-bar{height:7px;background:#eef0f3;border-radius:100px;overflow:hidden;margin-top:2px}
+.heat-bar span{display:block;height:100%;border-radius:100px;transition:width .2s}
+/* 跑马灯玩法标签 */
+.angle-tag{display:inline-block;margin:0 4px;padding:0 6px;border-radius:100px;font-size:10px;font-weight:700;background:#eef0f3;color:#5b6470;white-space:nowrap}
 tr:hover td{background:#fbfaf7}
 /* 热点源同步条 */
 .sync-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px;padding:10px 12px;background:#eef4ff;border:1px solid #d6e3fb;border-radius:10px}
@@ -723,7 +734,8 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         <label class="nab-sort" title="表格排序方式">
           排序：
           <select id="sortBy" onchange="renderHotspot()">
-            <option value="hook">按挂钩度 ↓（推荐）</option>
+            <option value="value">按综合可发价值 ↓（推荐）</option>
+            <option value="hook">按电商挂钩度 ↓</option>
             <option value="added">按新增时间 ↓（最新在最上）</option>
             <option value="date">按热点日期 ↓</option>
           </select>
@@ -742,30 +754,29 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <option value="festival">🎉 电商节日</option>
           <option value="news">📰 行业资讯</option>
         </select>
-        <select id="filterHMatch" onchange="renderHotspot()">
-          <option value="">全部匹配度</option>
-          <option value="high">⭐⭐⭐ 高匹配</option>
-          <option value="mid">⭐⭐ 中匹配</option>
-          <option value="low">⭐ 低匹配</option>
+        <select id="filterHAngle" onchange="renderHotspot()" title="玩法类型：带货=可挂商品；蹭热=高热非电商、用 Flyelep 做图蹭流量；痛点规则=平台限流/算法新规，Flyelep 去同质化解法">
+          <option value="">全部玩法</option>
+          <option value="带货">🔥 带货</option>
+          <option value="蹭热">🌊 蹭热（高流量热点）</option>
+          <option value="痛点规则">🛡️ 痛点规则</option>
+          <option value="节日">🎉 节日</option>
+          <option value="其他">📦 其他</option>
+        </select>
+        <select id="filterHHeat" onchange="renderHotspot()" title="热度阈值（0-100 归一化）">
+          <option value="">全部热度</option>
+          <option value="high">🔥 高热（≥70）</option>
+          <option value="mid">🌤 中热（40-69）</option>
+          <option value="low">❄️ 低热（&lt;40）</option>
+        </select>
+        <select id="filterHFit" onchange="renderHotspot()" title="Flyelep 结合度（能做内容/图的程度）">
+          <option value="">全部结合度</option>
+          <option value="强">💪 强</option>
+          <option value="中">🤝 中</option>
+          <option value="弱">😶 弱</option>
         </select>
         <select id="filterHMarket" onchange="renderHotspot()">
           <option value="">全部市场</option>
           <option value="国内">国内</option><option value="海外">海外</option><option value="全球">全球</option>
-        </select>
-        <select id="filterHEcom" onchange="renderHotspot()" title="电商判定：默认只显示与电商/带货相关的热点">
-          <option value="useful" selected>✅ 仅电商相关</option>
-          <option value="">全部（含非电商）</option>
-          <option value="strong">🔥 强电商</option>
-          <option value="weak">🤔 疑似电商</option>
-          <option value="no">🚫 非电商</option>
-        </select>
-        <select id="filterHGrade" onchange="renderHotspot()" title="与脚本挂钩度：默认只显示 S/A/B 级">
-          <option value="sab" selected>🎯 挂钩 S/A/B 级</option>
-          <option value="">全部等级</option>
-          <option value="S">S 级（强烈建议做）</option>
-          <option value="A">A 级（适合做）</option>
-          <option value="B">B 级（可尝试）</option>
-          <option value="C">C 级（先放着）</option>
         </select>
         <select id="filterHPlatform" onchange="renderHotspot()">
           <option value="">全部平台</option>
@@ -776,11 +787,17 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <option>Shopee</option><option>Lazada</option><option>速卖通</option>
           <option>Temu</option><option>独立站</option><option>其他</option>
         </select>
+        <select id="filterHStatus" onchange="renderHotspot()" title="内容状态">
+          <option value="">全部状态</option>
+          <option value="pending">⏳ 未用</option>
+          <option value="used">✓ 已用</option>
+          <option value="discard">✗ 弃用</option>
+        </select>
         <input type="text" class="kw" id="filterHKeyword" placeholder="🔍 搜标题 / 商品 / 玩法 / 评级理由" oninput="renderHotspot()">
         <button class="reset" onclick="resetHotspotFilters()" title="清空所有筛选">清空筛选</button>
       </div>
       <div class="table-scroll"><table id="hotspotTable"><thead><tr>
-        <th class="hs-cb"><input type="checkbox" id="hsSelectAll" onchange="toggleSelectAll(this.checked)" title="全选当前可见行"></th><th>日期</th><th>类型</th><th>渠道</th><th>标题</th><th>💰 可挂钩商品</th><th>🎬 内容玩法</th><th>🎯 挂钩等级</th><th>状态</th><th>操作</th>
+        <th class="hs-cb"><input type="checkbox" id="hsSelectAll" onchange="toggleSelectAll(this.checked)" title="全选当前可见行"></th><th>日期</th><th>类型</th><th>玩法</th><th>渠道</th><th>标题</th><th>💰 可挂钩商品</th><th>🎬 内容玩法</th><th>🔥 热度</th><th>🎯 价值/等级</th><th>状态</th><th>操作</th>
       </tr></thead><tbody></tbody></table></div>
     </div>
 
@@ -791,7 +808,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       <div class="gen-steps" id="genSteps">
         <div class="gen-step" data-step="hotspot">
           <div class="step-head"><span class="step-num">1</span>选热点 <span class="req">*</span></div>
-          <select id="genHotspot" onchange="genOnHotspotChange()"><option value="">— 选择要拍的热点（按挂钩度排序）—</option></select>
+          <select id="genHotspot" onchange="genOnHotspotChange()"><option value="">— 选择要拍的热点（按综合价值排序）—</option></select>
           <div class="gen-step-info" id="infoHotspot"></div>
         </div>
         <div class="gen-step" data-step="account">
@@ -1580,11 +1597,9 @@ function bulkHotspotSetStatus(status){
   save(); renderHotspot(); toast(`✓ 已标记 ${items.length} 条为「${label}」`);
 }
 function resetHotspotFilters(){
-  ['filterHType','filterHMatch','filterHMarket','filterHPlatform','filterHKeyword'].forEach(id=>{ const el=$('#'+id); if(el) el.value=''; });
-  const e=$('#filterHEcom'); if(e) e.value='useful';
-  const g=$('#filterHGrade'); if(g) g.value='sab';
+  ['filterHType','filterHAngle','filterHHeat','filterHFit','filterHMarket','filterHPlatform','filterHStatus','filterHKeyword'].forEach(id=>{ const el=$('#'+id); if(el) el.value=''; });
   const o=$('#onlyNewBtn'); if(o) o.classList.remove('on');
-  const s=$('#sortBy'); if(s) s.value='hook';
+  const s=$('#sortBy'); if(s) s.value='value';
   _onlyThisBatch=false;
   renderHotspot();
 }
@@ -1617,12 +1632,11 @@ function showNewArrival(n, src){
   if(_nabHideTimer) clearTimeout(_nabHideTimer);
   _nabHideTimer=setTimeout(()=>{ bar.classList.add('hidden'); }, 8000);
 }
-/* 🆕 立即查看：放宽筛选项 + 切到本次新增 + 按新增时间排 — 一键直达 282 条全部新热点 */
+/* 🆕 立即查看：放宽筛选项 + 切到本次新增 + 按新增时间排 — 一键直达本次扒取的全部新热点 */
 let _onlyThisBatch=false;   // 是否仅显示本次新增
 function jumpToNew(){
-  // 1) 放宽默认严筛：电商判定/挂钩等级 都放开
-  const e=$('#filterHEcom'); if(e) e.value='';
-  const g=$('#filterHGrade'); if(g) g.value='';
+  // 1) 放宽所有筛选（玩法/热度/结合度/状态/类型/渠道 全放开）
+  ['filterHAngle','filterHHeat','filterHFit','filterHStatus','filterHType','filterHMarket','filterHPlatform'].forEach(id=>{ const e=$('#'+id); if(e) e.value=''; });
   // 2) 开启"🆕 24h 新增" + "本次新增"精确筛选
   _onlyThisBatch=true;
   const o=$('#onlyNewBtn'); if(o) o.classList.add('on');
@@ -1641,19 +1655,19 @@ function jumpToNew(){
 
 /* ================== 生成脚本（选热点→选账号→视频类型→时长→主推功能→选结构） ================== */
 function populateGenSelects(){
-  // 默认按挂钩度降序：高等级热点排前面，优先做
-  const hs=[...state.hotspots].sort((a,b)=>(b.hook||0)-(a.hook||0) || (b.date||'').localeCompare(a.date||''));
+  // 默认按综合可发价值降序：高价值热点排前面，优先做
+  const hs=[...state.hotspots].sort((a,b)=>(b.value||0)-(a.value||0) || (b.hook||0)-(a.hook||0) || (b.date||'').localeCompare(a.date||''));
   // 先记住当前已选（修复「筛选 / 重渲染后生成脚本配置消失」的 bug）
   const keep={};
   ['genHotspot','genAccount','genVidType','genVidDur','genFeature','genStruct'].forEach(id=>{
     const el=document.getElementById(id); if(el) keep[id]=el.value;
   });
   const g=$('#genHotspot');
-  if(g) g.innerHTML='<option value="">— 选择要拍的热点（按挂钩度排序）—</option>'+hs.map(h=>{
+  if(g) g.innerHTML='<option value="">— 选择要拍的热点（按综合价值排序）—</option>'+hs.map(h=>{
     const t=HOT_TYPES[h.type]?HOT_TYPES[h.type][2]:'热点';
     const gTxt=h.grade||(h.match==='high'?'S':h.match==='mid'?'B':'C');
-    const ec = h.ecom==='no' ? '非电商' : (h.ecom==='weak'?'疑似':'电商');
-    return `<option value="${h.id}">[${gTxt}] ${ec}·${t}·${escapeHtml(h.title)}</option>`;
+    const ang = h.angle||'其他';
+    return `<option value="${h.id}">[${gTxt}] ${ang}·${t}·${escapeHtml(h.title)}</option>`;
   }).join('');
   const a=$('#genAccount');
   if(a) a.innerHTML='<option value="">— 选择发布账号 —</option>'+state.accounts.map(x=>{
@@ -1882,7 +1896,7 @@ ${rules}${fewShotBlock}${learnedBlock}
 - 标题：${h.title||'(无)'}
 - 类型：${(HOT_TYPES[h.type]&&HOT_TYPES[h.type][2])||h.type||'热点'}
 - 来源：${h.source} (${h.market||'全球'} · ${h.platform||''})
-- 电商判定：${h.ecom||'-'}（挂钩等级 ${h.grade||'-'} · ${h.hook||0} 分）
+- 玩法类型：${h.angle||'-'}（综合价值 ${h.value||0} · 等级 ${h.grade||'-'} · 热度 ${h.heat||0}）
 - 可挂钩商品：${h.product||'(待定)'}（${h.category||'品类未填'}）
 - 价格/销量线索：${h.price||''} ${h.sales||''}
 - 玩法描述：${h.playbook||'(无)'}
@@ -3257,37 +3271,40 @@ const PLAT_RULES={
 function renderHotspot(){
   populateGenSelects();
   const ft=$('#filterHType')?.value||'', fm=$('#filterHMarket')?.value||'',
-        fp=$('#filterHPlatform')?.value||'', fm2=$('#filterHMatch')?.value||'',
-        fe=$('#filterHEcom')?.value||'', fg=$('#filterHGrade')?.value||'',
+        fp=$('#filterHPlatform')?.value||'', fa=$('#filterHAngle')?.value||'',
+        fh=$('#filterHHeat')?.value||'', ff=$('#filterHFit')?.value||'',
+        fst=$('#filterHStatus')?.value||'',
         fk=$('#filterHKeyword')?.value.toLowerCase()||'',
         onlyNew=$('#onlyNewBtn')?.classList.contains('on')||false,
-        sortBy=$('#sortBy')?.value||'hook';
-  // 补全老数据评级（无 hook 字段时实时计算一次）
+        sortBy=$('#sortBy')?.value||'value';
+  // 补全老数据评级（无 value/heat/angle 字段时实时计算一次）
   let needSave=false;
-  for(const h of state.hotspots){ if(h.hook==null || h.grade==null){ evalHotspot(h); needSave=true; } }
+  for(const h of state.hotspots){ if(h.value==null || h.heat==null || h.angle==null){ evalHotspot(h); needSave=true; } }
   if(needSave){ try{ save(); }catch(_){} }
 
-  // 排序：按挂钩度（默认）/ 按新增时间 / 按热点日期 —— 新增时间用 addedAt，缺则回退到 date
+  // 排序：综合可发价值（默认）/ 电商挂钩度 / 新增时间 / 热点日期
   const now=Date.now();
   const ts=h=>h.addedAt||Date.parse((h.date||'').replace(/-/g,'/'))||0;
   let arr=[...state.hotspots];
-  if(sortBy==='added'){
-    arr.sort((a,b)=>ts(b)-ts(a));
-  }else if(sortBy==='date'){
-    arr.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  }else{
+  if(sortBy==='value'){
+    arr.sort((a,b)=>(b.value||0)-(a.value||0) || (b.heat||0)-(a.heat||0) || ts(b)-ts(a));
+  }else if(sortBy==='hook'){
     arr.sort((a,b)=>(b.hook||0)-(a.hook||0) || (b.date||'').localeCompare(a.date||''));
+  }else if(sortBy==='added'){
+    arr.sort((a,b)=>ts(b)-ts(a));
+  }else{
+    arr.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   }
   if(ft) arr=arr.filter(h=>h.type===ft);
   if(fm) arr=arr.filter(h=>h.market===fm);
   if(fp) arr=arr.filter(h=>h.platform===fp);
-  if(fm2) arr=arr.filter(h=>h.match===fm2);
-  // 电商判定筛选（默认 useful=仅电商相关）
-  if(fe==='useful') arr=arr.filter(h=>h.ecom!=='no');
-  else if(fe) arr=arr.filter(h=>h.ecom===fe);
-  // 挂钩等级筛选（默认 sab=S/A/B）
-  if(fg==='sab') arr=arr.filter(h=>['S','A','B'].includes(h.grade));
-  else if(fg) arr=arr.filter(h=>h.grade===fg);
+  if(fa) arr=arr.filter(h=>h.angle===fa);
+  // 热度档（high≥70 / mid 40-69 / low<40）
+  if(fh){
+    arr=arr.filter(h=>{ const v=h.heat||0; return fh==='high'?v>=70 : fh==='mid'?(v>=40&&v<70) : v<40; });
+  }
+  if(ff) arr=arr.filter(h=>h.flyelepFit===ff);
+  if(fst) arr=arr.filter(h=>h.status===fst);
   if(fk) arr=arr.filter(h=>[h.title,h.source,h.product,h.playbook,h.topic,h.script,h.material,h.reasons].some(x=>(x||'').toLowerCase().includes(fk)));
   // 🆕 仅看 24h 内新增；或本次新增（更精确，只显示本次扒取的那批）
   if(_onlyThisBatch && _lastMergeIds.length){
@@ -3297,19 +3314,21 @@ function renderHotspot(){
     arr=arr.filter(h=> (h.addedAt||0) >= now-86400000);
   }
 
-  // KPI 概览（7 张）
+  // KPI 概览（7 张）—— 按玩法类型统计，不再只盯电商
   const cnt=t=>arr.filter(h=>h.type===t).length;
+  const byAngle=a=>arr.filter(h=>h.angle===a).length;
   const pending=arr.filter(h=>h.status==='pending');
   const usable=pending.filter(h=>['S','A'].includes(h.grade)).length;
   const hasNote=arr.filter(h=>h.topic||h.script||h.material).length;
+  const new24=arr.filter(h=>(h.addedAt||0)>=now-86400000).length;
   $('#hotspotKpiGrid').innerHTML=`
     <div class="kpi"><div class="lbl">热点总数</div><div class="num">${arr.length}</div><div class="sub">当前筛选范围</div></div>
-    <div class="kpi b2"><div class="lbl">🔥 电商热点</div><div class="num">${cnt('hot')}</div><div class="sub">平台 / 行业趋势</div></div>
-    <div class="kpi b3"><div class="lbl">🎵 抖音热点</div><div class="num">${cnt('dy')}</div><div class="sub">热榜 / 话题 / 挑战</div></div>
-    <div class="kpi b4"><div class="lbl">🎬 娱乐热点</div><div class="num">${cnt('ent')}</div><div class="sub">影视 / 梗 / IP</div></div>
-    <div class="kpi" style="--k:7"><div class="lbl">🛍️ 平台爆品</div><div class="num">${cnt('product')}</div><div class="sub">各平台热卖款</div></div>
-    <div class="kpi b4"><div class="lbl">🎉 电商节日</div><div class="num">${cnt('festival')}</div><div class="sub">大促 / 节日</div></div>
-    <div class="kpi b3"><div class="lbl">🎯 S/A 级可用</div><div class="num">${usable}</div><div class="sub">${pending.length} 条待用 · ${hasNote} 条已备选题</div></div>
+    <div class="kpi b2"><div class="lbl">🔥 带货</div><div class="num">${byAngle('带货')}</div><div class="sub">可挂商品</div></div>
+    <div class="kpi b3"><div class="lbl">🌊 蹭热</div><div class="num">${byAngle('蹭热')}</div><div class="sub">高流量非电商</div></div>
+    <div class="kpi b4"><div class="lbl">🛡️ 痛点规则</div><div class="num">${byAngle('痛点规则')}</div><div class="sub">限流/算法新规</div></div>
+    <div class="kpi" style="--k:7"><div class="lbl">🎉 节日</div><div class="num">${byAngle('节日')}</div><div class="sub">大促 / 节日</div></div>
+    <div class="kpi b4"><div class="lbl">🎯 S/A 级可用</div><div class="num">${usable}</div><div class="sub">${pending.length} 条待用</div></div>
+    <div class="kpi b3"><div class="lbl">🆕 24h 新增</div><div class="num">${new24}</div><div class="sub">${hasNote} 条已备选题</div></div>
   `;
 
   const tbody=$('#hotspotTable tbody');
@@ -3322,27 +3341,30 @@ function renderHotspot(){
     else if(selectedOnView===arr.length) sa.indeterminate=false, sa.checked=true;
     else sa.indeterminate=true, sa.checked=false;
   }
-  if(!arr.length){ tbody.innerHTML='<tr><td colspan="10" class="empty"><div class="big">🔥</div>当前筛选下没有热点，试试把「仅电商相关 / 挂钩等级」切到「全部」</td></tr>'; updateBulkBar(); return; }
+  if(!arr.length){ tbody.innerHTML='<tr><td colspan="12" class="empty"><div class="big">🔥</div>当前筛选下没有热点，试试把「玩法 / 热度 / 结合度」切到「全部」</td></tr>'; updateBulkBar(); return; }
   const statusMap={used:['st-used','已用'],pending:['st-pending','未用'],discard:['st-discard','弃用']};
-  const ecomMap={strong:['ec-strong','🔥 强电商'],weak:['ec-weak','🤔 疑似'],no:['ec-no','🚫 非电商']};
+  const angleMap={'带货':['an-dai','🔥 带货'],'蹭热':['an-ride','🌊 蹭热'],'痛点规则':['an-rule','🛡️ 痛点规则'],'节日':['an-fest','🎉 节日'],'其他':['an-other','📦 其他']};
   const gradeMap={S:['g-S','S'],A:['g-A','A'],B:['g-B','B'],C:['g-C','C']};
   tbody.innerHTML=arr.map(h=>{
     const [tCls,tEmo,tTxt]=HOT_TYPES[h.type]||['','','—'];
     const [mCls,mTxt]=MKT_MAP[h.market]||['',''];
-    const [ecCls,ecTxt]=ecomMap[h.ecom]||['','—'];
+    const [aCls,aTxt]=angleMap[h.angle]||['','—'];
     const [gCls,gTxt]=gradeMap[h.grade]||['','—'];
     const [sCls,sTxt]=statusMap[h.status]||statusMap.pending;
     const hasDetail=h.topic||h.script||h.material||h.reasons||h.url||h.note;
     const sel=state.hotspotSelections&&state.hotspotSelections.has(h.id);
     const isNew=(h.addedAt||0) >= now-86400000;   // 24h 内为新
     const channel=[h.market,h.platform].filter(Boolean).join(' · ')||'—';
-    return `<tr${sel?' class="selected"':''}>
+    const heat=h.heat||0;
+    const heatColor=heat>=70?'#e8590c':heat>=40?'#f59f00':'#adb5bd';
+    return `<tr${sel?' class="selected"':''} data-id="${h.id}">
       <td class="hs-cb"><input type="checkbox" data-hid="${h.id}" ${sel?'checked':''} onchange="toggleHotspotSelect('${h.id}', this.checked)"></td>
       <td style="white-space:nowrap;font-size:12.5px">
         ${h.date||'—'}
         ${isNew?'<div class="new-badge" title="本次扒取新增">🆕 新增</div>':''}
       </td>
       <td><span class="pill ${tCls}">${tEmo} ${tTxt}</span></td>
+      <td><span class="pill ${aCls}">${aTxt}</span></td>
       <td style="font-size:12px;white-space:nowrap"><span class="pill ${mCls}">${channel}</span></td>
       <td style="max-width:230px" title="${escapeHtml(h.title)}">
         ${h.url
@@ -3363,9 +3385,13 @@ function renderHotspot(){
           return angle+pb || `<button class="ai-mini" onclick="aiSuggestRow('${h.id}')">⚡ AI推荐</button>`;
         })()}
       </td>
+      <td style="white-space:nowrap;min-width:96px">
+        <div class="heat-bar" title="热度 ${heat}/100"><span style="width:${Math.max(4,heat)}%;background:${heatColor}"></span></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">热度 ${heat}${h.flyelepFit?` · ${h.flyelepFit}结合`:''}</div>
+      </td>
       <td style="white-space:nowrap;font-size:12px">
-        <span class="pill ${ecCls}">${ecTxt}</span>
-        <div style="margin-top:3px"><span class="badge-grade ${gCls}">${gTxt}级</span> <span style="font-size:11px;color:var(--muted)">${h.hook||0}分</span></div>
+        <span class="badge-grade ${gCls}">${gTxt}级</span>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">价值 ${h.value||0}</div>
       </td>
       <td><span class="pill ${sCls}">${sTxt}</span></td>
       <td style="white-space:nowrap">
@@ -3373,7 +3399,7 @@ function renderHotspot(){
         <button class="btn sm primary" onclick="genFromRow('${h.id}')">🎬 生成</button>
         <button class="btn sm danger" onclick="deleteHotspot('${h.id}')">删</button>
       </td>
-    </tr>${hasDetail?`<tr class="hs-detail hidden" id="hsd-${h.id}"><td colspan="10"><div class="dt">
+    </tr>${hasDetail?`<tr class="hs-detail hidden" id="hsd-${h.id}"><td colspan="12"><div class="dt">
       ${h.topic?`<b>📌 视频选题</b><div>${escapeHtml(h.topic)}</div>`:''}
       ${h.script?`<b>🎬 脚本要点</b><div>${escapeHtml(h.script)}</div>`:''}
       ${h.material?`<b>🧰 素材清单</b><div>${escapeHtml(h.material)}</div>`:''}
@@ -3386,13 +3412,12 @@ function renderHotspot(){
   try{ renderHotMarquee(); }catch(_){} // 顺手刷一下跑马灯
 }
 
-/* 热门热点跑马灯：横向无缝循环滚动，从 state.hotspots 取挂钩等级 S/A/B 的前 20 条 */
+/* 热门热点跑马灯：横向无缝循环滚动，按综合可发价值取前 20 条（含蹭热/痛点规则） */
 function renderHotMarquee(){
   const track=$('#hotMarqueeTrack');
   if(!track) return;
   const arr=(state.hotspots||[])
-    .filter(h=>['S','A','B'].includes(h.grade||''))
-    .sort((a,b)=>(b.hook||0)-(a.hook||0))
+    .sort((a,b)=>(b.value||0)-(a.value||0))
     .slice(0,20);
   if(!arr.length){
     track.innerHTML='<div class="marquee-content"><span class="marquee-empty">📭 暂无热门热点，先点下面「🔥 一键扒热点（Yellow Dog Hot 1.0）」抓一批 →</span></div>'
@@ -3403,8 +3428,10 @@ function renderHotMarquee(){
     const title=(h.title||'').slice(0,32);
     const featLabel=(FLYELEP_FEATURES.find(f=>f.key===h.flyelepFeature)||{}).label || (h.flyelepFeature?'':'通用 AI');
     const angleTag = featLabel? `<span class="flyelep-tag" title="${escapeHtml(h.flyelepAngle||'')}">🎯 ${escapeHtml(featLabel)}</span>`:'';
+    const aTag = h.angle? `<span class="angle-tag">${escapeHtml(h.angle)}</span>`:'';
     return `<span class="marquee-item" data-id="${h.id}" onclick="scrollToHotspot('${h.id}')" title="${escapeHtml((h.title||'')+ (h.flyelepAngle?'\n\n🎯 Flyelep 角度：'+h.flyelepAngle:''))}">`
          + `<span class="grade ${h.grade||''}">${h.grade||'?'}</span>`
+         + aTag
          + `<span>${escapeHtml(title)}${title.length>0 && (h.title||'').length>32?'…':''}</span>`
          + angleTag
          + (h.source?`<span class="src">· ${escapeHtml((h.source||'').slice(0,10))}</span>`:'')
@@ -3779,6 +3806,8 @@ const FLYELEP_HOT_KW={
   clarity: ['超清','清晰度','模糊修复','老照片','马赛克','细节增强','低清修复','去噪','清晰化','图片变清晰'],
   brandm:  ['品牌模型','专属模型','定制模型','私有模型','品牌 ai','专属 ai','品牌定制','模型微调','训练模型'],
   brandt:  ['品牌模板','预设模板','模板套用','节日模板','营销模板','618 模板','双11 模板','黑五模板','圣诞模板','模板库'],
+  // 平台规则 / 限流 / 痛点（Flyelep 去同质化、AI 化可破解，属「痛点规则」玩法）
+  rule:   ['限流','算法','审核','同质化','版权','降权','封号','流量分配','推荐机制','合规','政策','搬运','查重','去重','内容审核','新规','规则调整','流量池','权重','打压','限推荐','去同质化','内容治理','平台治理','低质','水印','批量生成'],
   // 通用 Flyelep 关键词（命中但未匹配具体功能时使用）
   '':      ['flyelep','AI 工具','AI工具','AI 电商','AI 电商工具','AI 提效','电商 AI','跨境 AI','选品 AI','AI 选品','AI 主图','AI 详情','AI 视频','AI 抠图','电商人必备','电商效率','效率工具','AI 生产力','AI 创作','AI 营销','ai 商业化','ai 商业化','生成式 AI','生成式','midjourney','stable diffusion','sora','kling','可灵','即梦','dalle','suno','runway','pika','adobe firefly','chatgpt','gpt','gemini','claude','llm','大模型','文心','通义','豆包','kimi','deepseek','混元','hunyuan','qwen','qwen3','ernie','智谱','glm','claude','grok','llama','mistral','ai 助手','ai agent','agent','智能体','ai 工具','aigc','a 工具','aigc 工具','gpt-4','gpt-5','claude 3','claude 4','sora 2','amazon','亚马逊','shopee','lazada','ozon','temu','shein','tiktok shop','速卖通','aliexpress','独立站','shopify','woocommerce','ebay','walmart','mercadolibre','跨境电商平台','电商平台','出海平台','跨境平台','电商运营','亚马逊运营','shopee 运营','tiktok shop 运营','选品','listing 优化','主图优化','listing 撰写','五点描述','商品推广','站内广告','站外引流','自然流量','付费流量','acos','roas','转化率','客单价','uv 价值','aov','gmv','日销','月销','爆款打造','新品推广','店铺装修','品牌打造','私域运营','用户运营','内容运营','海外仓','fba','海外仓发货','fba 头程','物流时效']
 };
@@ -3802,6 +3831,7 @@ const FLYELEP_ANGLE={
   clarity: '用 Flyelep「AI 超清」提升该热点产品图清晰度',
   brandm:  '用 Flyelep「品牌模型」为该热点品类训练专属模型',
   brandt:  '用 Flyelep「品牌模板」快速套用预设营销模板',
+  rule:    '用 Flyelep 生成「去同质化、强原创感」的 AI 图，把平台对 AI 图的限流 / 审核新规变成你的内容机会',
   '':      '用 Flyelep 的 AI 工具集给该热点内容做产品化升级'
 };
 
@@ -3842,47 +3872,95 @@ function isEcomRelated(text){
   return ECOM_STRICT.some(k=>t.includes(k.toLowerCase()));
 }
 
-// ============ 与脚本挂钩度评级（S/A/B/C） ============
-function scoreHook(h){
+// ============ 热度归一化 + 玩法分类 + 综合可发价值 ============
+// 不同数据源的热度量纲不同，统一归一到 0-100
+function normHeat(raw, kind){
+  const n=Number(raw||0);
+  if(kind==='hotlist'){ if(!n) return 50; return Math.max(5, Math.min(100, Math.round((Math.log10(n+1)/8)*100))); }
+  if(kind==='hn'){ if(!n) return 40; return Math.max(5, Math.min(100, Math.round((Math.log10(n+1)/5)*100))); }
+  return 50;
+}
+// RSS / NewsAPI 无显式热度 → 按新鲜度推算（越新越高），可选 boost 加权（如 AI 相关）
+function heatFromRecency(dateStr, boost){
+  let ageH=72;
+  try{ const t=Date.parse((dateStr||'').replace(/-/g,'/')||'1970'); if(!isNaN(t)) ageH=Math.max(0,(Date.now()-t)/36e5); }catch(_){}
+  let h = ageH<=6?85 : ageH<=12?75 : ageH<=24?65 : ageH<=48?52 : ageH<=72?42 : 32;
+  if(boost) h=Math.min(95, h+boost);
+  return h;
+}
+// 蹭流 / 痛点规则 关键词
+const RIDE_KW=['热搜','热榜','爆了','出圈','现象级','梗','挑战','meme','viral','刷屏','全网','爆款话题','话题','热议','冲上','登顶','霸榜','神曲','舞蹈','卡点','火了','破圈','刷爆','热梗','挑战赛','热舞'];
+// 痛点规则：必须含「限制/治理类」强信号词，避免 "AI 图像生成" 这类中性词误判
+const RULE_KW=['限流','算法','审核','同质化','版权','降权','封号','流量分配','推荐机制','合规','政策','搬运','查重','去重','内容审核','新规','规则调整','流量池','权重','打压','限推荐','内容治理','平台治理','低质','水印'];
+// 玩法类型：带货 / 蹭热 / 痛点规则 / 节日 / 其他
+function classifyAngle(h, heat, fv){
+  const t=((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')).toLowerCase();
+  if(h.type==='festival') return '节日';
+  if(RULE_KW.some(k=>t.includes(k))) return '痛点规则';
+  const ev=classifyEcom(t);
+  if(ev.ecom==='strong'||ev.ecom==='weak') return '带货';
+  const isRideWord=RIDE_KW.some(k=>t.includes(k));
+  const isRideType=['dy','ent','hot'].includes(h.type);
+  if((heat||0)>=55 && (isRideWord||isRideType)) return '蹭热';
+  return '其他';
+}
+// 电商挂钩度（仅保留为排序维度之一，不再决定热点显隐）
+function scoreHookRaw(h){
   const t=((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')+' '+(h.product||'')).toLowerCase();
   const ev=classifyEcom(t);
-  let hook=0; const reasons=[];
-  if(ev.ecom==='strong'){ hook+=25; reasons.push('电商强相关'); }
-  else if(ev.ecom==='weak'){ hook+=10; reasons.push('电商弱相关(疑似)'); }
-  else { reasons.push('非电商内容'); }
+  let hook=0;
+  if(ev.ecom==='strong') hook+=25; else if(ev.ecom==='weak') hook+=10;
   const sellKw=['带货','种草','直播','开箱','好物','测评','达人','主播','爆款','清仓','上新','预售','卖货','直播间'];
-  if(sellKw.some(k=>t.includes(k))){ hook+=20; reasons.push('带货/种草属性'); }
-  if(ECOM_CATEGORY.some(k=>t.includes(k))){ hook+=20; reasons.push('品类可挂货'); }
-  if(VISUAL_KW.some(k=>t.includes(k))){ hook+=20; reasons.push('视觉素材潜力'); }
+  if(sellKw.some(k=>t.includes(k))) hook+=20;
+  if(ECOM_CATEGORY.some(k=>t.includes(k))) hook+=20;
+  if(VISUAL_KW.some(k=>t.includes(k))) hook+=20;
   const hot=Number(h.sales||h.hot||0);
-  if(hot>=5e6){ hook+=15; reasons.push('高热度'); }
-  else if(hot>=1e6){ hook+=10; reasons.push('较高热度'); }
-  else if(hot>=2e5){ hook+=5; reasons.push('中等热度'); }
-  /* Flyelep 结合度（核心定位：所有热点必须能挂到 Flyelep 17 个功能上） */
-  const fv=scoreFlyelep(t);
-  if(fv.score>0){
-    const boost=Math.min(30, fv.score*8);  // 命中 1 个 Flyelep 关键词 +8，最高 +30
-    hook+=boost;
-    const featLabel=(FLYELEP_FEATURES.find(f=>f.key===fv.feature)||{}).label || '通用 AI 工具';
-    reasons.push(`🎯 Flyelep「${featLabel}」+${boost}`);
-  }else if(ev.ecom==='strong' || ev.ecom==='weak'){
-    // 通用消费品测评（手机/耳机/贴膜类）—— 无 Flyelep 角度时降权，避免占 S/A 级坑位
-    hook=Math.max(0, hook-10);
-    reasons.push('⚠️ 无 Flyelep 角度（纯消费品测评）');
-  }
-  hook=Math.min(100,hook);
-  let grade = hook>=80?'S' : hook>=60?'A' : hook>=40?'B' : 'C';
-  return {hook, grade, ecom:ev.ecom, reasons, match: grade==='C'?'low':(grade==='B'?'mid':'high'),
-          flyelepFeature: fv.feature, flyelepAngle: fv.angle, flyelepHits: fv.hits};
+  if(hot>=5e6) hook+=15; else if(hot>=1e6) hook+=10; else if(hot>=2e5) hook+=5;
+  return Math.min(100,hook);
 }
 
-// 一键评估：把评级结果写回热点对象（用于扒取/渲染时补全老数据）
+// ============ 综合可发价值（取代纯电商挂钩度，用于默认排序与分级） ============
+// 热点价值 = 热度够大 + Flyelep 能做内容；按玩法类型分「带货 / 蹭热 / 痛点规则 / 节日」
 function evalHotspot(h){
-  const r=scoreHook(h);
-  h.ecom=r.ecom; h.hook=r.hook; h.grade=r.grade; h.reasons=(r.reasons||[]).join('；');
-  h.match=r.match;
-  h.flyelepFeature=r.flyelepFeature||'';  // 17 功能 key 之一；空 = 未匹配具体功能
-  h.flyelepAngle=r.flyelepAngle||'';      // 软种草角度文案
+  // 热度（抓取时写入，缺失回退 50）
+  if(h.heat==null || isNaN(h.heat)) h.heat=50;
+  // Flyelep 结合度
+  const fv=scoreFlyelep((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')+' '+(h.product||''));
+  h.flyelepFeature=fv.feature||'';
+  h.flyelepAngle=fv.angle||'';
+  h.flyelepFit = fv.score>=4?'强' : fv.score>=2?'中' : '弱';
+  let fitScore = fv.score>=4?100 : fv.score>=2?65 : fv.score>=1?40 : 20;
+  // 玩法类型
+  const angle=classifyAngle(h, h.heat, fv);
+  h.angle=angle;
+  // 蹭热 / 痛点规则：Flyelep 始终能为其产出图/视频，结合度保底「中」
+  if((angle==='蹭热'||angle==='痛点规则') && fv.score<2){
+    fitScore=Math.max(fitScore,65);
+    if(h.flyelepFit==='弱') h.flyelepFit='中';
+  }
+  // 蹭热无具体功能时，给一个明确的「做图/视频蹭流量」角度
+  if(angle==='蹭热' && !h.flyelepFeature){
+    h.flyelepAngle='用 Flyelep 生成该热点的 详情图 / 海报 / 短视频，低成本蹭流量做内容';
+  }
+  // 综合可发价值 = 0.45*热度 + 0.35*Flyelep结合度 + 0.20*玩法加成
+  const angleBoost=({'带货':100,'蹭热':100,'痛点规则':100,'节日':80,'其他':45})[angle]||45;
+  let value=Math.round(0.45*(h.heat||50) + 0.35*fitScore + 0.20*angleBoost);
+  value=Math.min(100, Math.max(0, value));
+  h.value=value;
+  // 电商挂钩度（保留，仅作排序维度之一）
+  h.hook=scoreHookRaw(h);
+  // 等级由「综合可发价值」决定
+  h.grade = value>=80?'S' : value>=60?'A' : value>=40?'B' : 'C';
+  // 评级理由
+  const reasons=[];
+  reasons.push('热度 '+(h.heat||0));
+  reasons.push('玩法 '+angle);
+  if(fv.score>0){ const lbl=(FLYELEP_FEATURES.find(f=>f.key===fv.feature)||{}).label||'通用 AI 工具'; reasons.push('🎯 Flyelep「'+lbl+'」+'+fv.score*8); }
+  else reasons.push('⚠️ Flyelep 角度弱');
+  if(angle==='痛点规则') reasons.push('🛡️ 限流/规则痛点');
+  if(angle==='蹭热') reasons.push('🌊 蹭流热点');
+  h.reasons=reasons.join('；');
+  h.match = h.grade==='C'?'low':(h.grade==='B'?'mid':'high');
   return h;
 }
 
@@ -3907,6 +3985,7 @@ function mapFeed(it, cfg, today){
     market:cfg.market, platform:cfg.platform,
     title:(it.title||'').trim(), url:it.url||it.mobileUrl||'',
     product:'', category:'', price:'', sales:(it.hot?String(it.hot):''),
+    heat: normHeat(it.hot,'hotlist'),
     playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
     status:'pending', note:''
   };
@@ -3985,6 +4064,7 @@ async function scrapeHotFromApi(){
                 title:(a.title||'').trim(),
                 url:a.url||'',
                 product:'', category:'', price:'', sales:'',
+                heat: heatFromRecency(a.publishedAt||a.published_at, 10),
                 playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
                 status:'pending', note:(a.source&&a.source.name?('来源：'+a.source.name):'')
               };
@@ -4018,11 +4098,9 @@ async function scrapeHotFromApi(){
     const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心 AI 资讯', 'HN Show':'HN Show HN'};
     const src=srcMap[usedBase]||usedBase||'本地/云端';
     const all=state.hotspots;
-    const strong=all.filter(h=>h.ecom==='strong').length;
-    const weak=all.filter(h=>h.ecom==='weak').length;
-    const noE=all.filter(h=>h.ecom==='no').length;
+    const cntA=a=>all.filter(h=>h.angle===a).length;
     const sab=all.filter(h=>['S','A','B'].includes(h.grade)).length;
-    el.textContent='✅ 本次新增 '+total+' 条（来源：'+src+'）｜库内共 '+all.length+' 条：强电商 '+strong+' · 疑似 '+weak+' · 非电商 '+noE+'（默认已隐藏）｜S/A/B 级可用 '+sab+' 条'+(errors.length?'；失败：'+errors.join('/'):'');
+    el.textContent='✅ 本次新增 '+total+' 条（来源：'+src+'）｜库内共 '+all.length+' 条：带货 '+cntA('带货')+' · 蹭热 '+cntA('蹭热')+' · 痛点规则 '+cntA('痛点规则')+' · 节日 '+cntA('节日')+' · 其他 '+cntA('其他')+'｜S/A 级可用 '+sab+' 条（默认按综合价值展示全部，不再隐藏非电商）'+(errors.length?'；失败：'+errors.join('/'):'');
     el.className='feed-status ok';
     toast('扒取到 '+total+' 条新热点');
     // 🆕 顶部"新增快报"横幅 —— 8 秒后自动收起；用户点"立即查看"切到本次新增 + 新增时间排序
@@ -4074,6 +4152,7 @@ async function fetchNewsHN(){
           title:h.title.trim(),
           url:h.url||('https://news.ycombinator.com/item?id='+h.id),
           product:'', category:'', price:'', sales:'',
+          heat: normHeat(h.score,'hn'),
           playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
           status:'pending', note:'HN 热度 '+(h.score||0)
         };
@@ -4105,6 +4184,7 @@ async function fetchAIRSS(){
           date:today, type:'news', source:src.name, market:'国内', platform:src.name,
           title:String(d.title||'').slice(0,140), url:d.url||'',
           product:'', category:'', price:'', sales:'',
+          heat: heatFromRecency(d.date||d.pubDate, 15),
           playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
           status:'pending', note:'AI 资讯'
         };
@@ -4132,6 +4212,7 @@ async function fetchShowHN(){
         date:today, type:'news', source:'HN Show', market:'海外', platform:'Hacker News',
         title:String(d.title||'').slice(0,140), url:d.url||('https://news.ycombinator.com/item?id='+d.id),
         product:'', category:'', price:'', sales:'',
+        heat: normHeat(d.score,'hn'),
         playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
         status:'pending', note:'🆕 Show HN · 👍 '+(d.score||0)
       };
