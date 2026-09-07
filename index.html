@@ -184,6 +184,20 @@ tr:hover td{background:#fbfaf7}
 .bulk-bar{position:sticky;top:0;z-index:5;display:none;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding:8px 12px;background:#fff5f0;border:1px solid #f1c0b0;border-radius:10px;box-shadow:0 4px 12px rgba(193,74,43,.08);font-size:13px;color:var(--ink)}
 .bulk-bar.show{display:flex}
 .bulk-bar .cnt{font-weight:700;color:var(--accent)}
+/* 热门热点跑马灯（横向无缝循环滚动，hover 暂停，点击定位到表格行） */
+.hot-marquee{overflow:hidden;background:linear-gradient(90deg,#fff8e6 0%,#fff3d6 50%,#fff8e6 100%);border:1px solid #ffe1a8;border-radius:10px;padding:9px 0;margin:0 0 10px;white-space:nowrap;cursor:default;box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.hot-marquee:hover .marquee-track{animation-play-state:paused}
+.marquee-track{display:flex;width:max-content;animation:marquee 50s linear infinite;will-change:transform}
+.marquee-content{display:inline-flex;flex-shrink:0}
+.marquee-item{display:inline-flex;align-items:center;margin:0 18px;font-size:13px;color:#a85a00;cursor:pointer;white-space:nowrap;line-height:1.4}
+.marquee-item:hover{color:#d36a00;text-decoration:underline}
+.marquee-item .grade{font-weight:700;margin-right:5px;padding:1px 5px;border-radius:3px;background:rgba(168,90,0,.12);font-size:11.5px}
+.marquee-item .grade.S{background:#ffe2b8;color:#a8430b}
+.marquee-item .grade.A{background:#fff0c8;color:#946c0a}
+.marquee-item .grade.B{background:#eef7e4;color:#3a7a23}
+.marquee-item .src{margin-left:6px;font-size:10.5px;color:#a86b1a;opacity:.7}
+.marquee-empty{display:inline-block;color:var(--muted);font-size:12.5px;padding:0 16px;font-style:italic}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .bulk-bar .actions{display:flex;gap:6px;margin-left:auto}
 .bulk-bar .btn{font-size:12px}
 /* 表格复选框列 */
@@ -641,6 +655,31 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
     <!-- 🔥 热点列表（核心：每天推荐的热点） -->
     <div class="panel">
       <h2>🔥 每日推荐热点 <span style="font-size:12px;font-weight:400;color:var(--muted)">高匹配排前 · 点「🎬 生成」直接出脚本</span></h2>
+      <!-- 跑马灯：展示热门热点（替代原 filter-bar 位置） -->
+      <div class="hot-marquee" id="hotMarquee" title="热门热点滚动 · 鼠标悬停暂停 · 点击定位到表格">
+        <div class="marquee-track" id="hotMarqueeTrack">
+          <div class="marquee-content"><span class="marquee-empty">📭 暂无热门热点，先点下面「🔥 一键扒热点（Yellow Dog Hot 1.0）」抓一批 →</span></div>
+          <div class="marquee-content" aria-hidden="true"><span class="marquee-empty">·</span></div>
+        </div>
+      </div>
+      <div class="bulk-bar" id="bulkBar">
+        <span>已选 <span class="cnt" id="bulkCount">0</span> 条</span>
+        <span style="font-size:11.5px;color:var(--muted)">⚠️ 删除不可恢复</span>
+        <div class="actions">
+          <button class="btn sm" onclick="bulkHotspotSetStatus('used')">✓ 标记已用</button>
+          <button class="btn sm" onclick="bulkHotspotSetStatus('discard')">✗ 标记弃用</button>
+          <button class="btn sm danger" onclick="bulkDeleteHotspots()">🗑 批量删除</button>
+          <button class="btn sm ghost" onclick="clearHotspotSelection()">取消选择</button>
+        </div>
+      </div>
+      <div class="sync-bar">
+        <button class="btn sm hot" id="btnScrape" onclick="scrapeHotFromApi()">🔥 一键扒热点（Yellow Dog Hot 1.0）</button>
+        <button class="btn sm primary" onclick="syncHotspotFeed(true)">🔄 同步热点源（拉取最新一周）</button>
+        <button class="btn sm" onclick="document.getElementById('feedFileInput').click()">📂 导入热点源文件</button>
+        <input type="file" id="feedFileInput" accept=".json,application/json" hidden onchange="importFeedFile(this)">
+        <span id="feedStatus" class="feed-status">⬇️ 打开看板会自动同步热点源（hotspot_feed.js / .json）</span>
+      </div>
+      <!-- 筛选项（从原 filter-bar 位置挪到 sync-bar 后面） -->
       <div class="filter-bar">
         <span class="lbl">筛选</span>
         <select id="filterHType" onchange="renderHotspot()">
@@ -688,23 +727,6 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         </select>
         <input type="text" class="kw" id="filterHKeyword" placeholder="🔍 搜标题 / 商品 / 玩法 / 评级理由" oninput="renderHotspot()">
         <button class="reset" onclick="resetHotspotFilters()" title="清空所有筛选">清空筛选</button>
-      </div>
-      <div class="bulk-bar" id="bulkBar">
-        <span>已选 <span class="cnt" id="bulkCount">0</span> 条</span>
-        <span style="font-size:11.5px;color:var(--muted)">⚠️ 删除不可恢复</span>
-        <div class="actions">
-          <button class="btn sm" onclick="bulkHotspotSetStatus('used')">✓ 标记已用</button>
-          <button class="btn sm" onclick="bulkHotspotSetStatus('discard')">✗ 标记弃用</button>
-          <button class="btn sm danger" onclick="bulkDeleteHotspots()">🗑 批量删除</button>
-          <button class="btn sm ghost" onclick="clearHotspotSelection()">取消选择</button>
-        </div>
-      </div>
-      <div class="sync-bar">
-        <button class="btn sm hot" id="btnScrape" onclick="scrapeHotFromApi()">🔥 一键扒热点（uapis）</button>
-        <button class="btn sm primary" onclick="syncHotspotFeed(true)">🔄 同步热点源（拉取最新一周）</button>
-        <button class="btn sm" onclick="document.getElementById('feedFileInput').click()">📂 导入热点源文件</button>
-        <input type="file" id="feedFileInput" accept=".json,application/json" hidden onchange="importFeedFile(this)">
-        <span id="feedStatus" class="feed-status">⬇️ 打开看板会自动同步热点源（hotspot_feed.js / .json）</span>
       </div>
       <div class="table-scroll"><table id="hotspotTable"><thead><tr>
         <th class="hs-cb"><input type="checkbox" id="hsSelectAll" onchange="toggleSelectAll(this.checked)" title="全选当前可见行"></th><th>日期</th><th>类型</th><th>渠道</th><th>标题</th><th>💰 可挂钩商品</th><th>🎬 内容玩法</th><th>🎯 挂钩等级</th><th>状态</th><th>操作</th>
@@ -755,7 +777,6 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <option value="siliconflow">🌊 Yellow Dog DeepSeek</option>
           <option value="local">📝 Yellow Dog 本地模板</option>
         </select>
-        <span id="genEngineStatus" class="api-status" title="Yellow Dog 引擎状态">⏳ 探测中…</span>
         <span class="gen-meta-tip">
           <a href="#" onclick="event.preventDefault();showEngineInfo()">⚙ 引擎说明</a>
         </span>
@@ -1655,6 +1676,20 @@ async function generateScript(){
       // 已流式部分内容 → 保留已生成部分 + 中断提示
       renderAiScript(h, {content: lastFull, model_used: engineLabel(engine)}, '⚠️ 生成中断（'+reason+'），已保留已生成部分。', lastFull);
       toast('生成中断，已保留已生成内容');
+    }else if(engine==='zhipu-pro' || engine==='siliconflow'){
+      // GLM-5.3 (推理) 或 DeepSeek (备用) 失败 → 自动 fallback 到默认 Yellow Dog GLM-4-Flash（非推理·稳）
+      toast('⚠️ '+engineLabel(engine)+' 失败（'+reason+'），自动改用 '+engineLabel('ai')+' 重试…');
+      try{
+        const r2=await callZhipu([{role:'system',content:prompt.system},{role:'user',content:prompt.user}], 0, { model:'glm-4-flash', onToken:null });
+        renderAiScript(h, {content: (r2&&r2.content||'').trim(), model_used: r2?r2.model_used:engineLabel('ai')}, '⚠️ '+engineLabel(engine)+' 失败，已自动改用 '+engineLabel('ai')+' 完成出稿（原失败原因：'+reason+'）。', null);
+        return;
+      }catch(e2){
+        const reason2=(e2&&e2.message)?e2.message:'未知错误';
+        const fallbackScript=buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf);
+        renderAiScript(h, null, '⚠️ '+engineLabel(engine)+' 与默认引擎均失败，已用 Yellow Dog 本地模板兜底：'+reason2+'。', fallbackScript);
+        toast('所有 Yellow Dog 引擎均不可用，已用本地模板兜底');
+        return;
+      }
     }else{
       const fallbackScript=buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf);
       const noKey=!((localStorage.getItem('flyelep_zhipu_key')||'').trim());
@@ -3208,6 +3243,43 @@ function renderHotspot(){
       ${h.url?`<b>链接</b><div><a href="${h.url}" target="_blank" style="color:var(--brand)">${escapeHtml(h.url)}</a></div>`:''}
     </div></td></tr>`:''}`;
   }).join('');
+  try{ renderHotMarquee(); }catch(_){} // 顺手刷一下跑马灯
+}
+
+/* 热门热点跑马灯：横向无缝循环滚动，从 state.hotspots 取挂钩等级 S/A/B 的前 20 条 */
+function renderHotMarquee(){
+  const track=$('#hotMarqueeTrack');
+  if(!track) return;
+  const arr=(state.hotspots||[])
+    .filter(h=>['S','A','B'].includes(h.grade||''))
+    .sort((a,b)=>(b.hook||0)-(a.hook||0))
+    .slice(0,20);
+  if(!arr.length){
+    track.innerHTML='<div class="marquee-content"><span class="marquee-empty">📭 暂无热门热点，先点下面「🔥 一键扒热点（Yellow Dog Hot 1.0）」抓一批 →</span></div>'
+                  +'<div class="marquee-content" aria-hidden="true"><span class="marquee-empty">·</span></div>';
+    return;
+  }
+  const one=arr.map(h=>{
+    const title=(h.title||'').slice(0,36);
+    return `<span class="marquee-item" data-id="${h.id}" onclick="scrollToHotspot('${h.id}')" title="点击定位到表格：${escapeHtml(h.title||'')}">`
+         + `<span class="grade ${h.grade||''}">${h.grade||'?'}</span>`
+         + `<span>${escapeHtml(title)}${title.length>0 && (h.title||'').length>36?'…':''}</span>`
+         + (h.source?`<span class="src">· ${escapeHtml((h.source||'').slice(0,12))}</span>`:'')
+         + `</span>`;
+  }).join('');
+  // 复制一份实现无缝循环（CSS translateX(-50%) 收尾相接）
+  track.innerHTML=`<div class="marquee-content">${one}</div><div class="marquee-content" aria-hidden="true">${one}</div>`;
+}
+
+function scrollToHotspot(id){
+  // 先清空筛选，让目标行可见
+  const row=$(`#hotspotTable tbody tr[data-id="${id}"]`);
+  if(!row){ toast('该热点不在当前筛选内，已清空筛选重新定位'); resetHotspotFilters(); return; }
+  row.scrollIntoView({behavior:'smooth',block:'center'});
+  // 高亮闪烁一下
+  const orig=row.style.background;
+  row.style.background='#fff3d6';
+  setTimeout(()=>{ row.style.background=orig; }, 1500);
 }
 function toggleHsDetail(id){
   const el=$('#hsd-'+id); if(el) el.classList.toggle('hidden');
@@ -3705,7 +3777,7 @@ async function scrapeHotFromApi(){
   }catch(e){ /* 不影响 DailyHotApi 结果 */ }
   if(btn){ btn.disabled=false; btn.textContent='🔥 一键扒取热点（DailyHotApi + NewsAPI）'; }
   if(usedBase){
-    const srcMap={local:'本机 server.js 反代', api:'团队云后端代理（uapis）', imsyy:'公共实例 api-hot.imsyy.top', NewsAPI:'NewsAPI', 'Hacker News':'Hacker News'};
+    const srcMap={local:'本机 server.js 反代', api:'团队云后端代理', imsyy:'公共实例 api-hot.imsyy.top', NewsAPI:'NewsAPI', 'Hacker News':'Hacker News'};
     const src=srcMap[usedBase]||usedBase||'本地/云端';
     const all=state.hotspots;
     const strong=all.filter(h=>h.ecom==='strong').length;
@@ -3720,6 +3792,7 @@ async function scrapeHotFromApi(){
     el.className='feed-status warn';
     toast('扒取失败：三级兜底均不可达，请稍后重试');
   }
+  try{ renderHotspot(); }catch(_){} // 刷新跑马灯
 }
 async function importFeedFile(input){
   const f=input.files[0]; if(!f) return;
