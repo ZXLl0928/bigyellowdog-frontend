@@ -242,6 +242,32 @@ a.hs-title:hover{text-decoration:underline}
 .badge-cd.past{background:#efeeea;color:#8a8982}
 .cal-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:4px}
 
+/* 🆕 新增快报工具栏（抓完热点后自动展开 8 秒） */
+.new-arrival-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:9px 14px;margin:10px 0;
+  background:linear-gradient(90deg,#ecfdf3 0%,#f0fdf4 100%);
+  border:1px solid #bbf7d0;border-radius:10px;font-size:13px;color:#166534;
+  animation:nabPulse 1.2s ease-out 1}
+@keyframes nabPulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}100%{box-shadow:0 0 0 8px rgba(34,197,94,0)}}
+.nab-main b{font-size:15px;color:#15803d;font-weight:800;margin:0 2px}
+.nab-src{font-size:11.5px;color:#475569}
+.nab-gap{flex:1}
+.nab-sort{display:flex;align-items:center;gap:5px;font-size:12px;color:#475569}
+.nab-sort select{height:28px;padding:3px 8px;font-size:12px;border:1px solid #bbf7d0;border-radius:6px;background:#fff;color:#166534}
+.nab-close{background:none;border:none;font-size:18px;color:#94a3b8;cursor:pointer;padding:0 6px;line-height:1}
+.nab-close:hover{color:#166534}
+
+/* 通用 chip 按钮（🆕 24h 新增） */
+.chip{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 12px;border-radius:100px;
+  font-size:12px;font-weight:600;background:#fff;border:1px solid #bbf7d0;color:#475569;cursor:pointer;transition:.15s}
+.chip:hover{background:#f0fdf4;border-color:#86efac}
+.chip.on{background:#22c55e;color:#fff;border-color:#16a34a;box-shadow:0 1px 4px rgba(34,197,94,.3)}
+
+/* 表格行里的"🆕 新增"小角标 */
+.new-badge{display:inline-block;margin-top:3px;font-size:10px;padding:1px 6px;border-radius:100px;
+  background:linear-gradient(90deg,#22c55e,#16a34a);color:#fff;font-weight:700;letter-spacing:.3px;
+  box-shadow:0 1px 3px rgba(34,197,94,.3)}
+
 /* 表单分区 */
 .form-section{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
 .form-section:first-child{margin-top:0;padding-top:0;border-top:none}
@@ -682,6 +708,22 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         <button class="btn sm" onclick="document.getElementById('feedFileInput').click()">📂 导入热点源文件</button>
         <input type="file" id="feedFileInput" accept=".json,application/json" hidden onchange="importFeedFile(this)">
         <span id="feedStatus" class="feed-status">⬇️ 打开看板会自动同步热点源（hotspot_feed.js / .json）</span>
+      </div>
+      <!-- 🆕 新增快报（每次扒取后高亮 8 秒，含快捷筛选 + 排序） -->
+      <div class="new-arrival-bar hidden" id="newArrivalBar">
+        <span class="nab-main">✅ 本次扒取新增 <b id="nabCount">0</b> 条</span>
+        <span class="nab-src">来源：<span id="nabSrc">—</span></span>
+        <span class="nab-gap"></span>
+        <button class="chip" id="onlyNewBtn" onclick="toggleOnlyNew()" title="只看 24h 内新增的热点">🆕 24h 新增</button>
+        <label class="nab-sort" title="表格排序方式">
+          排序：
+          <select id="sortBy" onchange="renderHotspot()">
+            <option value="hook">按挂钩度 ↓（推荐）</option>
+            <option value="added">按新增时间 ↓（最新在最上）</option>
+            <option value="date">按热点日期 ↓</option>
+          </select>
+        </label>
+        <button class="nab-close" onclick="dismissNewBanner()" title="收起">×</button>
       </div>
       <!-- 筛选项（从原 filter-bar 位置挪到 sync-bar 后面） -->
       <div class="filter-bar">
@@ -1413,7 +1455,7 @@ function submitHotspot(e){
     struct:$('#hStruct').value, status:$('#hStatus').value, note:$('#hNote').value
   };
   if(id){ const h=state.hotspots.find(x=>x.id===id); Object.assign(h,data); toast('热点已更新'); }
-  else{ state.hotspots.push({id:uid(),...data,createdAt:Date.now()}); toast('热点已添加'); }
+  else{ state.hotspots.push({id:uid(),...data,createdAt:Date.now(),addedAt:Date.now()}); toast('热点已添加'); }
   save(); resetHotspotForm(); renderHotspot(); updateBadges(); renderTodayTodo();
 }
 function resetHotspotForm(){
@@ -1536,7 +1578,29 @@ function resetHotspotFilters(){
   ['filterHType','filterHMatch','filterHMarket','filterHPlatform','filterHKeyword'].forEach(id=>{ const el=$('#'+id); if(el) el.value=''; });
   const e=$('#filterHEcom'); if(e) e.value='useful';
   const g=$('#filterHGrade'); if(g) g.value='sab';
+  const o=$('#onlyNewBtn'); if(o) o.classList.remove('on');
+  const s=$('#sortBy'); if(s) s.value='hook';
   renderHotspot();
+}
+/* 🆕 新增快报：切换"只看 24h 内新增" */
+function toggleOnlyNew(){
+  const b=$('#onlyNewBtn'); if(!b) return;
+  b.classList.toggle('on');
+  renderHotspot();
+}
+/* 🆕 收起新增快报横幅（仅本次操作，不影响筛选） */
+function dismissNewBanner(){
+  const bar=$('#newArrivalBar'); if(bar) bar.classList.add('hidden');
+}
+/* 🆕 抓完热点后展示"新增 N 条"横幅，8 秒后自动收起 */
+let _nabHideTimer=null;
+function showNewArrival(n, src){
+  const bar=$('#newArrivalBar'); if(!bar) return;
+  const nc=$('#nabCount'); if(nc) nc.textContent=n;
+  const ns=$('#nabSrc'); if(ns) ns.textContent=src||'—';
+  bar.classList.remove('hidden');
+  if(_nabHideTimer) clearTimeout(_nabHideTimer);
+  _nabHideTimer=setTimeout(()=>{ bar.classList.add('hidden'); }, 8000);
 }
 
 /* ================== 生成脚本（选热点→选账号→视频类型→时长→主推功能→选结构） ================== */
@@ -2445,7 +2509,7 @@ function festivalToHotspot(id){
     playbook:f.playbook||'', fn:f.fn||'',
     trend:'up', win: d<=7?'today':(d<=30?'3d':'week'),
     struct:'', status:'pending',
-    note:`节日 ${f.date} · 建议提前 ${f.lead||14} 天备料`, createdAt:Date.now()
+    note:`节日 ${f.date} · 建议提前 ${f.lead||14} 天备料`, createdAt:Date.now(), addedAt:Date.now()
   });
   save(); renderHotspot(); renderTodayTodo(); updateBadges();
   toast('已加入热点库：'+f.name);
@@ -3159,14 +3223,25 @@ function renderHotspot(){
   const ft=$('#filterHType')?.value||'', fm=$('#filterHMarket')?.value||'',
         fp=$('#filterHPlatform')?.value||'', fm2=$('#filterHMatch')?.value||'',
         fe=$('#filterHEcom')?.value||'', fg=$('#filterHGrade')?.value||'',
-        fk=$('#filterHKeyword')?.value.toLowerCase()||'';
+        fk=$('#filterHKeyword')?.value.toLowerCase()||'',
+        onlyNew=$('#onlyNewBtn')?.classList.contains('on')||false,
+        sortBy=$('#sortBy')?.value||'hook';
   // 补全老数据评级（无 hook 字段时实时计算一次）
   let needSave=false;
   for(const h of state.hotspots){ if(h.hook==null || h.grade==null){ evalHotspot(h); needSave=true; } }
   if(needSave){ try{ save(); }catch(_){} }
 
-  // 默认按挂钩度降序排（最值得做的排最前）
-  let arr=[...state.hotspots].sort((a,b)=>(b.hook||0)-(a.hook||0) || (b.date||'').localeCompare(a.date||''));
+  // 排序：按挂钩度（默认）/ 按新增时间 / 按热点日期 —— 新增时间用 addedAt，缺则回退到 date
+  const now=Date.now();
+  const ts=h=>h.addedAt||Date.parse((h.date||'').replace(/-/g,'/'))||0;
+  let arr=[...state.hotspots];
+  if(sortBy==='added'){
+    arr.sort((a,b)=>ts(b)-ts(a));
+  }else if(sortBy==='date'){
+    arr.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  }else{
+    arr.sort((a,b)=>(b.hook||0)-(a.hook||0) || (b.date||'').localeCompare(a.date||''));
+  }
   if(ft) arr=arr.filter(h=>h.type===ft);
   if(fm) arr=arr.filter(h=>h.market===fm);
   if(fp) arr=arr.filter(h=>h.platform===fp);
@@ -3178,6 +3253,8 @@ function renderHotspot(){
   if(fg==='sab') arr=arr.filter(h=>['S','A','B'].includes(h.grade));
   else if(fg) arr=arr.filter(h=>h.grade===fg);
   if(fk) arr=arr.filter(h=>[h.title,h.source,h.product,h.playbook,h.topic,h.script,h.material,h.reasons].some(x=>(x||'').toLowerCase().includes(fk)));
+  // 🆕 仅看 24h 内新增
+  if(onlyNew) arr=arr.filter(h=> (h.addedAt||0) >= now-86400000);
 
   // KPI 概览（7 张）
   const cnt=t=>arr.filter(h=>h.type===t).length;
@@ -3216,11 +3293,16 @@ function renderHotspot(){
     const [sCls,sTxt]=statusMap[h.status]||statusMap.pending;
     const hasDetail=h.topic||h.script||h.material||h.reasons||h.url||h.note;
     const sel=state.hotspotSelections&&state.hotspotSelections.has(h.id);
+    const isNew=(h.addedAt||0) >= now-86400000;   // 24h 内为新
+    const channel=[h.market,h.platform].filter(Boolean).join(' · ')||'—';
     return `<tr${sel?' class="selected"':''}>
       <td class="hs-cb"><input type="checkbox" data-hid="${h.id}" ${sel?'checked':''} onchange="toggleHotspotSelect('${h.id}', this.checked)"></td>
-      <td style="white-space:nowrap">${h.date}</td>
+      <td style="white-space:nowrap;font-size:12.5px">
+        ${h.date||'—'}
+        ${isNew?'<div class="new-badge" title="本次扒取新增">🆕 新增</div>':''}
+      </td>
       <td><span class="pill ${tCls}">${tEmo} ${tTxt}</span></td>
-      <td style="font-size:12px;white-space:nowrap">${h.market?`<span class="pill ${mCls}">${mTxt}</span>`:''}${h.platform?` <span class="pill plat">${h.platform}</span>`:''}${!h.market&&!h.platform?'—':''}</td>
+      <td style="font-size:12px;white-space:nowrap"><span class="pill ${mCls}">${channel}</span></td>
       <td style="max-width:230px" title="${escapeHtml(h.title)}">
         ${h.url
           ? `<a href="${h.url}" target="_blank" class="hs-title">${escapeHtml(h.title)}</a>`
@@ -3243,11 +3325,10 @@ function renderHotspot(){
       <td style="white-space:nowrap;font-size:12px">
         <span class="pill ${ecCls}">${ecTxt}</span>
         <div style="margin-top:3px"><span class="badge-grade ${gCls}">${gTxt}级</span> <span style="font-size:11px;color:var(--muted)">${h.hook||0}分</span></div>
-        ${h.reasons?`<div style="font-size:10.5px;color:var(--muted);margin-top:2px;max-width:170px;line-height:1.4">${h.reasons}</div>`:''}
       </td>
       <td><span class="pill ${sCls}">${sTxt}</span></td>
       <td style="white-space:nowrap">
-        ${hasDetail?`<button class="btn sm" onclick="toggleHsDetail('${h.id}')">详情</button> `:''}
+        ${hasDetail?`<button class="btn sm" onclick="toggleHsDetail('${h.id}')" title="查看评级理由 / 选题 / 脚本要点 / 素材清单">详情 ▾</button> `:''}
         <button class="btn sm primary" onclick="genFromRow('${h.id}')">🎬 生成</button>
         <button class="btn sm danger" onclick="deleteHotspot('${h.id}')">删</button>
       </td>
@@ -3551,7 +3632,8 @@ function mergeFeed(list){
     if(existing.has(k)) return;
     const o=Object.assign(
       {id:'feed-'+Date.now()+'-'+n, url:'', note:'', price:'', sales:'', category:'',
-       playbook:'', fn:'', struct:'', status:'pending', match:'', topic:'', script:'', material:''},
+       playbook:'', fn:'', struct:'', status:'pending', match:'', topic:'', script:'', material:'',
+       addedAt:Date.now()},
       h
     );
     state.hotspots.push(o); existing.add(k); n++;
@@ -3587,6 +3669,8 @@ async function syncHotspotFeed(manual){
     const added=mergeFeed(data.hotspots||[]);
     if(el){ el.textContent='✅ 热点源已同步：'+ (data.updatedAt||'') +`（库中共 ${state.hotspots.length} 条）`; el.className='feed-status ok'; }
     if(manual) toast(added? `已同步 ${added} 条新热点` : '已是最新，无新增热点');
+    // 🆕 手动同步也展示"新增快报"横幅
+    if(manual && added>0){ showNewArrival(added, '热点源文件'); }
     return added;
   }
   if(el){ el.textContent='⚠️ 自动读取热点源失败（'+errMsg+'），可点「导入热点源文件」手动导入'; el.className='feed-status warn'; }
@@ -3889,6 +3973,8 @@ async function scrapeHotFromApi(){
     el.textContent='✅ 本次新增 '+total+' 条（来源：'+src+'）｜库内共 '+all.length+' 条：强电商 '+strong+' · 疑似 '+weak+' · 非电商 '+noE+'（默认已隐藏）｜S/A/B 级可用 '+sab+' 条'+(errors.length?'；失败：'+errors.join('/'):'');
     el.className='feed-status ok';
     toast('扒取到 '+total+' 条新热点');
+    // 🆕 顶部"新增快报"横幅 —— 8 秒后自动收起；用户点"立即查看"切到 24h 新增 + 新增时间排序
+    if(total>0){ showNewArrival(total, src); }
   }else{
     el.textContent='⚠️ 扒取失败：服务端代理 + 本机 server + 公共实例三级兜底全部不可达。建议：① 等几秒重试（公共实例偶发波动）；② 检查网络。';
     el.className='feed-status warn';
@@ -3902,6 +3988,7 @@ async function importFeedFile(input){
     const txt=await f.text(); const data=JSON.parse(txt);
     const added=mergeFeed(data.hotspots||[]);
     toast(added? `已导入 ${added} 条新热点` : '导入完成，无新增');
+    if(added>0) showNewArrival(added, '导入文件');
   }catch(e){ toast('导入失败：'+e.message); }
   input.value='';
 }
