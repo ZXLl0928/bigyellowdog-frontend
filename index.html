@@ -505,7 +505,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       </div>
       <div class="drawer-section">
         <div class="drawer-title">🔑 高级（一般不用动）</div>
-        <button class="drawer-item" onclick="openZhipuKey()">🔑 配置智谱 Key</button>
+        <button class="drawer-item" onclick="openZhipuKey()">🔑 配置引擎 Key</button>
         <button class="drawer-item" onclick="cfgServer()">⚙️ 后端服务器地址</button>
       </div>
       <div class="drawer-foot">数据存在云端 / 本地浏览器 · 团队共享请登录</div>
@@ -749,13 +749,13 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       </div>
       <div class="gen-actionbar">
         <button class="btn primary gen-primary-btn" id="genGoBtn" onclick="generateScript()">🎬 AI 生成脚本</button>
-        <select id="genEngine" class="gen-engine-select" title="生成引擎：默认 GLM-4-Flash（免费·稳定·快）；GLM-5.3 为推理强力模型（慢、易因思考占满额度导致正文为空）；硅基流动为免费备用；本地模板离线可用">
-          <option value="ai" selected>⚡ 智谱 GLM-4-Flash（免费·推荐）</option>
-          <option value="zhipu-pro">☁️ 智谱 GLM-5.3（强力·推理·慢）</option>
-          <option value="siliconflow">🌊 硅基流动 DeepSeek（免费·备用）</option>
-          <option value="local">📝 本地模板</option>
+        <select id="genEngine" class="gen-engine-select" title="生成引擎选择 — 默认项适合大多数场景；其他可按需切换">
+          <option value="ai" selected>⚡ Yellow Dog GLM-4-Flash</option>
+          <option value="zhipu-pro">☁️ Yellow Dog GLM-5.3</option>
+          <option value="siliconflow">🌊 Yellow Dog DeepSeek</option>
+          <option value="local">📝 Yellow Dog 本地模板</option>
         </select>
-        <span id="genEngineStatus" class="api-status" title="智谱服务状态">⏳ 探测中…</span>
+        <span id="genEngineStatus" class="api-status" title="Yellow Dog 引擎状态">⏳ 探测中…</span>
         <span class="gen-meta-tip">
           <a href="#" onclick="event.preventDefault();showEngineInfo()">⚙ 引擎说明</a>
         </span>
@@ -934,7 +934,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         月百条爆款不是梦 —— 专为电商运营部打造的一站式工具：<b>扒热点 → 选商品/玩法 → AI 出脚本 → 跟数据</b>。
       </p>
       <p style="font-size:12.5px;color:var(--muted);line-height:1.7">
-        · 数据存储、导入/导出、连接本地文件、智谱 Key 等高级设置，已收纳到右上角 <b>「⋯」</b> 按钮（数据与设置抽屉）。<br>
+        · 数据存储、导入/导出、连接本地文件、引擎 Key 等高级设置，已收纳到右上角 <b>「⋯」</b> 按钮（数据与设置抽屉）。<br>
         · 不登录也能用本地模式；点右上角 <b>☁️</b> 可加入团队云，多人实时共享。
       </p>
     </div>
@@ -1630,9 +1630,9 @@ async function generateScript(){
   const engine=($('#genEngine')?.value)||'ai';
   showGenLoading(h, engine, {vt,vd,vf});
   if(engine==='local'){ buildLocalScript(h,a,st,plat,fn,vt,vd,vf); return; }
-  // 硅基流动：未配 Key 时友好提示并回退本地模板
+  // 备用通道（DeepSeek/Qwen 等）：未配 Key 时友好提示并回退本地模板
   if(engine==='siliconflow' && window.__engines && window.__engines.siliconflow===false){
-    toast('⚠️ 硅基流动通道未启用（owner 需在 Render 设 SILICONFLOW_KEY）。已用本地模板兜底，或切到智谱引擎。');
+    toast('⚠️ 备用通道未启用（owner 需在 Render 设 SILICONFLOW_KEY）。已用 Yellow Dog 本地模板兜底，或切到默认引擎。');
     buildLocalScript(h,a,st,plat,fn,vt,vd,vf); return;
   }
   const prompt=buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid);
@@ -1659,10 +1659,10 @@ async function generateScript(){
       const fallbackScript=buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf);
       const noKey=!((localStorage.getItem('flyelep_zhipu_key')||'').trim());
       const hint=noKey
-        ? '（未检测到智谱 Key —— 请点页面右下角「🔑 配置智谱Key」填入后重试）'
-        : '（已配置 Key 但仍失败，可能是模型限流/超时，可点「🔁 重生成」重试，或切到「📝 本地模板」）';
-      renderAiScript(h, null, '⚠️ 调用失败，已自动回退本地模板：'+reason+'。'+hint, fallbackScript);
-      toast('AI 调用失败，已用本地模板兜底');
+        ? '（未检测到引擎 Key —— 请点页面右下角「🔑 配置引擎 Key」填入后重试）'
+        : '（已配置 Key 但仍失败，可能是限流/超时，可点「🔁 重生成」重试，或切到「📝 Yellow Dog 本地模板」）';
+      renderAiScript(h, null, '⚠️ 调用失败，已自动回退 Yellow Dog 本地模板：'+reason+'。'+hint, fallbackScript);
+      toast('AI 调用失败，已用 Yellow Dog 本地模板兜底');
     }
   }finally{ if(btn) btn.disabled=false; }
 }
@@ -1772,14 +1772,14 @@ async function callZhipu(messages, retry=0, opts={}){
     }catch(e){
       // 浏览器 Key 直连失败（多半 Key 失效/过期/额度用完）→ 自动回退团队后端代理（后端 ZHIPU_KEY 已验证可用，全团队免配 Key）
       if(API_BASE){
-        try{ if(window.toast) toast('⚠️ 浏览器智谱 Key 直连失败，已自动改用团队后端通道'); }catch(_){}
+        try{ if(window.toast) toast('⚠️ 浏览器直连失败，已自动改用团队后端通道'); }catch(_){}
         return await _callZhipuBackend(messages, model, onToken, retry, opts);
       }
       throw e;
     }
   }
   // 否则走团队云后端代理（后端需配 ZHIPU_KEY 环境变量，owner 一次配置全团队免配 Key）
-  if(!API_BASE) throw new Error('未配置智谱 Key，且未连接团队云后端');
+  if(!API_BASE) throw new Error('未配置引擎 Key，且未连接团队云后端');
   return await _callZhipuBackend(messages, model, onToken, retry, opts);
 }
 
@@ -1801,7 +1801,7 @@ async function _callZhipuBackend(messages, model, onToken, retry=0, opts={}){
       const j=await resp.json().catch(()=>({ok:false,error:'非 JSON 响应'}));
       if(!j.ok) throw new Error(j.error||'HTTP '+resp.status);
       const txt=j.raw?.choices?.[0]?.message?.content?.trim?.();
-      if(!txt) throw new Error('智谱返回内容为空（该模型为推理模型时易把额度花在思考上；建议改用「智谱 GLM-4-Flash」）');
+      if(!txt) throw new Error('返回内容为空（该模型为推理型时易把额度花在思考上；建议改用「Yellow Dog GLM-4-Flash」）');
       return {content: txt, model_used: j.model_used||model};
     }
     return await _readSSE(resp, onToken, model);
@@ -1837,7 +1837,7 @@ async function callZhipuDirect(messages, key, retry=0, opts={}){
       if(!onToken){
         const j=await resp.json();
         const txt=j.choices?.[0]?.message?.content?.trim?.();
-        if(!txt){ if(i<models.length-1) continue; throw new Error('智谱返回内容为空'); }
+        if(!txt){ if(i<models.length-1) continue; throw new Error('返回内容为空'); }
         return {content: txt, model_used: m};
       }
       return await _readSSE(resp, onToken, m);
@@ -1885,7 +1885,7 @@ async function _readSSE(resp, onToken, modelLabel){
 // 硅基流动代理（走团队云后端 /api/siliconflow，OpenAI 兼容，读后端 SILICONFLOW_KEY；一个 Key 调 100+ 免费开源模型）
 async function callSiliconflow(messages, retry=0, opts={}){
   const { model='deepseek-ai/DeepSeek-V3', onToken=null } = opts;
-  if(!API_BASE) throw new Error('未连接团队云后端（硅基流动需后端代理）');
+  if(!API_BASE) throw new Error('未连接团队云后端（备用通道需后端代理）');
   const base=API_BASE.replace(/\/$/,'');
   const body={messages, model, temperature:0.8, max_tokens:4000, stream: !!onToken};
   const ctrl=new AbortController();
@@ -1899,7 +1899,7 @@ async function callSiliconflow(messages, retry=0, opts={}){
       const j=await resp.json().catch(()=>({ok:false,error:'非 JSON 响应'}));
       if(!j.ok) throw new Error(j.error||'HTTP '+resp.status);
       const txt=j.raw?.choices?.[0]?.message?.content?.trim?.();
-      if(!txt) throw new Error('硅基流动返回内容为空');
+      if(!txt) throw new Error('备用通道返回内容为空');
       return {content: txt, model_used: j.model_used||model};
     }
     return await _readSSE(resp, onToken, model);
@@ -1911,10 +1911,10 @@ async function callSiliconflow(messages, retry=0, opts={}){
 }
 
 function engineLabel(e){
-  return e==='siliconflow' ? '硅基流动 DeepSeek'
-       : e==='zhipu-pro'   ? '智谱 GLM-5.3（推理）'
-       : e==='local'       ? '本地模板'
-       : '智谱 GLM-4-Flash（免费）';
+  return e==='siliconflow' ? 'Yellow Dog DeepSeek'
+       : e==='zhipu-pro'   ? 'Yellow Dog GLM-5.3'
+       : e==='local'       ? 'Yellow Dog 本地模板'
+       : 'Yellow Dog GLM-4-Flash';
 }
 
 // 流式打字机：每收到一个 token 即更新 #genScriptText（带闪烁光标 ▋）
@@ -1942,7 +1942,7 @@ function showGenLoading(h, engine, ctx){
     <div class="gen-head"><span>🎬 ${escapeHtml(h.title)}</span></div>
     <div class="gen-loading">
       <div class="spinner"></div>
-      <div><b>${engine==='local'?'📝 本地模板生成中…':'🤖 '+engineLabel(engine)+' 生成中…（边生成边显示）'}${ctxTxt}</b>
+      <div><b>${engine==='local'?'📝 Yellow Dog 本地模板生成中…':'🤖 '+engineLabel(engine)+' 生成中…（边生成边显示）'}${ctxTxt}</b>
       <div class="hint" style="font-size:11.5px;color:var(--muted);margin-top:3px">${engine==='local'?'即时生成，无需等待。':'AI 正在逐字生成，完成后即可复制 / 重生成。'}</div></div>
     </div></div>`;
 }
@@ -1950,8 +1950,8 @@ function showGenLoading(h, engine, ctx){
 function renderAiScript(h, r, fallbackError, fallbackScript){
   const box=$('#genResult');
   const content=r?r.content:(fallbackScript||'(空)');
-  const badge=r?`<span class="badge-grade g-A" title="由智谱 ${r.model_used} 生成">🤖 智谱 · ${r.model_used}</span>`
-                :`<span class="badge-grade g-C" title="智谱失败，自动回退">📝 本地模板（兜底）</span>`;
+  const badge=r?`<span class="badge-grade g-A" title="由 ${r.model_used} 生成">🤖 ${r.model_used}</span>`
+                :`<span class="badge-grade g-C" title="引擎调用失败，自动回退">📝 Yellow Dog 本地模板（兜底）</span>`;
   const errLine=fallbackError?`<div style="background:#fff5f5;border:1px solid #fdd;padding:8px 10px;border-radius:6px;font-size:12px;color:#a33;margin:8px 0">${escapeHtml(fallbackError)}</div>`:'';
   // Markdown 渲染：简单两手准备（标题加粗 / 段落分隔）
   const html=markdownLite(content);
@@ -2037,15 +2037,15 @@ async function probeZhipuStatus(){
   }
   const clientKey=(localStorage.getItem('flyelep_zhipu_key')||'').trim();
   if(clientKey){
-    el.textContent='🤖 智谱就绪（浏览器直连）'+(window.__engines.siliconflow?' · 备用✓':'');
+    el.textContent='🤖 Yellow Dog 就绪（浏览器直连）'+(window.__engines.siliconflow?' · 备用✓':'');
     el.className='api-status ok';
-    el.title='使用浏览器内配置的智谱 Key 直连 BigModel'+(window.__engines.siliconflow?'；备用通道硅基流动已就绪':'');
+    el.title='使用浏览器内已配置的 Key 直连'+(window.__engines.siliconflow?'；备用通道已就绪':'');
     return;
   }
   if(!base){
-    el.textContent='⚠️ 未连接团队云（可用「配置智谱Key」直连）';
+    el.textContent='⚠️ 未连接团队云（可用「配置 Key」直连）';
     el.className='api-status err';
-    el.title='未连接后端，可点右下角「配置智谱Key」填入 Key 后直连 BigModel';
+    el.title='未连接后端，可点右下角「配置引擎 Key」填入后直连';
     return;
   }
   try{
@@ -2060,33 +2060,33 @@ async function probeZhipuStatus(){
         });
         const tj=await t.json();
         if(tj && tj.ok){
-          el.textContent='🤖 智谱就绪 · 备用'+(window.__engines.siliconflow?'硅基流动✓':'硅基流动✗');
+          el.textContent='🤖 Yellow Dog 就绪 · 备用'+(window.__engines.siliconflow?'✓':'✗');
           el.className='api-status ok';
-          el.title='后端 ZHIPU_KEY 调用正常'+(window.__engines.siliconflow?'；硅基流动备用通道已配 Key 可用':'；硅基流动未配 Key（去 Render 设 SILICONFLOW_KEY 启用免费备用）');
+          el.title='团队云 Key 调用正常'+(window.__engines.siliconflow?'；备用通道已配 Key 可用':'；备用通道未配 Key');
         }else{
           el.textContent='⚠️ 团队云 Key 失效（'+((tj&&tj.error)||'调用失败')+'）';
           el.className='api-status err';
-          el.title='后端 ZHIPU_KEY 配了但智谱拒绝，请 owner 到 Render 更新有效 Key';
+          el.title='后端 Key 配了但被拒绝，请 owner 到 Render 更新有效 Key';
         }
       }catch(_){
         el.textContent='⚠️ 团队云 Key 失效（调用异常）';
         el.className='api-status err';
-        el.title='后端 Key 调用失败，请用「配置智谱Key」直连';
+        el.title='后端 Key 调用失败，请用「配置引擎 Key」直连';
       }
     }else{
-      el.textContent='⚠️ 团队云未配 Key（可选「配置智谱Key」直连）';
+      el.textContent='⚠️ 团队云未配 Key（可选「配置引擎 Key」直连）';
       el.className='api-status err';
-      el.title='后端未设 ZHIPU_KEY；可点右下角「配置智谱Key」直连 BigModel';
+      el.title='后端 Key 未配置；可点右下角「配置引擎 Key」直连';
     }
   }catch(_){
-    el.textContent='⚠️ 团队云智谱离线';
+    el.textContent='⚠️ 团队云离线';
     el.className='api-status err';
-    el.title='后端 /api/zhipu 不可达，可点右下角「配置智谱Key」直连 BigModel';
+    el.title='后端不可达，可点右下角「配置引擎 Key」直连';
   }
 }
 
 function showEngineInfo(){
-  alert(`生成脚本引擎说明（6 步流程 · 每步都会喂给智谱）：
+  alert(`生成脚本引擎说明（6 步流程 · 每步都会喂给 AI）：
 
 【第 1 步】选热点 → 已有挂钩点
 【第 2 步】选账号 → 平台调性 + 人群画像
@@ -2107,8 +2107,8 @@ function showEngineInfo(){
 
 【第 6 步】脚本结构（10 选 1）：悬念 / 发问 / 反差 / 对比 / 反认知 / 故事 / 误区 / 揭秘 / 现象 / 认知
 
-【引擎】默认 ☁️ 智谱 GLM-5.3（候选自动回退：glm-5.3 → glm-4-flash → glm-4-plus → glm-4-air）；失败自动回退本地模板（含全 6 项前置）。
-【未配 Key】点右下角「🔑 配置智谱Key」填入，立即可用真· GLM 出稿。`);
+【引擎】默认 ⚡ Yellow Dog GLM-4-Flash（候选自动回退：GLM-4-Flash → GLM-5.3 → GLM-4-Plus → GLM-4-Air）；失败自动回退 Yellow Dog 本地模板（含全 6 项前置）。
+【未配 Key】点右下角「🔑 配置引擎 Key」填入，立即可用真· Yellow Dog 出稿。`);
 }
 
 async function copyGenScript(){
@@ -2532,7 +2532,7 @@ ${SCRIPT_STRUCTS.map(s=>'- '+s.key+' = '+s.label).join('\n')}
     _cacheBlowoutAnalysis('biResult', j);
     renderBlowoutAnalysis('biResult', j, {url,plat,workName,vtype,mainContent,likes,comments,favorites,script});
   }catch(e){
-    resultEl.innerHTML='<div class="bar-title" style="color:#a8332b">❌ 拆解失败</div><div style="font-size:12px;color:#666">'+e.message+'</div><div class="muted" style="font-size:11.5px;margin-top:6px">小提示：检查智谱 Key / 后端 / 网络。你也可以点「💾 不拆解直接保存」手动指定结构。</div>';
+    resultEl.innerHTML='<div class="bar-title" style="color:#a8332b">❌ 拆解失败</div><div style="font-size:12px;color:#666">'+e.message+'</div><div class="muted" style="font-size:11.5px;margin-top:6px">小提示：检查引擎 Key / 后端 / 网络。你也可以点「💾 不拆解直接保存」手动指定结构。</div>';
   }
 }
 
@@ -3208,7 +3208,7 @@ async function aiSuggestRow(id){
   // 没有 Key 的话引导用户先去配置
   const key=(localStorage.getItem('flyelep_zhipu_key')||'').trim();
   if(!key){
-    toast('请先在右上角配置智谱 Key',4000);
+    toast('请先在右上角配置引擎 Key',4000);
     if(typeof openZhipuKey==='function'){ setTimeout(()=>openZhipuKey(), 600); }
     return;
   }
@@ -3304,7 +3304,7 @@ function exportJSON(onlyVideos){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url; a.download=`flyelep_${onlyVideos?'videos':'all'}_${todayStr()}.json`; a.click();
-  URL.revokeObjectURL(url); toast('已导出（含智谱 Key 与人群画像）');
+  URL.revokeObjectURL(url); toast('已导出（含引擎 Key 与人群画像）');
 }
 function exportCSV(){
   const arr=state.videos;
@@ -4063,19 +4063,19 @@ document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ const d=documen
 async function openZhipuKey(){
   const cur=(localStorage.getItem('flyelep_zhipu_key')||'').trim();
   const tip=cur
-    ? '已检测到已有 Key（前几位：'+cur.slice(0,6)+'…）。\n\n粘贴新的智谱 API Key 以覆盖（仅存本浏览器）：'
-    : '粘贴你的智谱 API Key（仅存本浏览器，不上传任何服务器）：\n\nBigModel 控制台 https://open.bigmodel.cn/usercenter/apikeys\n\n（团队云已默认走后端代理，一般不用填）';
+    ? '已检测到已有 Key（前几位：'+cur.slice(0,6)+'…）。\n\n粘贴新的引擎 API Key 以覆盖（仅存本浏览器）：'
+    : '粘贴你的引擎 API Key（仅存本浏览器，不上传任何服务器）：\n\n（团队云已默认走后端代理，一般不用填）';
   const v=prompt(tip, cur);
   if(v===null) return;
   const key=v.trim();
-  if(!key){ localStorage.removeItem('flyelep_zhipu_key'); toast('已清除智谱 Key'); probeZhipuStatus(); return; }
+  if(!key){ localStorage.removeItem('flyelep_zhipu_key'); toast('已清除引擎 Key'); probeZhipuStatus(); return; }
   localStorage.setItem('flyelep_zhipu_key', key);
   toast('🔄 已保存，正在测试 Key 是否有效…');
   // 立即发一条最小请求验证 Key 真实性（避免填错/失效的 Key 直到真正拆解才报错）
   try{
     const r=await callZhipuDirect([{role:'user',content:'回复一个字：好'}], key);
     if(r && r.content){
-      toast('✅ 智谱 Key 有效 · 直连已就绪（'+(r.model_used||'GLM')+'）');
+      toast('✅ 引擎 Key 有效 · 直连已就绪（'+(r.model_used||'GLM')+'）');
     }else{
       toast('⚠️ Key 已保存但返回异常，请重新获取');
     }
