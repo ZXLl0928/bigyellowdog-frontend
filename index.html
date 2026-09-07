@@ -251,6 +251,10 @@ a.hs-title:hover{text-decoration:underline}
 @keyframes nabPulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}100%{box-shadow:0 0 0 8px rgba(34,197,94,0)}}
 .nab-main b{font-size:15px;color:#15803d;font-weight:800;margin:0 2px}
 .nab-src{font-size:11.5px;color:#475569}
+.nab-go{height:30px;padding:0 14px;border-radius:100px;border:none;background:linear-gradient(90deg,#16a34a,#22c55e);
+  color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(34,197,94,.35);transition:.15s}
+.nab-go:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(34,197,94,.5)}
+.nab-go:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .nab-gap{flex:1}
 .nab-sort{display:flex;align-items:center;gap:5px;font-size:12px;color:#475569}
 .nab-sort select{height:28px;padding:3px 8px;font-size:12px;border:1px solid #bbf7d0;border-radius:6px;background:#fff;color:#166534}
@@ -713,6 +717,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       <div class="new-arrival-bar hidden" id="newArrivalBar">
         <span class="nab-main">✅ 本次扒取新增 <b id="nabCount">0</b> 条</span>
         <span class="nab-src">来源：<span id="nabSrc">—</span></span>
+        <button class="nab-go" id="nabGoBtn" onclick="jumpToNew()" title="放宽筛选条件，直接看到本次新增的全部 N 条">👀 立即查看 →</button>
         <span class="nab-gap"></span>
         <button class="chip" id="onlyNewBtn" onclick="toggleOnlyNew()" title="只看 24h 内新增的热点">🆕 24h 新增</button>
         <label class="nab-sort" title="表格排序方式">
@@ -1580,6 +1585,7 @@ function resetHotspotFilters(){
   const g=$('#filterHGrade'); if(g) g.value='sab';
   const o=$('#onlyNewBtn'); if(o) o.classList.remove('on');
   const s=$('#sortBy'); if(s) s.value='hook';
+  _onlyThisBatch=false;
   renderHotspot();
 }
 /* 🆕 新增快报：切换"只看 24h 内新增" */
@@ -1598,9 +1604,39 @@ function showNewArrival(n, src){
   const bar=$('#newArrivalBar'); if(!bar) return;
   const nc=$('#nabCount'); if(nc) nc.textContent=n;
   const ns=$('#nabSrc'); if(ns) ns.textContent=src||'—';
+  const go=$('#nabGoBtn'); if(go){
+    if(_lastMergeIds && _lastMergeIds.length){
+      go.textContent=`👀 立即查看 ${_lastMergeIds.length} 条 →`;
+      go.disabled=false;
+    }else{
+      go.textContent='👀 立即查看 →';
+      go.disabled=false;
+    }
+  }
   bar.classList.remove('hidden');
   if(_nabHideTimer) clearTimeout(_nabHideTimer);
   _nabHideTimer=setTimeout(()=>{ bar.classList.add('hidden'); }, 8000);
+}
+/* 🆕 立即查看：放宽筛选项 + 切到本次新增 + 按新增时间排 — 一键直达 282 条全部新热点 */
+let _onlyThisBatch=false;   // 是否仅显示本次新增
+function jumpToNew(){
+  // 1) 放宽默认严筛：电商判定/挂钩等级 都放开
+  const e=$('#filterHEcom'); if(e) e.value='';
+  const g=$('#filterHGrade'); if(g) g.value='';
+  // 2) 开启"🆕 24h 新增" + "本次新增"精确筛选
+  _onlyThisBatch=true;
+  const o=$('#onlyNewBtn'); if(o) o.classList.add('on');
+  // 3) 排序切到"按新增时间↓"
+  const s=$('#sortBy'); if(s) s.value='added';
+  // 4) 横幅停留，不自动收起
+  const bar=$('#newArrivalBar'); if(bar) bar.classList.remove('hidden');
+  if(_nabHideTimer) clearTimeout(_nabHideTimer);
+  renderHotspot();
+  // 5) 滚到表格并提示
+  setTimeout(()=>{
+    const tbl=$('#hotspotTable'); if(tbl) tbl.scrollIntoView({behavior:'smooth',block:'start'});
+    toast(`✅ 已显示本次新增 ${_lastMergeIds.length||0} 条（已放宽筛选项）`);
+  }, 80);
 }
 
 /* ================== 生成脚本（选热点→选账号→视频类型→时长→主推功能→选结构） ================== */
@@ -3253,8 +3289,13 @@ function renderHotspot(){
   if(fg==='sab') arr=arr.filter(h=>['S','A','B'].includes(h.grade));
   else if(fg) arr=arr.filter(h=>h.grade===fg);
   if(fk) arr=arr.filter(h=>[h.title,h.source,h.product,h.playbook,h.topic,h.script,h.material,h.reasons].some(x=>(x||'').toLowerCase().includes(fk)));
-  // 🆕 仅看 24h 内新增
-  if(onlyNew) arr=arr.filter(h=> (h.addedAt||0) >= now-86400000);
+  // 🆕 仅看 24h 内新增；或本次新增（更精确，只显示本次扒取的那批）
+  if(_onlyThisBatch && _lastMergeIds.length){
+    const idSet=new Set(_lastMergeIds);
+    arr=arr.filter(h=>idSet.has(h.id));
+  }else if(onlyNew){
+    arr=arr.filter(h=> (h.addedAt||0) >= now-86400000);
+  }
 
   // KPI 概览（7 张）
   const cnt=t=>arr.filter(h=>h.type===t).length;
@@ -3621,10 +3662,13 @@ function renderAll(){
 
 /* ================== 热点源同步（每日自动化写入 hotspot_feed.json） ================== */
 function hsKey(h){ return ((h.title||'')+'|'+(h.type||'')).trim(); }
+// 本次新增的热点 ID 列表（供"立即查看"按钮精确筛选本次抓取的内容，不被 24h / 历史数据污染）
+let _lastMergeIds=[];
 // 把热点源里的条目合并进当前库；已存在的（按 标题|类型 去重）不覆盖，避免重复或冲掉用户编辑
 function mergeFeed(list){
   if(!Array.isArray(list)) return 0;
   const existing=new Set(state.hotspots.map(hsKey));
+  const ids=[];
   let n=0;
   list.forEach(h=>{
     if(!h || !h.title) return;
@@ -3636,9 +3680,13 @@ function mergeFeed(list){
        addedAt:Date.now()},
       h
     );
-    state.hotspots.push(o); existing.add(k); n++;
+    state.hotspots.push(o); existing.add(k); ids.push(o.id); n++;
   });
-  if(n>0){ save(); renderHotspot(); updateBadges(); renderTodayTodo(); }
+  if(n>0){
+    // 累积本次抓取的 ID（去重） —— 一次抓取可能多次调用 mergeFeed（不同数据源），需要聚合
+    _lastMergeIds=Array.from(new Set([...(_lastMergeIds||[]), ...ids]));
+    save(); renderHotspot(); updateBadges(); renderTodayTodo();
+  }
   return n;
 }
 // 用 <script> 动态加载热点源（file:// 双击打开也能用，不依赖 fetch / 本地服务器）
@@ -3654,6 +3702,8 @@ function loadFeedViaScript(){
 async function syncHotspotFeed(manual){
   const el=$('#feedStatus');
   let data=null, errMsg='';
+  // 重置本次新增 ID 列表
+  _lastMergeIds=[]; _onlyThisBatch=false;
   // 1) 优先 <script> 加载（file:// 与 http:// 都可用，最稳）
   try{ data=await loadFeedViaScript(); }
   catch(e){ errMsg=e.message; }
@@ -3866,6 +3916,8 @@ async function scrapeHotFromApi(){
   const btn=document.getElementById('btnScrape');
   const el=$('#feedStatus');
   if(btn){ btn.disabled=true; btn.textContent='⏳ 扒取中…'; }
+  // 重置本次新增 ID 列表（让 showNewArrival / jumpToNew 精确显示本次扒取的 N 条）
+  _lastMergeIds=[]; _onlyThisBatch=false;
   // 数据源优先级（每条路由依次尝试，任一成功即采用）：
   // ① 同源反代 /api/hot（仅本机跑 server.js 时有效）
   // ② Supabase Edge Function「scrape-hot」（登录团队云后可用，服务端抓取，无 CORS、无需本机）
@@ -3973,7 +4025,7 @@ async function scrapeHotFromApi(){
     el.textContent='✅ 本次新增 '+total+' 条（来源：'+src+'）｜库内共 '+all.length+' 条：强电商 '+strong+' · 疑似 '+weak+' · 非电商 '+noE+'（默认已隐藏）｜S/A/B 级可用 '+sab+' 条'+(errors.length?'；失败：'+errors.join('/'):'');
     el.className='feed-status ok';
     toast('扒取到 '+total+' 条新热点');
-    // 🆕 顶部"新增快报"横幅 —— 8 秒后自动收起；用户点"立即查看"切到 24h 新增 + 新增时间排序
+    // 🆕 顶部"新增快报"横幅 —— 8 秒后自动收起；用户点"立即查看"切到本次新增 + 新增时间排序
     if(total>0){ showNewArrival(total, src); }
   }else{
     el.textContent='⚠️ 扒取失败：服务端代理 + 本机 server + 公共实例三级兜底全部不可达。建议：① 等几秒重试（公共实例偶发波动）；② 检查网络。';
@@ -3984,6 +4036,7 @@ async function scrapeHotFromApi(){
 }
 async function importFeedFile(input){
   const f=input.files[0]; if(!f) return;
+  _lastMergeIds=[]; _onlyThisBatch=false;   // 重置本次新增 ID 列表
   try{
     const txt=await f.text(); const data=JSON.parse(txt);
     const added=mergeFeed(data.hotspots||[]);
