@@ -154,6 +154,9 @@ td .pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:100px
 .pill.win-today{background:#fde8e8;color:#c0392b} .pill.win-3d{background:#fff0e0;color:#b45309}
 .pill.win-week{background:#fff8dd;color:#8a6100} .pill.win-long{background:#e6f7ed;color:#1a6e3f}
 .pill.fn{background:#e8f0fe;color:#1e4fa0}
+.flyelep-angle{background:linear-gradient(90deg,#f5f0ff,#e9def8);border:1px solid #d4c0eb;border-radius:6px;padding:5px 8px;margin-bottom:4px;font-size:11.5px;color:#5b21b6;line-height:1.45;position:relative}
+.flyelep-angle-tag{display:inline-block;background:#7c3aed;color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;margin-left:6px;vertical-align:1px}
+.playbook-text{color:var(--ink2);line-height:1.45}
 /* 电商判定 & 挂钩等级徽章 */
 .pill.ec-strong{background:#d9efe2;color:#1a6e3f;border:1px solid #b6dcbf}
 .pill.ec-weak{background:#fff3d6;color:#9a6b00;border:1px solid #ecd79a}
@@ -196,6 +199,7 @@ tr:hover td{background:#fbfaf7}
 .marquee-item .grade.A{background:#fff0c8;color:#946c0a}
 .marquee-item .grade.B{background:#eef7e4;color:#3a7a23}
 .marquee-item .src{margin-left:6px;font-size:10.5px;color:#a86b1a;opacity:.7}
+.marquee-item .flyelep-tag{display:inline-block;margin-left:8px;padding:2px 7px;border-radius:10px;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-size:10.5px;font-weight:600;letter-spacing:.2px;white-space:nowrap;box-shadow:0 1px 2px rgba(124,58,237,.3);vertical-align:middle}
 .marquee-empty{display:inline-block;color:var(--muted);font-size:12.5px;padding:0 16px;font-style:italic}
 @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .bulk-bar .actions{display:flex;gap:6px;margin-left:auto}
@@ -1721,6 +1725,16 @@ function buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid){
 - 一切为「能直接开拍」服务：标题、短视频钩子、分镜/分节、台词、视觉、CTA、必须钩某款商品或脚本模版全部具体化
 - 输出**纯 Markdown**，**不要**用三个反引号包裹（用户是直接粘贴到剪贴板用的），结尾自动结束
 
+【核心 · Flyelep 软种草（这是这个工具的出发点和灵魂，绝对不能偏离）】
+- Flyelep 是「给跨境电商人用的 AI 工具矩阵」，17 个核心功能：AI帮写 / 详情图 / 专业主图 / 产品单图 / 广告营销 / 视频生成 / 局部重绘 / 商品替换 / 场景替换 / 智能延展 / 图片翻译 / AI抠图 / 商品换色 / 无损放大 / AI超清 / 品牌模型 / 品牌模板
+- 你写的每一个脚本、每一条视频的最终目的都是「自然地把 Flyelep 某个功能介绍给跨境电商人 / 内容创作者」，让他们看完就有"我得去试试这个工具"的冲动
+- 软种草 ≠ 硬广：不要在脚本里直接喊"用 Flyelep XX 功能"。要让 Flyelep 工具作为「解决用户痛点的具体方法」出现。例如：
+  · "想要 3 套不同风格主图？用 AI 主图工具 10 秒就能出 3 套对比"（用数字 + 速度 + 痛点）
+  · "想把这张图翻译成 5 种小语种？图片翻译一键搞定"（用场景 + 一键）
+  · "拍了 50 张产品图，但只有 1 张背景能用？AI 抠图 + 场景替换，1 张变 50 张"（对比痛点）
+- 每个脚本结尾必须自然过渡到【Flyelep 落地工具】段，给出用户可立刻照做的 1 步行动
+- 钩子要带「痛点 / 好奇 / 数字」三选一；不要喊口号、列空话
+
 【平台调性 · ${plat}】
 调性：${tone}
 平台专属写法（必须逐条遵守，否则脚本不像这个平台的号）：
@@ -1774,6 +1788,7 @@ ${rules}${fewShotBlock}${learnedBlock}
 - 玩法描述：${h.playbook||'(无)'}
 - 原始选题要点：${h.topic||'(无)'}
 - 原始素材清单：${h.material||'(无)'} · URL：${h.url||''}
+${h.flyelepAngle?'\n【本热点 × Flyelep 推荐角度（按这个角度切入最自然）】\n'+h.flyelepAngle+'\n请围绕这个角度设计脚本：钩子怎么引入 Flyelep、痛点怎么点到 Flyelep 解决、结尾怎么自然落到 Flyelep 工具。':''}
 
 【账号信息】
 - 账号：${a.platform||plat} · ${a.name}
@@ -3217,10 +3232,13 @@ function renderHotspot(){
           ? `<b>${escapeHtml(h.product)}</b>${h.category?`<div style="font-size:11px;color:var(--muted)">${escapeHtml(h.category)}</div>`:''}${h.sales?`<div style="font-size:11px;color:var(--accent);font-weight:600">${escapeHtml(h.sales)}${h.price?' · '+escapeHtml(h.price):''}</div>`:''}`
           : `<button class="ai-mini" data-airow="${h.id}" onclick="aiSuggestRow('${h.id}')">⚡ AI推荐</button>`}
       </td>
-      <td style="max-width:240px;font-size:12px;color:var(--ink2)">
-        ${h.playbook
-          ? `${escapeHtml(h.playbook)}${h.fn?`<div style="margin-top:3px"><span class="pill fn">${escapeHtml(h.fn)}</span></div>`:''}`
-          : `<button class="ai-mini" onclick="aiSuggestRow('${h.id}')">⚡ AI推荐</button>`}
+      <td style="max-width:280px;font-size:12px;color:var(--ink2)">
+        ${(()=>{
+          const fp=(FLYELEP_FEATURES.find(f=>f.key===h.flyelepFeature)||{}).label;
+          const angle=h.flyelepAngle && (!h.playbook || h.flyelepAngle!==h.playbook) ? `<div class="flyelep-angle" title="自动判定 · ${escapeHtml(fp||'通用 AI 工具')} 角度">${escapeHtml(h.flyelepAngle)}${fp?`<span class="flyelep-angle-tag">${escapeHtml(fp)}</span>`:''}</div>` : '';
+          const pb=h.playbook?`<div class="playbook-text">${escapeHtml(h.playbook)}${h.fn?`<span class="pill fn">${escapeHtml(h.fn)}</span>`:''}</div>` : '';
+          return angle+pb || `<button class="ai-mini" onclick="aiSuggestRow('${h.id}')">⚡ AI推荐</button>`;
+        })()}
       </td>
       <td style="white-space:nowrap;font-size:12px">
         <span class="pill ${ecCls}">${ecTxt}</span>
@@ -3260,11 +3278,14 @@ function renderHotMarquee(){
     return;
   }
   const one=arr.map(h=>{
-    const title=(h.title||'').slice(0,36);
-    return `<span class="marquee-item" data-id="${h.id}" onclick="scrollToHotspot('${h.id}')" title="点击定位到表格：${escapeHtml(h.title||'')}">`
+    const title=(h.title||'').slice(0,32);
+    const featLabel=(FLYELEP_FEATURES.find(f=>f.key===h.flyelepFeature)||{}).label || (h.flyelepFeature?'':'通用 AI');
+    const angleTag = featLabel? `<span class="flyelep-tag" title="${escapeHtml(h.flyelepAngle||'')}">🎯 ${escapeHtml(featLabel)}</span>`:'';
+    return `<span class="marquee-item" data-id="${h.id}" onclick="scrollToHotspot('${h.id}')" title="${escapeHtml((h.title||'')+ (h.flyelepAngle?'\n\n🎯 Flyelep 角度：'+h.flyelepAngle:''))}">`
          + `<span class="grade ${h.grade||''}">${h.grade||'?'}</span>`
-         + `<span>${escapeHtml(title)}${title.length>0 && (h.title||'').length>36?'…':''}</span>`
-         + (h.source?`<span class="src">· ${escapeHtml((h.source||'').slice(0,12))}</span>`:'')
+         + `<span>${escapeHtml(title)}${title.length>0 && (h.title||'').length>32?'…':''}</span>`
+         + angleTag
+         + (h.source?`<span class="src">· ${escapeHtml((h.source||'').slice(0,10))}</span>`:'')
          + `</span>`;
   }).join('');
   // 复制一份实现无缝循环（CSS translateX(-50%) 收尾相接）
@@ -3605,6 +3626,64 @@ const ECOM_EXCLUDE=['地震','暴雨','台风','洪水','干旱','火灾','疫�
 // 视觉素材潜力：命中说明适合做短视频内容（既用于挂钩度评分，也用于电商弱信号辅助判定）
 const VISUAL_KW=['开箱','测评','好物','种草','穿搭','妆容','美食','改造','对比','教程','探店','合集','清单','vlog','记录','晒单','买家秀','试色','试吃','拆箱','好物分享','避坑','攻略','红黑榜','拔草'];
 
+/* ============ Flyelep 17 个功能 × 可结合热点关键词（核心定位：所有热点必须能挂到 Flyelep 上） ============ */
+const FLYELEP_HOT_KW={
+  aibw:    ['文案','标题','listing','五点描述','bullet point','描述','卖点','种草文案','爆款文案','广告语','营销文案','描述优化','产品文案','详情文案','标题优化','listing 优化','广告标题','amazon listing','tiktok shop 文案','shopee listing','产品描述','广告标题','seo 文案'],
+  detail:  ['详情页','详情图','产品详情','listing 图','多角度','套图','详情优化','详情页优化','商品详情','五点 bullet'],
+  main:    ['主图','白底图','主图优化','平台规范','主图设计','amazon 主图','temu 主图','tiktok 主图','主图风格','主图点击率','主图 A/B'],
+  single:  ['单图','产品图','展示图','高清图','产品单图','单张产品图','白底单图'],
+  ad:      ['广告','营销','海报','投放','素材','广告素材','营销图','投放素材','广告图','ad creative','banner','信息流广告','facebook 广告','instagram 广告','tiktok ads','巨量广告','巨量引擎','鲁班','万相台'],
+  video:   ['视频','短视频','产品视频','5秒','15秒','60秒','口播','带货视频','视频生成','AI 视频','动效视频','产品动画','产品演示','产品动效','开箱视频','种草视频','实拍视频','视频脚本','分镜视频','tiktok video','reels','短视频脚本','视频素材'],
+  redraw:  ['重绘','改字','换字','消除','局部重绘','水印去除','logo 改色','瑕疵修复','文字消除','去水印','抹除','局部修改','圈选重绘','inpainting','outpainting'],
+  preplace:['商品替换','主体替换','换产品','商品主体','同场景换品','产品换主体','换款'],
+  sreplace:['场景','场景图','背景替换','换场景','生活场景','节日场景','使用场景','场景营销','新场景','场景化','场景搭建','拍摄场景'],
+  extend:  ['延展','扩图','尺寸','比例','1:1','3:4','9:16','16:9','适配','amazon 比例','temu 比例','多比例','扩画布','扩图','outpaint','变尺寸','适配多平台'],
+  translate:['多语言','翻译','出海','跨境','多语种','本地化','英语','日语','韩语','俄语','西班牙语','法语','德语','葡萄牙语','小语种','15种语言','listing 翻译','图片翻译','多语种','本地化翻译','跨境翻译'],
+  matting: ['抠图','背景透明','alpha','主体抠出','换底','一键抠图','透明 png','抠商品','发丝抠图','人像抠图','产品抠图'],
+  recolor: ['换色','同款多色','配色','多色展示','多色款','商品换色','同款不同色','配色方案','色彩搭配'],
+  upscale: ['放大','无损','分辨率','高分辨率','大图','低分辨率','模糊放大','细节放大','无损放大'],
+  clarity: ['超清','清晰度','模糊修复','老照片','马赛克','细节增强','低清修复','去噪','清晰化','图片变清晰'],
+  brandm:  ['品牌模型','专属模型','定制模型','私有模型','品牌 ai','专属 ai','品牌定制','模型微调','训练模型'],
+  brandt:  ['品牌模板','预设模板','模板套用','节日模板','营销模板','618 模板','双11 模板','黑五模板','圣诞模板','模板库'],
+  // 通用 Flyelep 关键词（命中但未匹配具体功能时使用）
+  '':      ['flyelep','AI 工具','AI工具','AI 电商','AI 电商工具','AI 提效','电商 AI','跨境 AI','选品 AI','AI 选品','AI 主图','AI 详情','AI 视频','AI 抠图','电商人必备','电商效率','效率工具','AI 生产力','AI 创作','AI 营销','ai 商业化','ai 商业化','生成式 AI','生成式','midjourney','stable diffusion','sora','kling','可灵','即梦','dalle','suno','runway','pika','adobe firefly','chatgpt','gpt','gemini','claude','llm','大模型','文心','通义','豆包','kimi','deepseek','混元','hunyuan','qwen','qwen3','ernie','智谱','glm','claude','grok','llama','mistral','ai 助手','ai agent','agent','智能体','ai 工具','aigc','a 工具','aigc 工具','gpt-4','gpt-5','claude 3','claude 4','sora 2','amazon','亚马逊','shopee','lazada','ozon','temu','shein','tiktok shop','速卖通','aliexpress','独立站','shopify','woocommerce','ebay','walmart','mercadolibre','跨境电商平台','电商平台','出海平台','跨境平台','电商运营','亚马逊运营','shopee 运营','tiktok shop 运营','选品','listing 优化','主图优化','listing 撰写','五点描述','商品推广','站内广告','站外引流','自然流量','付费流量','acos','roas','转化率','客单价','uv 价值','aov','gmv','日销','月销','爆款打造','新品推广','店铺装修','品牌打造','私域运营','用户运营','内容运营','海外仓','fba','海外仓发货','fba 头程','物流时效']
+};
+
+/* 17 个功能 × 软种草角度模板（一句话告诉用户：用 Flyelep 这个功能怎么结合这个热点） */
+const FLYELEP_ANGLE={
+  aibw:    '用 Flyelep「AI帮写」给该热点产品写 3 版不同风格文案对比展示',
+  detail:  '用 Flyelep「详情图」一键生成多角度详情图，套用到该热点产品',
+  main:    '用 Flyelep「专业主图」给该热点产品生成符合各平台规范的白底主图',
+  single:  '用 Flyelep「产品单图」为该热点产品拍一张高品质展示图',
+  ad:      '用 Flyelep「广告营销」把该热点做成 3 套不同风格广告素材',
+  video:   '用 Flyelep「视频生成」5 秒短视频，把该热点拍成产品短片',
+  redraw:  '用 Flyelep「局部重绘」优化该热点产品主图细节（去瑕疵 / 改字 / 换元素）',
+  preplace:'用 Flyelep「商品替换」把该热点场景里的产品换成你自己的',
+  sreplace:'用 Flyelep「场景替换」把该热点产品放到新场景里展示',
+  extend:  '用 Flyelep「智能延展」把该热点主图扩成 Amazon / Temu 各平台比例',
+  translate:'用 Flyelep「图片翻译」把该热点主图翻成跨境各语种',
+  matting: '用 Flyelep「AI 抠图」一键抠出该热点产品主体',
+  recolor: '用 Flyelep「商品换色」给该热点同款产品展示多色',
+  upscale: '用 Flyelep「无损放大」把该热点小图放大做主图',
+  clarity: '用 Flyelep「AI 超清」提升该热点产品图清晰度',
+  brandm:  '用 Flyelep「品牌模型」为该热点品类训练专属模型',
+  brandt:  '用 Flyelep「品牌模板」快速套用预设营销模板',
+  '':      '用 Flyelep 的 AI 工具集给该热点内容做产品化升级'
+};
+
+// 给一个标题/正文，判定可挂哪个 Flyelep 功能 + 生成软种草角度
+function scoreFlyelep(text){
+  const t=(text||'').toLowerCase();
+  let bestFeature='', bestHits=0, allHits=[];
+  for(const fk of Object.keys(FLYELEP_HOT_KW)){
+    const kws=FLYELEP_HOT_KW[fk];
+    const hits=kws.filter(k=>t.includes(k.toLowerCase()));
+    if(hits.length>bestHits){ bestHits=hits.length; bestFeature=fk; }
+    if(hits.length) allHits.push({fk, n:hits.length, sample:hits[0]});
+  }
+  return {feature: bestFeature, angle: FLYELEP_ANGLE[bestFeature]||FLYELEP_ANGLE[''], score: bestHits, hits: allHits};
+}
+
 // 判定电商相关程度：按「信号类别」而非累加，强信号优先，避免品类词累加越线
 // 返回 {ecom:'strong'|'weak'|'no', hits:[]}
 function classifyEcom(text){
@@ -3645,9 +3724,22 @@ function scoreHook(h){
   if(hot>=5e6){ hook+=15; reasons.push('高热度'); }
   else if(hot>=1e6){ hook+=10; reasons.push('较高热度'); }
   else if(hot>=2e5){ hook+=5; reasons.push('中等热度'); }
+  /* Flyelep 结合度（核心定位：所有热点必须能挂到 Flyelep 17 个功能上） */
+  const fv=scoreFlyelep(t);
+  if(fv.score>0){
+    const boost=Math.min(30, fv.score*8);  // 命中 1 个 Flyelep 关键词 +8，最高 +30
+    hook+=boost;
+    const featLabel=(FLYELEP_FEATURES.find(f=>f.key===fv.feature)||{}).label || '通用 AI 工具';
+    reasons.push(`🎯 Flyelep「${featLabel}」+${boost}`);
+  }else if(ev.ecom==='strong' || ev.ecom==='weak'){
+    // 通用消费品测评（手机/耳机/贴膜类）—— 无 Flyelep 角度时降权，避免占 S/A 级坑位
+    hook=Math.max(0, hook-10);
+    reasons.push('⚠️ 无 Flyelep 角度（纯消费品测评）');
+  }
   hook=Math.min(100,hook);
   let grade = hook>=80?'S' : hook>=60?'A' : hook>=40?'B' : 'C';
-  return {hook, grade, ecom:ev.ecom, reasons, match: grade==='C'?'low':(grade==='B'?'mid':'high')};
+  return {hook, grade, ecom:ev.ecom, reasons, match: grade==='C'?'low':(grade==='B'?'mid':'high'),
+          flyelepFeature: fv.feature, flyelepAngle: fv.angle, flyelepHits: fv.hits};
 }
 
 // 一键评估：把评级结果写回热点对象（用于扒取/渲染时补全老数据）
@@ -3655,6 +3747,8 @@ function evalHotspot(h){
   const r=scoreHook(h);
   h.ecom=r.ecom; h.hook=r.hook; h.grade=r.grade; h.reasons=(r.reasons||[]).join('；');
   h.match=r.match;
+  h.flyelepFeature=r.flyelepFeature||'';  // 17 功能 key 之一；空 = 未匹配具体功能
+  h.flyelepAngle=r.flyelepAngle||'';      // 软种草角度文案
   return h;
 }
 
@@ -3806,7 +3900,13 @@ async function importFeedFile(input){
 
 // 线上回退：Hacker News Algolia（CORS 开放）按电商关键词检索，映射成热点对象
 async function fetchNewsHN(){
-  const terms=['shopify','amazon','"direct to consumer"','"cross-border"','"tiktok shop"','ecommerce','dropshipping','fulfillment','"Black Friday"'];
+  /* 关键词分两组：① 跨境电商平台/玩法 ② AI 工具/模型 进展 —— 两组都能结合 Flyelep 17 个功能 */
+  const terms=[
+    // 跨境电商（结合 Flyelep 主图/详情/翻译/视频 等）
+    'shopify','amazon','"direct to consumer"','"cross-border"','"tiktok shop"','ecommerce','dropshipping','fulfillment','"Black Friday"','"Cyber Monday"','temu','shein','mercadolibre','"amazon fba"','shopee','lazada','ozon','"amazon listing"','"amazon seo"','"product listing"','"conversion rate"',
+    // AI 工具/模型（结合 Flyelep 全部 17 个功能，"用 AI 工具做电商"的趋势）
+    '"AI image generator"','"AI video"','"AI tools"','"generative AI"','"AI ecommerce"','"AI for sellers"','"AI product photo"','"AI background removal"','"AI image editing"','"AI upscaler"','"AI translation"','"AI copywriting"','"AI listing"','"AI product photography"','"AI marketing tools"','"AI content creation"','"AI for amazon sellers"','"AI for shopify"','"AI for dropshippers"','"AI for ecommerce"','midjourney','"stable diffusion"','"sora"','"kling"','"runway"','"pika"','"dall-e"','"claude"','"chatgpt"','"llm"','"agent"','"AIGC"'
+  ];
   const seen=new Set(); let added=0;
   for(const t of terms){
     try{
