@@ -749,9 +749,9 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       </div>
       <div class="gen-actionbar">
         <button class="btn primary gen-primary-btn" id="genGoBtn" onclick="generateScript()">🎬 AI 生成脚本</button>
-        <select id="genEngine" class="gen-engine-select" title="生成引擎：智谱 GLM-5.3 默认（强）；GLM-4.7-Flash 与硅基流动 DeepSeek 为稳定免费通道；本地模板离线可用">
-          <option value="ai" selected>☁️ 智谱 GLM-5.3</option>
-          <option value="zhipu-flash">⚡ 智谱 GLM-4.7-Flash（免费）</option>
+        <select id="genEngine" class="gen-engine-select" title="生成引擎：默认 GLM-4-Flash（免费·稳定·快）；GLM-5.3 为推理强力模型（慢、易因思考占满额度导致正文为空）；硅基流动为免费备用；本地模板离线可用">
+          <option value="ai" selected>⚡ 智谱 GLM-4-Flash（免费·推荐）</option>
+          <option value="zhipu-pro">☁️ 智谱 GLM-5.3（强力·推理·慢）</option>
           <option value="siliconflow">🌊 硅基流动 DeepSeek（免费·备用）</option>
           <option value="local">📝 本地模板</option>
         </select>
@@ -1644,7 +1644,7 @@ async function generateScript(){
     if(engine==='siliconflow'){
       r=await callSiliconflow([{role:'system',content:prompt.system},{role:'user',content:prompt.user}], 0, { onToken });
     }else{
-      const m = engine==='zhipu-flash' ? 'glm-4.7-flash' : 'glm-5.3';
+      const m = engine==='ai' ? 'glm-4-flash' : 'glm-5.3';
       r=await callZhipu([{role:'system',content:prompt.system},{role:'user',content:prompt.user}], 0, { model:m, onToken });
     }
     // 完成：渲染最终版（带复制 / 重生成按钮）
@@ -1766,9 +1766,25 @@ async function callZhipu(messages, retry=0, opts={}){
   // 优先：浏览器内已配置智谱 Key → 直连 BigModel（线上版无需本地服务）
   const { model='glm-5.3', onToken=null } = opts;
   const clientKey=(localStorage.getItem('flyelep_zhipu_key')||'').trim();
-  if(clientKey) return callZhipuDirect(messages, clientKey, retry, opts);
+  if(clientKey){
+    try{
+      return await callZhipuDirect(messages, clientKey, retry, opts);
+    }catch(e){
+      // 浏览器 Key 直连失败（多半 Key 失效/过期/额度用完）→ 自动回退团队后端代理（后端 ZHIPU_KEY 已验证可用，全团队免配 Key）
+      if(API_BASE){
+        try{ if(window.toast) toast('⚠️ 浏览器智谱 Key 直连失败，已自动改用团队后端通道'); }catch(_){}
+        return await _callZhipuBackend(messages, model, onToken, retry, opts);
+      }
+      throw e;
+    }
+  }
   // 否则走团队云后端代理（后端需配 ZHIPU_KEY 环境变量，owner 一次配置全团队免配 Key）
   if(!API_BASE) throw new Error('未配置智谱 Key，且未连接团队云后端');
+  return await _callZhipuBackend(messages, model, onToken, retry, opts);
+}
+
+// 团队后端代理（读取后端 ZHIPU_KEY 环境变量；glm-5.3 为推理模型，正文可能为空，推荐用 glm-4-flash 等非推理模型）
+async function _callZhipuBackend(messages, model, onToken, retry=0, opts={}){
   const base=API_BASE.replace(/\/$/,'');
   const body={messages, model, temperature:0.8, max_tokens:4000, stream: !!onToken};
   const ctrl=new AbortController();
@@ -1785,13 +1801,13 @@ async function callZhipu(messages, retry=0, opts={}){
       const j=await resp.json().catch(()=>({ok:false,error:'非 JSON 响应'}));
       if(!j.ok) throw new Error(j.error||'HTTP '+resp.status);
       const txt=j.raw?.choices?.[0]?.message?.content?.trim?.();
-      if(!txt) throw new Error('智谱返回内容为空');
+      if(!txt) throw new Error('智谱返回内容为空（该模型为推理模型时易把额度花在思考上；建议改用「智谱 GLM-4-Flash」）');
       return {content: txt, model_used: j.model_used||model};
     }
     return await _readSSE(resp, onToken, model);
   }catch(e){
     if(e.name==='AbortError') throw new Error('超时 120s');
-    if(retry<1){ await new Promise(r=>setTimeout(r,1500)); return callZhipu(messages,retry+1,opts); }
+    if(retry<1){ await new Promise(r=>setTimeout(r,1500)); return _callZhipuBackend(messages, model, onToken, retry+1, opts); }
     throw e;
   }finally{ clearTimeout(tid); }
 }
@@ -1896,9 +1912,9 @@ async function callSiliconflow(messages, retry=0, opts={}){
 
 function engineLabel(e){
   return e==='siliconflow' ? '硅基流动 DeepSeek'
-       : e==='zhipu-flash' ? '智谱 GLM-4.7-Flash'
+       : e==='zhipu-pro'   ? '智谱 GLM-5.3（推理）'
        : e==='local'       ? '本地模板'
-       : '智谱 GLM-5.3';
+       : '智谱 GLM-4-Flash（免费）';
 }
 
 // 流式打字机：每收到一个 token 即更新 #genScriptText（带闪烁光标 ▋）
