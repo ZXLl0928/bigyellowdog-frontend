@@ -168,6 +168,75 @@ td .pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:100px
 .badge-grade.g-C{background:#cfcdc4;color:#54534e}
 .pill.mkt-cn{background:#e6f7ed;color:#1a6e3f} .pill.mkt-overseas{background:#e6f0fa;color:#1a56a3} .pill.mkt-global{background:#f5f0fa;color:#5b2d8a}
 .pill.plat{background:#f0efea;color:var(--ink2);border:1px solid #e0ddd6}
+/* 🆕 四大类 Tab 切换器 */
+.hot-tabs{display:flex;gap:6px;margin:0 0 12px;padding:8px;background:linear-gradient(180deg,#f7f4ec,#efece4);border:1px solid var(--line);border-radius:12px;box-shadow:inset 0 1px 0 #fff}
+.hot-tab{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;font-size:13.5px;font-weight:600;color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:9px;cursor:pointer;transition:all .15s ease;white-space:nowrap}
+.hot-tab:hover{border-color:var(--brand);color:var(--brand);background:#fffaf0;transform:translateY(-1px)}
+.hot-tab.active{background:linear-gradient(180deg,#fff8e6,#ffe8b8);border-color:#f0c674;color:#9a5b00;box-shadow:0 2px 6px rgba(240,198,116,.4),inset 0 1px 0 #fff}
+.hot-tab.active .ht-ico{filter:drop-shadow(0 1px 1px rgba(154,91,0,.3))}
+.hot-tab .ht-ico{font-size:16px;line-height:1}
+.hot-tab .ht-label{font-size:13.5px}
+.hot-tab .ht-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 7px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(0,0,0,.06);color:var(--muted)}
+.hot-tab.active .ht-badge{background:rgba(154,91,0,.18);color:#9a5b00}
+/* 高级筛选抽屉 */
+.advanced-filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 12px;margin:-6px 0 10px;background:#f6f4ee;border:1px dashed var(--line);border-radius:10px}
+.advanced-filters.hidden{display:none}
+.advanced-filters select{font-size:12.5px;padding:5px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;outline:none}
+.advanced-filters .advanced-hint{font-size:11.5px;color:var(--muted);margin-left:auto}
+.advanced-toggle{font-size:11.5px;color:var(--brand);border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 10px;cursor:pointer}
+.advanced-toggle:hover{background:#fff8e1;border-color:#f0c674}
+/* filter-bar 加 .fill 占位 */
+.filter-bar .fill{flex:1}
+/* 表格列宽与排版（重设计版） */
+.hs-title-col{font-size:13px;line-height:1.55;padding:8px 0}
+.hs-title-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hs-title-row .hs-title{font-size:13.5px;font-weight:600}
+.hs-title-row .hs-title:not(a){color:var(--ink)}
+.hs-meta-row{display:flex;gap:8px;align-items:center;font-size:11.5px;color:var(--muted);margin-top:4px;flex-wrap:wrap}
+.hs-meta-row .hs-date{font-feature-settings:"tnum";color:#9a8b6e}
+.hs-meta-row .hs-mkt{display:inline-block;padding:0 6px;border-radius:4px;font-size:10.5px;font-weight:600}
+.hs-meta-row .hs-mkt-cn{background:#e6f7ed;color:#1a6e3f}
+.hs-meta-row .hs-mkt-overseas{background:#e6f0fa;color:#1a56a3}
+.hs-meta-row .hs-mkt-global{background:#f5f0fa;color:#5b2d8a}
+.hs-meta-row .hs-src{color:var(--muted)}
+.hs-meta-row .hs-status{margin-left:auto}
+.hs-meta-row .hs-status .pill{padding:1px 7px;font-size:10.5px}
+/* Flyelep 角度行（在标题列下方，独立成段，行高宽） */
+.hs-angle{display:flex;align-items:flex-start;gap:8px;margin-top:6px;padding:7px 10px;background:linear-gradient(90deg,#faf5ff 0%,#fff 100%);border:1px solid #e9d5ff;border-left:3px solid #a855f7;border-radius:6px;font-size:12px;line-height:1.65;color:#4a3a6e;word-break:break-word}
+.hs-angle-tag{flex-shrink:0;display:inline-block;padding:1px 8px;border-radius:100px;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-size:10.5px;font-weight:600;line-height:1.5}
+/* 新增 + 翻译角标 */
+.new-badge{display:inline-flex;align-items:center;height:18px;padding:0 6px;background:#15803d;color:#fff;border-radius:5px;font-size:10.5px;font-weight:700;letter-spacing:.3px;box-shadow:0 1px 2px rgba(21,128,61,.25)}
+.i18n-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:18px;background:#dbeafe;color:#1e40af;border-radius:5px;font-size:12px;font-weight:700;cursor:help}
+/* 可挂钩商品列 */
+.hs-product{font-size:12.5px;line-height:1.55}
+.hs-product b{color:var(--ink);font-weight:700}
+.hs-cat{font-size:11px;color:var(--muted);margin-top:1px}
+.hs-sales{font-size:11px;color:var(--accent);font-weight:600;margin-top:2px}
+/* 热度列 */
+.hs-heat{text-align:center;min-width:110px;padding:6px 4px}
+.hs-heat .heat-bar{margin:4px 0 6px}
+.hs-heat-num{font-size:13px;font-weight:700;color:var(--ink);line-height:1.2;font-feature-settings:"tnum"}
+.hs-heat-cap{font-size:10px;color:var(--muted);font-weight:500}
+/* 评级列 */
+.hs-value-num{font-size:11px;color:var(--muted);margin-top:2px;font-feature-settings:"tnum"}
+/* 操作列 */
+.hs-act{display:flex;flex-direction:column;gap:4px;align-items:flex-start;min-width:90px}
+.hs-act .btn{font-size:11.5px;padding:4px 9px}
+/* Fit pill 颜色 */
+.pill.fit-strong{background:#e0fbe6;color:#0e7a3a;border:1px solid #b8ecc7}
+.pill.fit-mid{background:#fff3d6;color:#9a6b00;border:1px solid #ecd79a}
+.pill.fit-weak{background:#eef0f3;color:#7c8493;border:1px solid #dde0e6}
+/* KPI 显式条数 + /20 角标 */
+.kpi .num{font-feature-settings:"tnum"}
+.kpi-cap{font-size:14px;color:var(--muted);font-weight:500;margin-left:3px}
+/* 表格列最小宽度，避免（避免列宽被挤压导致文字截断） */
+#hotspotTable th,#hotspotTable td{vertical-align:top}
+#hotspotTable th:nth-child(3),#hotspotTable td:nth-child(3){min-width:88px;text-align:center}
+#hotspotTable th:nth-child(4),#hotspotTable td:nth-child(4){min-width:130px}
+#hotspotTable th:nth-child(5),#hotspotTable td:nth-child(5){min-width:108px;text-align:center}
+#hotspotTable th:nth-child(6),#hotspotTable td:nth-child(6){min-width:78px;text-align:center}
+#hotspotTable th:nth-child(7),#hotspotTable td:nth-child(7){min-width:74px;text-align:center}
+#hotspotTable th:nth-child(8),#hotspotTable td:nth-child(8){min-width:96px;text-align:center}
 /* 玩法类型徽章（带货 / 蹭热 / 痛点规则 / 节日 / 其他） */
 .pill.an-dai{background:#fff0e0;color:#b45309;border:1px solid #f2d2ab}
 .pill.an-ride{background:#e7f0ff;color:#1c5fc9;border:1px solid #c3d8f7}
@@ -724,7 +793,15 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         <input type="file" id="feedFileInput" accept=".json,application/json" hidden onchange="importFeedFile(this)">
         <span id="feedStatus" class="feed-status">⬇️ 打开看板会自动同步热点源（hotspot_feed.js / .json）</span>
       </div>
-      <!-- 🆕 新增快报（每次扒取后高亮 8 秒，含快捷筛选 + 排序） -->
+      <!-- 🆕 四大类 Tab 切换（点哪个看哪个分类的排行榜；每个 Tab 内自动取 value 前 20） -->
+      <div class="hot-tabs" id="hotTabs">
+        <button class="hot-tab active" data-tab="all"      onclick="switchHotTab('all')">      <span class="ht-ico">🌐</span><span class="ht-label">全部</span>    <span class="ht-badge" id="htCountAll">0</span></button>
+        <button class="hot-tab"        data-tab="ecom"     onclick="switchHotTab('ecom')">     <span class="ht-ico">📊</span><span class="ht-label">电商热点</span><span class="ht-badge" id="htCountEcom">0</span></button>
+        <button class="hot-tab"        data-tab="web"      onclick="switchHotTab('web')">      <span class="ht-ico">🎵</span><span class="ht-label">网络热点</span><span class="ht-badge" id="htCountWeb">0</span></button>
+        <button class="hot-tab"        data-tab="product"  onclick="switchHotTab('product')">  <span class="ht-ico">🛍️</span><span class="ht-label">热门选品</span><span class="ht-badge" id="htCountProduct">0</span></button>
+        <button class="hot-tab"        data-tab="festival" onclick="switchHotTab('festival')"> <span class="ht-ico">🎉</span><span class="ht-label">电商节日</span><span class="ht-badge" id="htCountFestival">0</span></button>
+      </div>
+      <!-- 🆕 新增快报（每次扒取后高亮 8 秒，含「立即查看本次新增」按钮） -->
       <div class="new-arrival-bar hidden" id="newArrivalBar">
         <span class="nab-main">✅ 本次扒取新增 <b id="nabCount">0</b> 条</span>
         <span class="nab-src">来源：<span id="nabSrc">—</span></span>
@@ -734,70 +811,51 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         <label class="nab-sort" title="表格排序方式">
           排序：
           <select id="sortBy" onchange="renderHotspot()">
-            <option value="value">按综合可发价值 ↓（推荐）</option>
-            <option value="hook">按电商挂钩度 ↓</option>
-            <option value="added">按新增时间 ↓（最新在最上）</option>
-            <option value="date">按热点日期 ↓</option>
+            <option value="value">综合价值 ↓（推荐）</option>
+            <option value="heat">热度 ↓</option>
+            <option value="added">新增时间 ↓</option>
+            <option value="date">热点日期 ↓</option>
           </select>
         </label>
         <button class="nab-close" onclick="dismissNewBanner()" title="收起">×</button>
       </div>
-      <!-- 筛选项（从原 filter-bar 位置挪到 sync-bar 后面） -->
+      <!-- 简化筛选器：只保留关键词 + 状态；分类请用上面 4 大类 Tab -->
       <div class="filter-bar">
-        <span class="lbl">筛选</span>
-        <select id="filterHType" onchange="renderHotspot()">
-          <option value="">全部类型</option>
-          <option value="hot">🔥 电商热点</option>
-          <option value="dy">🎵 抖音热点</option>
-          <option value="ent">🎬 娱乐热点</option>
-          <option value="product">🛍️ 平台爆品</option>
-          <option value="festival">🎉 电商节日</option>
-          <option value="news">📰 行业资讯</option>
-        </select>
-        <select id="filterHAngle" onchange="renderHotspot()" title="玩法类型：带货=可挂商品；蹭热=高热非电商、用 Flyelep 做图蹭流量；痛点规则=平台限流/算法新规，Flyelep 去同质化解法">
-          <option value="">全部玩法</option>
-          <option value="带货">🔥 带货</option>
-          <option value="蹭热">🌊 蹭热（高流量热点）</option>
-          <option value="痛点规则">🛡️ 痛点规则</option>
-          <option value="节日">🎉 节日</option>
-          <option value="其他">📦 其他</option>
-        </select>
-        <select id="filterHHeat" onchange="renderHotspot()" title="热度阈值（0-100 归一化）">
-          <option value="">全部热度</option>
-          <option value="high">🔥 高热（≥70）</option>
-          <option value="mid">🌤 中热（40-69）</option>
-          <option value="low">❄️ 低热（&lt;40）</option>
-        </select>
-        <select id="filterHFit" onchange="renderHotspot()" title="Flyelep 结合度（能做内容/图的程度）">
-          <option value="">全部结合度</option>
-          <option value="强">💪 强</option>
-          <option value="中">🤝 中</option>
-          <option value="弱">😶 弱</option>
-        </select>
-        <select id="filterHMarket" onchange="renderHotspot()">
-          <option value="">全部市场</option>
-          <option value="国内">国内</option><option value="海外">海外</option><option value="全球">全球</option>
-        </select>
-        <select id="filterHPlatform" onchange="renderHotspot()">
-          <option value="">全部平台</option>
-          <option>抖音</option><option>小红书</option><option>视频号</option><option>快手</option><option>B站</option><option>TikTok</option>
-          <option>淘宝/天猫</option><option>京东</option><option>拼多多</option>
-          <option>抖音电商</option><option>快手电商</option><option>小红书电商</option>
-          <option>Amazon</option><option>TikTok Shop</option><option>Shopify</option>
-          <option>Shopee</option><option>Lazada</option><option>速卖通</option>
-          <option>Temu</option><option>独立站</option><option>其他</option>
-        </select>
+        <input type="text" class="kw" id="filterHKeyword" placeholder="🔍 搜标题 / 商品 / 玩法 / 评级理由" oninput="renderHotspot()">
         <select id="filterHStatus" onchange="renderHotspot()" title="内容状态">
           <option value="">全部状态</option>
           <option value="pending">⏳ 未用</option>
           <option value="used">✓ 已用</option>
           <option value="discard">✗ 弃用</option>
         </select>
-        <input type="text" class="kw" id="filterHKeyword" placeholder="🔍 搜标题 / 商品 / 玩法 / 评级理由" oninput="renderHotspot()">
         <button class="reset" onclick="resetHotspotFilters()" title="清空所有筛选">清空筛选</button>
+        <span class="fill"></span>
+        <button class="advanced-toggle" id="advToggleBtn" onclick="toggleAdvancedFilters()" title="展开/收起高级筛选（玩法 / 市场 / 结合度）">⚙ 高级筛选 ▾</button>
+      </div>
+      <!-- 高级筛选抽屉（默认收起） -->
+      <div class="advanced-filters hidden" id="advancedFilters">
+        <select id="filterHAngle" onchange="renderHotspot()">
+          <option value="">全部玩法</option>
+          <option value="带货">🔥 带货</option>
+          <option value="蹭热">🌊 蹭热</option>
+          <option value="痛点规则">🛡️ 痛点规则</option>
+          <option value="节日">🎉 节日</option>
+          <option value="其他">📦 其他</option>
+        </select>
+        <select id="filterHMarket" onchange="renderHotspot()">
+          <option value="">全部市场</option>
+          <option value="国内">国内</option><option value="海外">海外</option><option value="全球">全球</option>
+        </select>
+        <select id="filterHFit" onchange="renderHotspot()">
+          <option value="">全部结合度</option>
+          <option value="强">💪 强</option>
+          <option value="中">🤝 中</option>
+          <option value="弱">😶 弱</option>
+        </select>
+        <span class="advanced-hint">💡 分类请用上面 4 个 Tab，这里只做精细过滤</span>
       </div>
       <div class="table-scroll"><table id="hotspotTable"><thead><tr>
-        <th class="hs-cb"><input type="checkbox" id="hsSelectAll" onchange="toggleSelectAll(this.checked)" title="全选当前可见行"></th><th>日期</th><th>类型</th><th>玩法</th><th>渠道</th><th>标题</th><th>💰 可挂钩商品</th><th>🎬 内容玩法</th><th>🔥 热度</th><th>🎯 价值/等级</th><th>状态</th><th>操作</th>
+        <th class="hs-cb"><input type="checkbox" id="hsSelectAll" onchange="toggleSelectAll(this.checked)" title="全选当前可见行"></th><th style="width:46%">标题 / 渠道 / 来源</th><th>玩法</th><th>💰 可挂钩商品</th><th style="min-width:110px">🔥 热度</th><th>结合度</th><th>评级</th><th>操作</th>
       </tr></thead><tbody></tbody></table></div>
     </div>
 
@@ -1597,11 +1655,18 @@ function bulkHotspotSetStatus(status){
   save(); renderHotspot(); toast(`✓ 已标记 ${items.length} 条为「${label}」`);
 }
 function resetHotspotFilters(){
-  ['filterHType','filterHAngle','filterHHeat','filterHFit','filterHMarket','filterHPlatform','filterHStatus','filterHKeyword'].forEach(id=>{ const el=$('#'+id); if(el) el.value=''; });
+  ['filterHAngle','filterHFit','filterHStatus','filterHKeyword'].forEach(id=>{ const el=$('#'+id); if(el) el.value=''; });
   const o=$('#onlyNewBtn'); if(o) o.classList.remove('on');
   const s=$('#sortBy'); if(s) s.value='value';
   _onlyThisBatch=false;
   renderHotspot();
+}
+/* 高级筛选抽屉（默认收起，仅做精细过滤） */
+function toggleAdvancedFilters(){
+  const box=$('#advancedFilters'); if(!box) return;
+  box.classList.toggle('hidden');
+  const btn=$('#advToggleBtn');
+  if(btn){ btn.textContent = box.classList.contains('hidden') ? '⚙ 高级筛选 ▾' : '⚙ 高级筛选 ▴'; }
 }
 /* 🆕 新增快报：切换"只看 24h 内新增" */
 function toggleOnlyNew(){
@@ -1632,24 +1697,18 @@ function showNewArrival(n, src){
   if(_nabHideTimer) clearTimeout(_nabHideTimer);
   _nabHideTimer=setTimeout(()=>{ bar.classList.add('hidden'); }, 8000);
 }
-/* 🆕 立即查看：放宽筛选项 + 切到本次新增 + 按新增时间排 — 一键直达本次扒取的全部新热点 */
+/* 🆕 立即查看：直接显示本次扒取的全部新增（默认已是 Top 20 + 本 Tab，不需要再放宽筛选） */
 let _onlyThisBatch=false;   // 是否仅显示本次新增
 function jumpToNew(){
-  // 1) 放宽所有筛选（玩法/热度/结合度/状态/类型/渠道 全放开）
-  ['filterHAngle','filterHHeat','filterHFit','filterHStatus','filterHType','filterHMarket','filterHPlatform'].forEach(id=>{ const e=$('#'+id); if(e) e.value=''; });
-  // 2) 开启"🆕 24h 新增" + "本次新增"精确筛选
   _onlyThisBatch=true;
   const o=$('#onlyNewBtn'); if(o) o.classList.add('on');
-  // 3) 排序切到"按新增时间↓"
   const s=$('#sortBy'); if(s) s.value='added';
-  // 4) 横幅停留，不自动收起
   const bar=$('#newArrivalBar'); if(bar) bar.classList.remove('hidden');
   if(_nabHideTimer) clearTimeout(_nabHideTimer);
   renderHotspot();
-  // 5) 滚到表格并提示
   setTimeout(()=>{
     const tbl=$('#hotspotTable'); if(tbl) tbl.scrollIntoView({behavior:'smooth',block:'start'});
-    toast(`✅ 已显示本次新增 ${_lastMergeIds.length||0} 条（已放宽筛选项）`);
+    toast(`✅ 已显示本次新增 ${_lastMergeIds.length||0} 条（按新增时间）`);
   }, 80);
 }
 
@@ -2566,10 +2625,27 @@ function festivalToHotspot(id){
 }
 
 /* ================== Render Hotspot ================== */
+/* 6 个原始 type 保留不动（迁移老数据）；UI 上通过 HOT_TAB_OF 归类到 4 大类 Tab */
 const HOT_TYPES={
   hot:['tp-hot','🔥','电商热点'], dy:['tp-dy','🎵','抖音热点'], ent:['tp-ent','🎬','娱乐热点'],
   product:['tp-product','🛍️','平台爆品'], festival:['tp-fest','🎉','电商节日'], news:['tp-news','📰','行业资讯']
 };
+const HOT_TAB_OF={ hot:'ecom', dy:'web', ent:'web', news:'web', product:'product', festival:'festival' };
+/* 4 大类 Tab 配置 */
+const HOT_TABS=[
+  {key:'all',      icon:'🌐', label:'全部',     desc:'综合排行榜（前 20）'},
+  {key:'ecom',     icon:'📊', label:'电商热点', desc:'平台动态 / 行业资讯（前 20）'},
+  {key:'web',      icon:'🎵', label:'网络热点', desc:'抖音 / 娱乐 / AI 资讯（前 20）'},
+  {key:'product',  icon:'🛍️', label:'热门选品', desc:'各平台爆款（前 20）'},
+  {key:'festival', icon:'🎉', label:'电商节日', desc:'大促 / 节日（前 20）'}
+];
+let _hotTab='all';   // 当前 Tab
+function tabOfHot(h){ return HOT_TAB_OF[h.type]||'web'; }
+function switchHotTab(tab){
+  _hotTab=tab;
+  $$('#hotTabs .hot-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  renderHotspot();
+}
 const MATCH_MAP={high:['m-high','⭐⭐⭐ 高'],mid:['m-mid','⭐⭐ 中'],low:['m-low','⭐ 低']};
 const MKT_MAP={'国内':['mkt-cn','国内'],'海外':['mkt-overseas','海外'],'全球':['mkt-global','全球']};
 
@@ -3270,9 +3346,8 @@ const PLAT_RULES={
 
 function renderHotspot(){
   populateGenSelects();
-  const ft=$('#filterHType')?.value||'', fm=$('#filterHMarket')?.value||'',
-        fp=$('#filterHPlatform')?.value||'', fa=$('#filterHAngle')?.value||'',
-        fh=$('#filterHHeat')?.value||'', ff=$('#filterHFit')?.value||'',
+  const fa=$('#filterHAngle')?.value||'',
+        ff=$('#filterHFit')?.value||'', fm=$('#filterHMarket')?.value||'',
         fst=$('#filterHStatus')?.value||'',
         fk=$('#filterHKeyword')?.value.toLowerCase()||'',
         onlyNew=$('#onlyNewBtn')?.classList.contains('on')||false,
@@ -3282,30 +3357,46 @@ function renderHotspot(){
   for(const h of state.hotspots){ if(h.value==null || h.heat==null || h.angle==null){ evalHotspot(h); needSave=true; } }
   if(needSave){ try{ save(); }catch(_){} }
 
-  // 排序：综合可发价值（默认）/ 电商挂钩度 / 新增时间 / 热点日期
+  // ===== Tab 数量徽章（用全量 state.hotspots） =====
+  const all=state.hotspots||[];
+  [['htCountAll','all'],['htCountEcom','ecom'],['htCountWeb','web'],['htCountProduct','product'],['htCountFestival','festival']].forEach(([id,t])=>{
+    const el=$('#'+id);
+    if(el) el.textContent= t==='all' ? all.length : all.filter(h=>tabOfHot(h)===t).length;
+  });
+
   const now=Date.now();
   const ts=h=>h.addedAt||Date.parse((h.date||'').replace(/-/g,'/'))||0;
-  let arr=[...state.hotspots];
-  if(sortBy==='value'){
-    arr.sort((a,b)=>(b.value||0)-(a.value||0) || (b.heat||0)-(a.heat||0) || ts(b)-ts(a));
-  }else if(sortBy==='hook'){
-    arr.sort((a,b)=>(b.hook||0)-(a.hook||0) || (b.date||'').localeCompare(a.date||''));
+  let arr=[...all];
+
+  // 1) Tab 过滤（用户硬性需求：点 Tab 看到对应分类的排行榜）
+  if(_hotTab && _hotTab!=='all') arr=arr.filter(h=>tabOfHot(h)===_hotTab);
+  // 2) 高级筛选（关键词 / 玩法 / 结合度 / 市场 / 状态）
+  if(fk) arr=arr.filter(h=>[h.title,h.source,h.product,h.playbook,h.topic,h.script,h.material,h.reasons,(h.titleOrig||'')].some(x=>(x||'').toLowerCase().includes(fk)));
+  if(fa) arr=arr.filter(h=>h.angle===fa);
+  if(ff) arr=arr.filter(h=>h.flyelepFit===ff);
+  if(fm) arr=arr.filter(h=>h.market===fm);
+  if(fst) arr=arr.filter(h=>h.status===fst);
+  // 3) 「本次新增」精确筛选 / 24h 新增筛选
+  if(_onlyThisBatch && _lastMergeIds.length){
+    const idSet=new Set(_lastMergeIds);
+    arr=arr.filter(h=>idSet.has(h.id));
+  }else if(onlyNew){
+    arr=arr.filter(h=>(h.addedAt||0)>=now-86400000);
+  }
+
+  // ===== 排序 =====
+  if(sortBy==='heat'){
+    arr.sort((a,b)=>(b.heat||0)-(a.heat||0) || ts(b)-ts(a));
   }else if(sortBy==='added'){
     arr.sort((a,b)=>ts(b)-ts(a));
-  }else{
+  }else if(sortBy==='date'){
     arr.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  }else{
+    arr.sort((a,b)=>(b.value||0)-(a.value||0) || (b.heat||0)-(a.heat||0) || ts(b)-ts(a));
   }
-  if(ft) arr=arr.filter(h=>h.type===ft);
-  if(fm) arr=arr.filter(h=>h.market===fm);
-  if(fp) arr=arr.filter(h=>h.platform===fp);
-  if(fa) arr=arr.filter(h=>h.angle===fa);
-  // 热度档（high≥70 / mid 40-69 / low<40）
-  if(fh){
-    arr=arr.filter(h=>{ const v=h.heat||0; return fh==='high'?v>=70 : fh==='mid'?(v>=40&&v<70) : v<40; });
-  }
-  if(ff) arr=arr.filter(h=>h.flyelepFit===ff);
-  if(fst) arr=arr.filter(h=>h.status===fst);
-  if(fk) arr=arr.filter(h=>[h.title,h.source,h.product,h.playbook,h.topic,h.script,h.material,h.reasons].some(x=>(x||'').toLowerCase().includes(fk)));
+
+  // ===== Top 20 截断（用户硬性需求：每个 Tab 内只显示综合价值前 20 条） =====
+  arr = arr.slice(0, 20);
   // 🆕 仅看 24h 内新增；或本次新增（更精确，只显示本次扒取的那批）
   if(_onlyThisBatch && _lastMergeIds.length){
     const idSet=new Set(_lastMergeIds);
@@ -3314,92 +3405,85 @@ function renderHotspot(){
     arr=arr.filter(h=> (h.addedAt||0) >= now-86400000);
   }
 
-  // KPI 概览（7 张）—— 按玩法类型统计，不再只盯电商
-  const cnt=t=>arr.filter(h=>h.type===t).length;
+  // KPI 概览（按玩法统计当前可见的 20 条）
   const byAngle=a=>arr.filter(h=>h.angle===a).length;
-  const pending=arr.filter(h=>h.status==='pending');
-  const usable=pending.filter(h=>['S','A'].includes(h.grade)).length;
-  const hasNote=arr.filter(h=>h.topic||h.script||h.material).length;
+  const sa=arr.filter(h=>['S','A'].includes(h.grade)).length;
   const new24=arr.filter(h=>(h.addedAt||0)>=now-86400000).length;
   $('#hotspotKpiGrid').innerHTML=`
-    <div class="kpi"><div class="lbl">热点总数</div><div class="num">${arr.length}</div><div class="sub">当前筛选范围</div></div>
+    <div class="kpi"><div class="lbl">显示条数</div><div class="num">${arr.length}<span class="kpi-cap">/ 20</span></div><div class="sub">本分类综合 Top 20</div></div>
     <div class="kpi b2"><div class="lbl">🔥 带货</div><div class="num">${byAngle('带货')}</div><div class="sub">可挂商品</div></div>
-    <div class="kpi b3"><div class="lbl">🌊 蹭热</div><div class="num">${byAngle('蹭热')}</div><div class="sub">高流量非电商</div></div>
-    <div class="kpi b4"><div class="lbl">🛡️ 痛点规则</div><div class="num">${byAngle('痛点规则')}</div><div class="sub">限流/算法新规</div></div>
+    <div class="kpi b3"><div class="lbl">🌊 蹭热</div><div class="num">${byAngle('蹭热')}</div><div class="sub">高流量</div></div>
+    <div class="kpi b4"><div class="lbl">🛡️ 痛点规则</div><div class="num">${byAngle('痛点规则')}</div><div class="sub">限流/新规</div></div>
     <div class="kpi" style="--k:7"><div class="lbl">🎉 节日</div><div class="num">${byAngle('节日')}</div><div class="sub">大促 / 节日</div></div>
-    <div class="kpi b4"><div class="lbl">🎯 S/A 级可用</div><div class="num">${usable}</div><div class="sub">${pending.length} 条待用</div></div>
-    <div class="kpi b3"><div class="lbl">🆕 24h 新增</div><div class="num">${new24}</div><div class="sub">${hasNote} 条已备选题</div></div>
+    <div class="kpi b4"><div class="lbl">🎯 S/A 级</div><div class="num">${sa}</div><div class="sub">${arr.length} 条中的可用</div></div>
+    <div class="kpi b3"><div class="lbl">🆕 24h 新增</div><div class="num">${new24}</div><div class="sub">本 Tab 内</div></div>
   `;
 
   const tbody=$('#hotspotTable tbody');
-  const visibleIds=new Set(arr.map(h=>h.id));
-  const selectedOnView=arr.filter(h=>state.hotspotSelections&&state.hotspotSelections.has(h.id)).length;
-  // 同步表头「全选」复选框的三态（无/部分/全部）
-  const sa=$('#hsSelectAll');
-  if(sa){
-    if(selectedOnView===0) sa.indeterminate=false, sa.checked=false;
-    else if(selectedOnView===arr.length) sa.indeterminate=false, sa.checked=true;
-    else sa.indeterminate=true, sa.checked=false;
+  const saSel=$('#hsSelectAll');
+  if(saSel){ saSel.indeterminate=false; saSel.checked=false; }
+  if(!arr.length){
+    tbody.innerHTML='<tr><td colspan="8" class="empty"><div class="big">🔥</div>这个 Tab 下没有热点，先点「🔥 一键扒热点」抓一批，或切换 Tab</td></tr>';
+    updateBulkBar(); return;
   }
-  if(!arr.length){ tbody.innerHTML='<tr><td colspan="12" class="empty"><div class="big">🔥</div>当前筛选下没有热点，试试把「玩法 / 热度 / 结合度」切到「全部」</td></tr>'; updateBulkBar(); return; }
   const statusMap={used:['st-used','已用'],pending:['st-pending','未用'],discard:['st-discard','弃用']};
   const angleMap={'带货':['an-dai','🔥 带货'],'蹭热':['an-ride','🌊 蹭热'],'痛点规则':['an-rule','🛡️ 痛点规则'],'节日':['an-fest','🎉 节日'],'其他':['an-other','📦 其他']};
   const gradeMap={S:['g-S','S'],A:['g-A','A'],B:['g-B','B'],C:['g-C','C']};
+  const fitMap={'强':['fit-strong','💪 强'],'中':['fit-mid','🤝 中'],'弱':['fit-weak','😶 弱']};
+
   tbody.innerHTML=arr.map(h=>{
-    const [tCls,tEmo,tTxt]=HOT_TYPES[h.type]||['','','—'];
-    const [mCls,mTxt]=MKT_MAP[h.market]||['',''];
     const [aCls,aTxt]=angleMap[h.angle]||['','—'];
     const [gCls,gTxt]=gradeMap[h.grade]||['','—'];
+    const [fCls,fTxt]=fitMap[h.flyelepFit]||['',h.flyelepFit||'—'];
     const [sCls,sTxt]=statusMap[h.status]||statusMap.pending;
-    const hasDetail=h.topic||h.script||h.material||h.reasons||h.url||h.note;
+    const hasDetail=h.topic||h.script||h.material||h.reasons||h.url||h.note||h.flyelepAngle;
     const sel=state.hotspotSelections&&state.hotspotSelections.has(h.id);
-    const isNew=(h.addedAt||0) >= now-86400000;   // 24h 内为新
-    const channel=[h.market,h.platform].filter(Boolean).join(' · ')||'—';
+    const isNew=(h.addedAt||0) >= now-86400000;
     const heat=h.heat||0;
     const heatColor=heat>=70?'#e8590c':heat>=40?'#f59f00':'#adb5bd';
+    const featLabel=(FLYELEP_FEATURES.find(f=>f.key===h.flyelepFeature)||{}).label;
+    const origHint = h.titleOrig && h.titleOrig!==h.title ? `title="🌐 原文：${escapeHtml(h.titleOrig)}"` : '';
+    const angleBlock = h.flyelepAngle ? `<div class="hs-angle" title="自动判定 · ${escapeHtml(featLabel||'通用 AI 工具')} 角度">${escapeHtml(h.flyelepAngle)}${featLabel?`<span class="hs-angle-tag">${escapeHtml(featLabel)}</span>`:''}</div>` : '';
     return `<tr${sel?' class="selected"':''} data-id="${h.id}">
       <td class="hs-cb"><input type="checkbox" data-hid="${h.id}" ${sel?'checked':''} onchange="toggleHotspotSelect('${h.id}', this.checked)"></td>
-      <td style="white-space:nowrap;font-size:12.5px">
-        ${h.date||'—'}
-        ${isNew?'<div class="new-badge" title="本次扒取新增">🆕 新增</div>':''}
+      <td class="hs-title-col">
+        <div class="hs-title-row" ${origHint}>
+          ${h.url
+            ? `<a href="${h.url}" target="_blank" class="hs-title">${escapeHtml(h.title)}</a>`
+            : `<div class="hs-title">${escapeHtml(h.title)}</div>`}
+          ${isNew?'<span class="new-badge">🆕 新增</span>':''}
+          ${h.titleOrig?'<span class="i18n-badge" title="已自动翻译为中文">🌐</span>':''}
+        </div>
+        <div class="hs-meta-row">
+          <span class="hs-date">${h.date||'—'}</span>
+          ${h.platform?`<span class="hs-platform">· ${escapeHtml(h.platform)}</span>`:''}
+          ${h.market?`<span class="hs-mkt mkt-${h.market==='国内'?'cn':h.market==='海外'?'overseas':'global'}">${escapeHtml(h.market)}</span>`:''}
+          <span class="hs-src">· ${escapeHtml(h.source||'')}</span>
+          <span class="hs-status"><span class="pill ${sCls}">${sTxt}</span></span>
+        </div>
+        ${angleBlock}
       </td>
-      <td><span class="pill ${tCls}">${tEmo} ${tTxt}</span></td>
       <td><span class="pill ${aCls}">${aTxt}</span></td>
-      <td style="font-size:12px;white-space:nowrap"><span class="pill ${mCls}">${channel}</span></td>
-      <td style="max-width:230px" title="${escapeHtml(h.title)}">
-        ${h.url
-          ? `<a href="${h.url}" target="_blank" class="hs-title">${escapeHtml(h.title)}</a>`
-          : `<div class="hs-title">${escapeHtml(h.title)}</div>`}
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">来源：${escapeHtml(h.source||'')}</div>
-      </td>
-      <td style="max-width:170px;font-size:12.5px">
+      <td class="hs-product">
         ${h.product
-          ? `<b>${escapeHtml(h.product)}</b>${h.category?`<div style="font-size:11px;color:var(--muted)">${escapeHtml(h.category)}</div>`:''}${h.sales?`<div style="font-size:11px;color:var(--accent);font-weight:600">${escapeHtml(h.sales)}${h.price?' · '+escapeHtml(h.price):''}</div>`:''}`
+          ? `<b>${escapeHtml(h.product)}</b>${h.category?`<div class="hs-cat">${escapeHtml(h.category)}</div>`:''}${h.sales?`<div class="hs-sales">${escapeHtml(h.sales)}${h.price?' · '+escapeHtml(h.price):''}</div>`:''}`
           : `<button class="ai-mini" data-airow="${h.id}" onclick="aiSuggestRow('${h.id}')">⚡ AI推荐</button>`}
       </td>
-      <td style="max-width:280px;font-size:12px;color:var(--ink2)">
-        ${(()=>{
-          const fp=(FLYELEP_FEATURES.find(f=>f.key===h.flyelepFeature)||{}).label;
-          const angle=h.flyelepAngle && (!h.playbook || h.flyelepAngle!==h.playbook) ? `<div class="flyelep-angle" title="自动判定 · ${escapeHtml(fp||'通用 AI 工具')} 角度">${escapeHtml(h.flyelepAngle)}${fp?`<span class="flyelep-angle-tag">${escapeHtml(fp)}</span>`:''}</div>` : '';
-          const pb=h.playbook?`<div class="playbook-text">${escapeHtml(h.playbook)}${h.fn?`<span class="pill fn">${escapeHtml(h.fn)}</span>`:''}</div>` : '';
-          return angle+pb || `<button class="ai-mini" onclick="aiSuggestRow('${h.id}')">⚡ AI推荐</button>`;
-        })()}
-      </td>
-      <td style="white-space:nowrap;min-width:96px">
+      <td class="hs-heat">
         <div class="heat-bar" title="热度 ${heat}/100"><span style="width:${Math.max(4,heat)}%;background:${heatColor}"></span></div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">热度 ${heat}${h.flyelepFit?` · ${h.flyelepFit}结合`:''}</div>
+        <div class="hs-heat-num">${heat}<span class="hs-heat-cap">/100</span></div>
       </td>
-      <td style="white-space:nowrap;font-size:12px">
+      <td><span class="pill ${fCls}">${fTxt}</span></td>
+      <td>
         <span class="badge-grade ${gCls}">${gTxt}级</span>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">价值 ${h.value||0}</div>
+        <div class="hs-value-num">价值 ${h.value||0}</div>
       </td>
-      <td><span class="pill ${sCls}">${sTxt}</span></td>
-      <td style="white-space:nowrap">
+      <td class="hs-act">
         ${hasDetail?`<button class="btn sm" onclick="toggleHsDetail('${h.id}')" title="查看评级理由 / 选题 / 脚本要点 / 素材清单">详情 ▾</button> `:''}
         <button class="btn sm primary" onclick="genFromRow('${h.id}')">🎬 生成</button>
         <button class="btn sm danger" onclick="deleteHotspot('${h.id}')">删</button>
       </td>
-    </tr>${hasDetail?`<tr class="hs-detail hidden" id="hsd-${h.id}"><td colspan="12"><div class="dt">
+    </tr>${hasDetail?`<tr class="hs-detail hidden" id="hsd-${h.id}"><td colspan="8"><div class="dt">
       ${h.topic?`<b>📌 视频选题</b><div>${escapeHtml(h.topic)}</div>`:''}
       ${h.script?`<b>🎬 脚本要点</b><div>${escapeHtml(h.script)}</div>`:''}
       ${h.material?`<b>🧰 素材清单</b><div>${escapeHtml(h.material)}</div>`:''}
@@ -3409,7 +3493,8 @@ function renderHotspot(){
       ${h.url?`<b>链接</b><div><a href="${h.url}" target="_blank" style="color:var(--brand)">${escapeHtml(h.url)}</a></div>`:''}
     </div></td></tr>`:''}`;
   }).join('');
-  try{ renderHotMarquee(); }catch(_){} // 顺手刷一下跑马灯
+  updateBulkBar();
+  try{ renderHotMarquee(); }catch(_){}
 }
 
 /* 热门热点跑马灯：横向无缝循环滚动，按综合可发价值取前 20 条（含蹭热/痛点规则） */
@@ -3919,46 +4004,40 @@ function scoreHookRaw(h){
   return Math.min(100,hook);
 }
 
-// ============ 综合可发价值（取代纯电商挂钩度，用于默认排序与分级） ============
-// 热点价值 = 热度够大 + Flyelep 能做内容；按玩法类型分「带货 / 蹭热 / 痛点规则 / 节日」
+// ============ 综合可发价值（按用户的核心要求：只用热度 + Flyelep 结合度） ============
+// 热点价值 = 热度够大 + Flyelep 能做内容；玩法类型仅作为辅助显示标签，不再影响综合分
 function evalHotspot(h){
   // 热度（抓取时写入，缺失回退 50）
   if(h.heat==null || isNaN(h.heat)) h.heat=50;
-  // Flyelep 结合度
+  // Flyelep 结合度（按 fv.score 离散化为 0-100 的连续分）
   const fv=scoreFlyelep((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')+' '+(h.product||''));
   h.flyelepFeature=fv.feature||'';
   h.flyelepAngle=fv.angle||'';
   h.flyelepFit = fv.score>=4?'强' : fv.score>=2?'中' : '弱';
-  let fitScore = fv.score>=4?100 : fv.score>=2?65 : fv.score>=1?40 : 20;
-  // 玩法类型
+  let fitScore = fv.score>=5?100 : fv.score>=3?82 : fv.score>=2?65 : fv.score>=1?50 : 30;
+  // 玩法类型（仅显示标签，不影响 value）
   const angle=classifyAngle(h, h.heat, fv);
   h.angle=angle;
-  // 蹭热 / 痛点规则：Flyelep 始终能为其产出图/视频，结合度保底「中」
-  if((angle==='蹭热'||angle==='痛点规则') && fv.score<2){
-    fitScore=Math.max(fitScore,65);
-    if(h.flyelepFit==='弱') h.flyelepFit='中';
-  }
+  // 蹭热 / 痛点规则��Flyelep 始终能为其出图/出视频，结合度保底「中」（给 65）
+  if((angle==='蹭热'||angle==='痛点规则') && fitScore<65) fitScore=65;
   // 蹭热无具体功能时，给一个明确的「做图/视频蹭流量」角度
   if(angle==='蹭热' && !h.flyelepFeature){
     h.flyelepAngle='用 Flyelep 生成该热点的 详情图 / 海报 / 短视频，低成本蹭流量做内容';
   }
-  // 综合可发价值 = 0.45*热度 + 0.35*Flyelep结合度 + 0.20*玩法加成
-  const angleBoost=({'带货':100,'蹭热':100,'痛点规则':100,'节日':80,'其他':45})[angle]||45;
-  let value=Math.round(0.45*(h.heat||50) + 0.35*fitScore + 0.20*angleBoost);
+  // 综合可发价值（用户要求：仅用「热度 + 结合度」评级）
+  let value=Math.round(0.55*(h.heat||50) + 0.45*fitScore);
   value=Math.min(100, Math.max(0, value));
   h.value=value;
-  // 电商挂钩度（保留，仅作排序维度之一）
-  h.hook=scoreHookRaw(h);
-  // 等级由「综合可发价值」决定
+  // 等级由综合可发价值决定
   h.grade = value>=80?'S' : value>=60?'A' : value>=40?'B' : 'C';
   // 评级理由
   const reasons=[];
-  reasons.push('热度 '+(h.heat||0));
-  reasons.push('玩法 '+angle);
-  if(fv.score>0){ const lbl=(FLYELEP_FEATURES.find(f=>f.key===fv.feature)||{}).label||'通用 AI 工具'; reasons.push('🎯 Flyelep「'+lbl+'」+'+fv.score*8); }
-  else reasons.push('⚠️ Flyelep 角度弱');
-  if(angle==='痛点规则') reasons.push('🛡️ 限流/规则痛点');
-  if(angle==='蹭热') reasons.push('🌊 蹭流热点');
+  reasons.push('🔥 热度 '+(h.heat||0));
+  reasons.push('🎯 结合度 '+h.flyelepFit);
+  if(angle==='痛点规则') reasons.push('🛡️ 平台限流/规则痛点');
+  else if(angle==='蹭热') reasons.push('🌊 蹭流热点');
+  else if(angle==='带货') reasons.push('🛍️ 可带货');
+  else if(angle==='节日') reasons.push('🎉 节日');
   h.reasons=reasons.join('；');
   h.match = h.grade==='C'?'low':(h.grade==='B'?'mid':'high');
   return h;
@@ -4105,6 +4184,8 @@ async function scrapeHotFromApi(){
     toast('扒取到 '+total+' 条新热点');
     // 🆕 顶部"新增快报"横幅 —— 8 秒后自动收起；用户点"立即查看"切到本次新增 + 新增时间排序
     if(total>0){ showNewArrival(total, src); }
+    // 🆕 异步翻译外文标题（HN / NewsAPI 等英文源），不阻塞主流程
+    if(_lastMergeIds.length) setTimeout(()=>translateNewHotspots(_lastMergeIds), 700);
   }else{
     el.textContent='⚠️ 扒取失败：服务端代理 + 本机 server + 公共实例三级兜底全部不可达。建议：① 等几秒重试（公共实例偶发波动）；② 检查网络。';
     el.className='feed-status warn';
@@ -4119,9 +4200,46 @@ async function importFeedFile(input){
     const txt=await f.text(); const data=JSON.parse(txt);
     const added=mergeFeed(data.hotspots||[]);
     toast(added? `已导入 ${added} 条新热点` : '导入完成，无新增');
-    if(added>0) showNewArrival(added, '导入文件');
+    if(added>0){ showNewArrival(added, '导入文件'); setTimeout(()=>translateNewHotspots(_lastMergeIds), 600); }
   }catch(e){ toast('导入失败：'+e.message); }
   input.value='';
+}
+
+/* 🆕 自动翻译外文标题（仅翻译新增的中文占比 < 30% 的标题；走后端 /api/translate）
+ * - 保留 titleOrig 原文，用户悬停可看
+ * - 失败/超时静默降级，不影响主流程
+ */
+async function translateNewHotspots(ids){
+  if(!Array.isArray(ids) || !ids.length) return;
+  const newHs=(state.hotspots||[]).filter(h=>ids.includes(h.id) && h.title && !h.titleOrig);
+  const foreign=newHs.filter(h=>{
+    const t=String(h.title||'');
+    if(!t) return false;
+    const cn=(t.match(/[一-龥]/g)||[]).length;
+    return cn/Math.max(1,t.length) < 0.3;
+  });
+  if(!foreign.length) return;
+  const base=(typeof API_BASE==='string' && API_BASE) ? API_BASE.replace(/\/$/,'') : '';
+  if(!base) return;
+  try{
+    const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),30000);
+    const resp=await fetch(base+'/api/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texts:foreign.map(h=>h.title)}),signal:ctrl.signal});
+    clearTimeout(t);
+    if(!resp.ok) return;
+    const j=await resp.json();
+    if(!j.translated || j.translated.length!==foreign.length) return;
+    let changed=0;
+    foreign.forEach((h,i)=>{
+      const orig=h.title;
+      const translated=String(j.translated[i]||'').trim();
+      if(translated && translated!==orig){
+        h.titleOrig=orig;
+        h.title=translated;
+        changed++;
+      }
+    });
+    if(changed>0){ try{ save(); }catch(_){} renderHotspot(); toast(`🌐 已自动翻译 ${changed} 条外文标题`,3000); }
+  }catch(_){ /* 静默失败 */ }
 }
 
 // 线上回退：Hacker News Algolia（CORS 开放）按电商关键词检索，映射成热点对象
