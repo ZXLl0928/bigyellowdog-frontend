@@ -4352,8 +4352,10 @@ function top3PersonasForAngle(angle, geoCat, h){
     {kw:/B站|YouTube|bilibili|哔哩哔哩/i,                             keys:['B站/YouTube·中视频创作者']},
   ];
   let pinned=[];
+  // 同时扫描 platform 和 title——数据源常把 platform='AI资讯' 不填具体平台名
+  const scanText = plat + ' ' + String((h&&h.title)||'');
   for(const m of PLAT_MATCHERS){
-    if(m.kw.test(plat)){
+    if(m.kw.test(scanText)){
       for(const k of m.keys){
         if(PERSONA_CAT_BY_KEY[k]===geoCat){           // 仅前置同类目内的画像
           pinned.push({key:k, label:k, score:1000-(pinned.length), cat:geoCat, cls:catCls});
@@ -4495,10 +4497,12 @@ function renderHotspot(){
         onlyBindable=true,    // 🆕 默认隐藏 grade=C「无法结合」（UI 已隐藏「只看可结合」按钮；C 级永不显示，但保留后门）
         sortBy=$('#sortBy')?.value||'value';
   // 补全老数据评级（无 value/heat/angle 字段时实时计算一次）；同步补 geoCat
+  // 升级后：geoCat 强制重算（之前兜底错的『内容自媒体』会重新派到正确类目）
   let needSave=false;
   for(const h of state.hotspots){
     if(h.value==null || h.heat==null || h.angle==null){ evalHotspot(h); needSave=true; }
-    if(!h.geoCat){ h.geoCat = deriveGeoCat(h); needSave=true; }
+    const newGeo = deriveGeoCat(h);
+    if(h.geoCat !== newGeo){ h.geoCat = newGeo; needSave=true; }
   }
   if(needSave){ try{ save(); }catch(_){} }
 
@@ -5343,14 +5347,32 @@ function evalHotspot(h){
 function deriveGeoCat(h){
   const plat = String(h.platform||'');
   const mkt = String(h.market||'');
-  // 1) 市场优先级最高
+  const title = String(h.title||'');
+  // 0) 标题里的强信号（数据源没标平台时回退用）
+  const tn = title.toLowerCase();
+  const hasAmazon = /amazon|亚马逊|kindle|fba|ftc|supplement|advertising/i.test(title);
+  const hasTemu = /temu|shein/i.test(title);
+  const hasTiktok = /tiktok ?shop|tiktok shop|tiktok小店/i.test(title);
+  const hasAliex = /速卖通|aliexpress|wish|ebay/i.test(title);
+  const hasShopee = /shopee|lazada/i.test(title);
+  const hasShopify = /shopify|独立站|shopify独立站/i.test(title);
+  const hasOverseasB2B = /阿里国际站|国际站|made-in-china|环球资源|外贸/.test(title);
+  const hasDomestic = /淘宝|天猫|拼多多|京东|1688|抖音电商|视频号小店|快手电商/.test(title);
+  const hasCnSocial = /抖音|视频号|小红书|b站|bili|哔哩哔哩/.test(title);
+  // 1) 市场优先级最高（mkt 已有明确地域）
   if(mkt==='国内') return '国内电商';
   if(mkt==='海外') return '跨境电商（出口）';
+  if(mkt==='全球' && (hasAmazon||hasTemu||hasTiktok||hasAliex||hasShopee||hasShopify)) return '跨境电商（出口）';
   // 2) 平台关键词命中（注意：『淘宝/天猫,抖音电商』这种多平台也匹配国内电商）
   if(/淘宝|天猫|拼多多|京东|抖音电商|小红书电商|1688|视频号小店|快手电商/.test(plat)) return '国内电商';
   if(/Amazon|亚马逊|TikTok Shop|Temu|SHEIN|Shopee|Lazada|速卖通|eBay|Shopify|独立站|Wish|Walmart/.test(plat)) return '跨境电商（出口）';
   if(/阿里国际站|国际站|Made-in-China|环球资源|外贸/.test(plat)) return '外贸 B2B';
   if(/抖音|视频号|小红书|B站|YouTube/.test(plat)) return '内容自媒体';
+  // 3) 标题回退（数据源没填 platform 但标题里有明确信号）
+  if(hasAmazon||hasTemu||hasTiktok||hasAliex||hasShopee||hasShopify) return '跨境电商（出口）';
+  if(hasOverseasB2B) return '外贸 B2B';
+  if(hasDomestic) return '国内电商';
+  if(hasCnSocial) return '内容自媒体';
   if(mkt==='全球') return '内容自媒体';
   return '内容自媒体';
 }
