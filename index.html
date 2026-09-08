@@ -575,7 +575,8 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ============ 结构化脚本卡片（5 段式渲染）============ */
-.gen-sections{padding:14px 16px 18px;display:flex;flex-direction:column;gap:12px;max-height:560px;overflow:auto;background:linear-gradient(180deg,#fafcff 0%,#fff 100%)}
+/* 外容器：自然撑高，不锁死，让5 张卡片完整可见 */
+.gen-sections{padding:14px 16px 18px;display:flex;flex-direction:column;gap:14px;background:linear-gradient(180deg,#fafcff 0%,#fff 100%)}
 .gen-section{border-radius:10px;padding:11px 14px;border:1px solid var(--line);background:#fff;position:relative}
 .gen-section.sec-title{background:linear-gradient(135deg,#fff7e6 0%,#fff 100%);border-color:#f5d99b}
 .gen-section.sec-hook{background:linear-gradient(135deg,#fef3e8 0%,#fff 100%);border-color:#f7c799}
@@ -606,6 +607,14 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .gen-title-num{width:18px;height:18px;border-radius:50%;background:#f59e0b;color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;margin-top:1px}
 .gen-hook-text{font-size:14.5px;font-weight:700;color:#9a3412;line-height:1.5;padding:8px 12px;background:#fff;border:1px dashed #f7c799;border-radius:8px;text-align:center}
 .gen-beat{border-left:3px solid #93c5fd;padding:8px 10px 8px 12px;margin-bottom:8px;background:#f8fbff;border-radius:0 6px 6px 0}
+/* Beat 计数 + 折叠按钮 */
+.gen-beat-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px}
+.gen-beat-count{font-size:11.5px;color:#1d4ed8;background:#dbeafe;padding:2px 10px;border-radius:999px;font-weight:600}
+.gen-beat-toggle{display:none;background:transparent;border:1px solid #93c5fd;color:#1d4ed8;font-size:12px;padding:2px 10px;border-radius:6px;cursor:pointer;font-weight:600}
+.gen-beat-toggle:hover{background:#dbeafe}
+.gen-section.sec-body.is-long .gen-beat-toggle{display:inline-block}
+.gen-beat-wrap{transition:max-height .2s}
+.gen-section.sec-body.is-long .gen-beat-wrap{max-height:440px;overflow-y:auto;padding-right:4px}
 .gen-beat:last-child{margin-bottom:0}
 .gen-beat-time{font-size:11px;font-weight:700;color:#1d4ed8;background:#dbeafe;padding:2px 8px;border-radius:999px;display:inline-block;margin-bottom:6px}
 .gen-beat-row{display:flex;gap:6px;align-items:flex-start;font-size:13px;line-height:1.6;margin-bottom:3px;color:var(--ink)}
@@ -2574,12 +2583,14 @@ function renderScriptSections(raw){
     const icon = sec.icon;
     const tag = sec.tag;
     const body = sec.body.trim();
+    // SCRIPT 卡片：>3 段时折叠
+    const extraCls = sec._isLong ? ' is-long' : '';
     let bodyHtml = '';
 
     // ====== 缺段占位 ======
     if(sec._missing){
       bodyHtml = `<div class="gen-missing">⚠️ 模型未输出此段（可点 🔁 重生成）</div>`;
-      return `<div class="gen-section ${cls}">
+      return `<div class="gen-section ${cls}${extraCls}">
         <div class="gen-sec-head">
           <span class="gen-sec-icon">${icon}</span>
           <span>${escapeHtml(sec.title)}</span>
@@ -2632,7 +2643,14 @@ function renderScriptSections(raw){
       if(beats.length === 0){
         bodyHtml = `<div class="gen-missing">⚠️ 模型未输出分镜 beat（可点 🔁 重生成）</div>`;
       } else {
-        bodyHtml = beats.map(parseBeat).join('');
+        // 段数 ≤ 3 → 全展开；段数 > 3 → 默认折叠（is-long 触发 max-height 440px + 内滚动）
+        const N = beats.length;
+        const isLong = N > 3;
+        sec._isLong = isLong;
+        const meta = `<div class="gen-beat-meta">
+          <span class="gen-beat-count">🎬 共 ${N} 段 beat${isLong ? ' · 可滚动' : ''}</span>
+        </div>`;
+        bodyHtml = meta + `<div class="gen-beat-wrap">${beats.map(parseBeat).join('')}</div>`;
       }
     } else if(cls === 'sec-cta'){
       // ====== 按二级小标签自动拆 sub-card（发布技巧 / 话题标签 / Flyelep 落地）======
@@ -2660,7 +2678,7 @@ function renderScriptSections(raw){
       bodyHtml = `<div class="gen-sec-body-text">${markdownLite(body)}</div>`;
     }
 
-    return `<div class="gen-section ${cls}">
+    return `<div class="gen-section ${cls}${extraCls}">
       <div class="gen-sec-head">
         <span class="gen-sec-icon">${icon}</span>
         <span>${escapeHtml(sec.title)}</span>
