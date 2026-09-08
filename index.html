@@ -2137,9 +2137,10 @@ ${rules}${fewShotBlock}${learnedBlock}
 - 主推功能：「${vf.label}」 —— ${vf.desc}
 
 **【视频文案脚本】**（必须**严格分 ${vd.beats} 段**，一段都不能少 · 总时长 ${vd.label}）
-每段格式：⏱ 秒 XX｜👀 画面（按 ${vt.shoot} 描述）｜🎙 台词｜🎯 卖点什么
+每段格式（**每一段必须独占一行**）：⏱0-7秒｜👀 画面（按 ${vt.shoot} 描述）｜🎙 台词｜🎯 卖点
+时间写单点（⏱0秒）或区间（⏱0-7秒）都行，但**每段必须独占一行且以 ⏱ 开头**
 节奏公式：${vd.pace}
-（**硬规则**：${vd.beats} 段必须写满 ${vd.beats} 段，每段都以 ⏱XX秒 开头，最后一段也必须写）
+（**硬规则**：${vd.beats} 段必须写满 ${vd.beats} 段，每段一行，最后一段也必须写，**严禁把多段挤在同一行**）
 （注：上一版叫【正文 / 分镜】，本次统一叫【视频文案脚本】，**不要**再写【正文 / 分镜】或【正文】）
 
 **【发布带话题推荐】**（这一段必须用 **三个二级小标签** 开头，分三段写清楚）
@@ -2626,33 +2627,18 @@ function renderScriptSections(raw){
     } else if(cls === 'sec-hook'){
       bodyHtml = `<div class="gen-hook-text">${escapeHtml(body || '（未生成钩子）')}</div>`;
     } else if(cls === 'sec-body'){
-      // 按 ⏱秒XX｜👀画面｜🎙台词｜🎯卖点 拆 beat
-      const lines = body.split('\n').map(l=>l.trim()).filter(Boolean);
-      const beats = [];
-      let cur = null;
-      for(const l of lines){
-        const m = l.match(/^(?:⏱\s*秒?\s*)?(\d+)\s*秒?\s*[\|｜]/);
-        if(m){
-          if(cur) beats.push(cur);
-          cur = { time: m[1]+'秒', raw: l };
-        } else if(cur){
-          cur.raw += '\n' + l;
-        } else {
-          // 没有 ⏱ 标记的行 → 作为 preamble
-          cur = { time:'', raw: l };
-        }
-      }
-      if(cur) beats.push(cur);
+      // 按 ⏱秒XX｜👀画面｜🎙台词｜🎯卖点 拆 beat（splitBeats 兼容时间区间 0-7秒 等多种写法 + 双重兜底）
+      const beats = splitBeats(body);
 
       if(beats.length === 0){
         bodyHtml = `<div class="gen-missing">⚠️ 模型未输出分镜 beat（可点 🔁 重生成）</div>`;
       } else {
-        // 段数 ≤ 3 → 全展开；段数 > 3 → 默认折叠（is-long 触发 max-height 440px + 内滚动）
+        // 不做内滚动折叠：外层 .gen-sections 已自然撑高，再套 max-height 内滚动就是"看不完整"的元凶
+        // 只保留「共 N 段」计数，让用户一眼确认全不全
         const N = beats.length;
-        const isLong = N > 3;
-        sec._isLong = isLong;
+        sec._isLong = false;
         const meta = `<div class="gen-beat-meta">
-          <span class="gen-beat-count">🎬 共 ${N} 段 beat${isLong ? ' · 可滚动' : ''}</span>
+          <span class="gen-beat-count">🎬 共 ${N} 段 beat · 已全部展开</span>
         </div>`;
         bodyHtml = meta + `<div class="gen-beat-wrap">${beats.map(parseBeat).join('')}</div>`;
       }
@@ -2747,51 +2733,106 @@ function renderCtaSubCards(body){
   return `<div class="gen-cta-subs">${html}</div>`;
 }
 
-// 解析单段 beat：⏱秒XX｜👀画面｜🎙台词｜🎯卖点
-function parseBeat(b){
-  const lines = b.raw.split('\n');
-  const timeBadge = b.time ? `<span class="gen-beat-time">⏱ ${b.time}</span>` : '';
-  // 第一行按 | 拆字段；后续行作为附加
-  const first = lines[0] || '';
-  const parts = first.split(/[\|｜]/).map(p=>p.trim());
-  // 提取 ⏱ 秒数（如果首部包含 ⏱XX秒）
-  let time = '';
-  let rest = parts;
-  if(/^⏱/.test(parts[0]) || /^\d+\s*秒/.test(parts[0])){
-    const m = parts[0].match(/(\d+)\s*秒/);
-    if(m) time = m[1]+'秒';
-    rest = parts.slice(1);
+// ====== 把【视频文案脚本】正文拆成 N 段 beat ======
+// 模型实际输出的时间格式五花八门，老正则只认「⏱0秒｜」，遇到「⏱0-7秒｜」这种"时间区间"就失配，
+// 导致 N 段全被合并成 1 段 → 用户看到"共 1 段 beat"且内容挤成一坨。这里做多重兼容 + 多重兜底。
+//   时间前缀：⏱0-7秒｜ / ⏱0秒｜ / 0~7s｜ / ⏱ 0-7 秒 ｜ / ⏱0到7秒｜ / 第1段｜0-7秒｜ / 0至7秒｜
+//   兜底 1  ：没有时间前缀 → 按 emoji(👀/🎙/🎯) 或 编号(1. / ①) 切
+//   兜底 2  ：还是 1 段 → 把每个 ｜ 拆成独立段，至少不挤成一坨
+const BEAT_TIME_RE  = /^(?:⏱\s*)?(?:第?\s*\d+\s*[段镜幕]\s*[|｜:：]?\s*)?(\d+\s*(?:[-–—~～−]\s*\d+\s*|(?:到|至)\s*\d+\s*)?(?:秒|s|S|″)?)\s*[|｜]/;
+const BEAT_EMOJI_RE = /^(?:[👀🎙🎯]\s*|(?:画面|镜头|台词|口播|卖点)\s*[:：])/;
+const BEAT_NUM_RE   = /^\s*(?:[\d]{1,2}\s*[\.\)、]|[①-⑳]\s*[\.\)、]?)\s*\S/;
+
+function splitBeats(body){
+  const lines = String(body||'').split('\n').map(l=>l.trim()).filter(Boolean);
+  if(!lines.length) return [];
+  const beats = [];
+
+  // ---- 策略 1：时间前缀（最准，兼容区间/空格/s/中文到至）----
+  let cur = null;
+  const flush = () => { if(cur) beats.push(cur); cur = null; };
+  for(const l of lines){
+    const m = l.match(BEAT_TIME_RE);
+    if(m){ flush(); cur = { time: m[1].trim(), raw: l }; }
+    else if(cur){ cur.raw += '\n' + l; }
+    else { cur = { time:'', raw: l }; }   // 开头无时间标记 → 归入首段
   }
-  // 识别 4 段（画面/台词/卖点）：用 emoji 前缀 👀/🎙/🎯 也兼容无 emoji 的「画面：」/「台词：」/「卖点：」
+  flush();
+
+  // ---- 策略 2：时间前缀没拆开（≤1 段且原文多行）→ 按 emoji / 编号再试 ----
+  if(beats.length <= 1 && lines.length > 1){
+    const alt = [];
+    let c = null;
+    for(const l of lines){
+      if(BEAT_EMOJI_RE.test(l) || BEAT_NUM_RE.test(l)){
+        if(c) alt.push(c);
+        const nm = l.match(/^\s*([\d]{1,2}|[①-⑳])\s*[\.\)、]\s*/);
+        c = { time: nm ? nm[1] : '', raw: l.replace(/^\s*([\d]{1,2}|[①-⑳])\s*[\.\)、]\s*/, '') };
+      } else if(c){ c.raw += '\n' + l; }
+      else { c = { time:'', raw:l }; }
+    }
+    if(c) alt.push(c);
+    if(alt.length > 1){ beats.length = 0; alt.forEach(b=>beats.push(b)); }
+  }
+
+  // ---- 策略 3：仍是 1 段 → 把每个 ｜ 拆成独立段（至少不挤成一坨）----
+  if(beats.length === 1 && /[|｜]/.test(beats[0].raw)){
+    const parts = beats[0].raw.split(/[|｜]/).map(p=>p.trim()).filter(Boolean);
+    if(parts.length > 1){
+      beats.length = 0;
+      parts.forEach(p => beats.push({ time:'', raw:p }));
+    }
+  }
+  return beats;
+}
+
+// 解析单段 beat：⏱0-7秒｜👀画面｜🎙台词｜🎯卖点（兼容时间区间 / 多行 / 无 emoji 写法）
+function parseBeat(b){
+  // 多行 beat：所有行都按 ｜ 拆开后合并 —— 老代码只取第一行，长台词换行会被整段丢掉
+  let parts = [];
+  for(const line of b.raw.split('\n')){
+    parts = parts.concat(line.split(/[\|｜]/).map(p=>p.trim()).filter(Boolean));
+  }
+  // 时间优先用 splitBeats 已提取的完整串（含区间，如 0-7秒）
+  let time = b.time || '';
+  // 首段若"整段只是时间"→ 剥掉，避免 badge 和内容重复显示
+  const TIME_ONLY = /^(?:⏱\s*)?\d+\s*(?:[-–—~～−]\s*\d+\s*|(?:到|至)\s*\d+\s*)?(?:秒|s|S|″)?$/;
+  if(parts.length > 1 && TIME_ONLY.test(parts[0])){
+    if(!time){
+      const m = parts[0].match(/(\d+\s*(?:[-–—~～−]\s*\d+\s*|(?:到|至)\s*\d+\s*)?)/);
+      if(m) time = m[1].trim();
+    }
+    parts = parts.slice(1);
+  }
+  // 识别 3 类字段：emoji 前缀 👀/🎙/🎯，或文字「画面：」「台词：」「卖点：」
   const rows = [];
-  for(const p of rest){
+  for(const p of parts){
     if(!p) continue;
     let label = '', text = p;
     const lm = p.match(/^(?:([👀🎙🎯])\s*)?(.+?)[：:]\s*(.+)$/);
     if(lm){
-      const [, , l, t] = lm;
-      text = t;
-      if(/画面/.test(l)) label='👀 画面';
-      else if(/台词|口播/.test(l)) label='🎙 台词';
-      else if(/卖点/.test(l)) label='🎯 卖点';
+      const l = lm[2];
+      text = lm[3];
+      if(/画面|镜头/.test(l)) label='👀 画面';
+      else if(/台词|口播|文案/.test(l)) label='🎙 台词';
+      else if(/卖点|目的/.test(l)) label='🎯 卖点';
       else label = l ? l+' ' : '';
     } else {
       const em = p.match(/^([👀🎙🎯])\s*(.+)$/);
       if(em){ label = em[1]+' '; text = em[2]; }
     }
     if(!label){
-      // 兜底：按出现顺序画面/台词/卖点
-      const guess = ['👀 画面','🎙 台词','🎯 卖点'][rows.length] || '·';
-      label = guess;
+      // 兜底：按出现顺序猜 画面 / 台词 / 卖点
+      label = ['👀 画面','🎙 台词','🎯 卖点'][rows.length] || '·';
     }
     rows.push({label, text});
   }
-  const finalTime = time || (b.time||'');
   const rowsHtml = rows.map(r=>{
     const cls = /画面/.test(r.label)?'gen-beat-visual':/台词/.test(r.label)?'gen-beat-line':'gen-beat-sell';
     return `<div class="gen-beat-row"><span class="gen-beat-label">${r.label}</span><span class="${cls}">${escapeHtml(r.text)}</span></div>`;
   }).join('');
-  return `<div class="gen-beat">${finalTime?`<span class="gen-beat-time">⏱ ${finalTime}</span>`:''}${rowsHtml}</div>`;
+  const timeHtml = time ? `<span class="gen-beat-time">⏱ ${escapeHtml(time)}</span>` : '';
+  return `<div class="gen-beat">${timeHtml}${rowsHtml}</div>`;
 }
 
 function buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf){
