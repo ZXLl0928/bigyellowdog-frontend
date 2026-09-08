@@ -581,6 +581,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .gen-section.sec-hook{background:linear-gradient(135deg,#fef3e8 0%,#fff 100%);border-color:#f7c799}
 .gen-section.sec-body{background:linear-gradient(180deg,#f0f7ff 0%,#fff 100%);border-color:#bfd7f3}
 .gen-section.sec-cta{background:linear-gradient(135deg,#f0fdf4 0%,#fff 100%);border-color:#b6e4c2}
+.gen-section.sec-preview{background:linear-gradient(135deg,#f5f3ff 0%,#fff 100%);border-color:#cdc4ee}
 .gen-section.sec-flyelep{background:linear-gradient(135deg,#faf5ff 0%,#fff 100%);border-color:#d7c3ee;border-width:1.5px}
 .gen-sec-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:700;font-size:13.5px;color:var(--ink)}
 .gen-sec-icon{width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
@@ -588,7 +589,16 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .gen-section.sec-hook .gen-sec-icon{background:#fed7aa;color:#c2410c}
 .gen-section.sec-body .gen-sec-icon{background:#dbeafe;color:#1d4ed8}
 .gen-section.sec-cta .gen-sec-icon{background:#bbf7d0;color:#15803d}
+.gen-section.sec-preview .gen-sec-icon{background:#ddd6fe;color:#6d28d9}
 .gen-section.sec-flyelep .gen-sec-icon{background:#e9d5ff;color:#7e22ce}
+.gen-preview-list{display:flex;flex-direction:column;gap:6px}
+.gen-preview-row{display:flex;gap:8px;align-items:flex-start;padding:6px 10px;border-radius:6px;border-width:1px;border-style:solid;font-size:13px;line-height:1.5}
+.gen-preview-persona{background:#fef3e8;border-color:#fbbf24;color:#92400e}
+.gen-preview-struct{background:#eff6ff;border-color:#93c5fd;color:#1e3a8a}
+.gen-preview-func{background:#f3e8ff;border-color:#c4b5fd;color:#5b21b6}
+.gen-preview-default{background:#f9fafb;border-color:#e5e7eb;color:#374151}
+.gen-preview-label{font-weight:700;flex-shrink:0;min-width:70px}
+.gen-preview-text{flex:1}
 .gen-sec-tag{font-size:10.5px;padding:2px 7px;border-radius:999px;background:#f3f4f6;color:#6b7280;font-weight:500;margin-left:auto}
 .gen-sec-body-text{font-size:13.5px;line-height:1.7;color:var(--ink);white-space:pre-wrap;word-break:break-word}
 .gen-titles-list{display:flex;flex-direction:column;gap:6px}
@@ -2020,6 +2030,9 @@ function buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid){
   const learnedBlock = learnedTxt
     ? ('\n【重要 · 本团队已学到的爆款规律（必须融进脚本）】\n'+learnedTxt)
     : '';
+  // ===== 用户画像差异化（不同人群用不同口吻、不同痛点、不同 CTA）=====
+  const personaKey = (a.audience || a.position || '').trim() || '中小跨境卖家（个人/小团队）';
+  const personaGuide = PERSONA_PROFILES[personaKey] || PERSONA_PROFILES['中小跨境卖家（个人/小团队）'];
   const sys = `你是「Flyelep 大黄狗运营」团队的资深短视频脚本编剧，专门给电商/带货账号写口播脚本。
 
 【你的风格】
@@ -2027,15 +2040,19 @@ function buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid){
 - 一切为「能直接开拍」服务：标题、短视频钩子、分镜/分节、台词、视觉、CTA、必须钩某款商品或脚本模版全部具体化
 - 输出**纯 Markdown**，**不要**用三个反引号包裹（用户是直接粘贴到剪贴板用的），结尾自动结束
 
-【核心 · Flyelep 软种草（这是这个工具的出发点和灵魂，绝对不能偏离）】
+【核心 · Flyelep 软种草（必须贯穿脚本，但不能硬广）】
 - Flyelep 是「给跨境电商人用的 AI 工具矩阵」，17 个核心功能：AI帮写 / 详情图 / 专业主图 / 产品单图 / 广告营销 / 视频生成 / 局部重绘 / 商品替换 / 场景替换 / 智能延展 / 图片翻译 / AI抠图 / 商品换色 / 无损放大 / AI超清 / 品牌模型 / 品牌模板
 - 你写的每一个脚本、每一条视频的最终目的都是「自然地把 Flyelep 某个功能介绍给跨境电商人 / 内容创作者」，让他们看完就有"我得去试试这个工具"的冲动
 - 软种草 ≠ 硬广：不要在脚本里直接喊"用 Flyelep XX 功能"。要让 Flyelep 工具作为「解决用户痛点的具体方法」出现。例如：
   · "想要 3 套不同风格主图？用 AI 主图工具 10 秒就能出 3 套对比"（用数字 + 速度 + 痛点）
   · "想把这张图翻译成 5 种小语种？图片翻译一键搞定"（用场景 + 一键）
   · "拍了 50 张产品图，但只有 1 张背景能用？AI 抠图 + 场景替换，1 张变 50 张"（对比痛点）
-- 每个脚本结尾必须自然过渡到【Flyelep 落地工具】段，给出用户可立刻照做的 1 步行动
 - 钩子要带「痛点 / 好奇 / 数字」三选一；不要喊口号、列空话
+
+【用户画像 · ${personaKey}】（不同人群用不同内容写，必须严格遵守）
+${personaGuide}
+- 脚本里的台词、画面、举例、CTA 全部按这个画像的真实工作场景和痛点设计
+- 比如：电商美工 → 谈"图层/蒙版/改稿"；电商运营 → 谈"点击率/转化率/ROI"；中小卖家 → 谈"省外包费/一个人搞定"；自媒体 → 谈"爆款/涨粉/矩阵号"；货源厂家 → 谈"批量出图/降本"；外贸工厂 → 谈"合规原创/多语种/海外审美"；中型跨境 → 谈"团队效率/标准化"；服务商/代运营 → 谈"服务 10 个客户/模板复用"
 
 【平台调性 · ${plat}】
 调性：${tone}
@@ -2079,21 +2096,26 @@ ${rules}${fewShotBlock}${learnedBlock}
 给 2-3 个备选，每条 ≤ 24 字，含数字 / 情绪词 / 钩子点
 
 **【开头 3 秒钩子】**
-一句口语化、有冲击力的开场（必须符合 ${plat} 调性）
+一句口语化、有冲击力的开场（必须符合 ${plat} 调性 + 命中 ${personaKey} 痛点）
 
-**【正文 / 分镜】（核心，分 ${vd.beats} 段，严格对应总时长 ${vd.label}）**
+**【脚本前置概要】**
+3 行说明，明确告诉用户这条脚本是为谁写、按什么结构走、主推什么 Flyelep 功能：
+- 用户画像：${personaKey}（按这个人群的口吻和痛点来写）
+- 视频结构：${st.label}
+- 主推功能：「${vf.label}」 —— ${vf.desc}
+
+**【视频文案脚本】**（分 ${vd.beats} 段，严格对应总时长 ${vd.label}）
 每段格式：⏱ 秒 XX｜👀 画面（按 ${vt.shoot} 描述）｜🎙 台词｜🎯 卖点什么
 节奏公式：${vd.pace}
+（注：上一版叫【正文 / 分镜】，本次统一叫【视频文案脚本】，**不要**再写【正文 / 分镜】或【正文】）
 
-**【平台调性 & CTA】**
-针对 ${plat} 的发布技巧 + 收尾引导语（必须合规，不踩违禁词）
-
-**【Flyelep 落地工具】（必须以「${vf.label}」为核心）**
-- 必须先说明怎么用「${vf.label}」一键完成本脚本的视觉（说明用途、${vf.desc}）
-- 再补充 1-2 个搭配的次要功能，覆盖"出图 → 优化 → 翻译 / 延展 / 抠图"的完整链路
+**【发布带话题推荐】**
+- 针对 ${plat} 的发布技巧 + 发布时间建议 + 收尾引导语（必须合规，不踩违禁词）
+- 话题标签推荐：5-8 个 #话题，混合「大流量标签 + 精准人群标签 + 热点相关标签」，便于系统推流
+- 把主推功能「${vf.label}」怎么用一句话自然落到发布语里（不硬喊"用 Flyelep"）
 - 字数控制在 350-${vd.beats*100} 字之间。`;
 
-  const user = `请按你的设定给我写一份可直接开拍的脚本（平台：${plat}，必须贴合上面【平台调性 · ${plat}】的写法和违禁词要求，且不能有任何 AI 腔）。
+  const user = `请按你的设定给我写一份可直接开拍的脚本（平台：${plat}，人群：${personaKey}，必须按上面【用户画像 · ${personaKey}】的口吻/痛点/CTA 写，且不能有任何 AI 腔、不能有元叙述）。
 
 【热点信息】
 - 标题：${h.title||'(无)'}
@@ -2109,7 +2131,7 @@ ${h.flyelepAngle?'\n【本热点 × Flyelep 推荐角度（按这个角度切入
 
 【账号信息】
 - 账号：${a.platform||plat} · ${a.name}
-- 人群画像：${a.audience||a.position||'(未填)'}  ← 脚本必须朝这个人群说话
+- 人群画像：${personaKey}  ← 脚本全程必须朝这个人群说话、举的例子 / 痛点 / CTA 必须命中这个画像
 - 平台调性参考：${tone}
 
 【视频制作前置】（以下 3 项必须严格遵循，不可漏掉）
@@ -2401,7 +2423,7 @@ function scrubScriptNarration(s){
   // 1) 把所有 **【X】** / 【X】 标准化成 **【X】**
   let t = s.replace(/\*\*\s*(\*{【1,2}[^*]+】{1,2})\s*\*\*/g, '**$1**');
   // 2) 找出第一个 5 段标题里的任意一个，从这里开始
-  const markers = ['**【视频标题】**','**【开头 3 秒钩子】**','**【正文 / 分镜】**','**【正文/分镜】**','**【正文】**','**【平台调性 & CTA】**','**【Flyelep 落地工具】**'];
+  const markers = ['**【视频标题】**','**【开头 3 秒钩子】**','**【开头 3s 钩子】**','**【脚本前置概要】**','**【视频文案脚本】**','**【正文 / 分镜】**','**【正文/分镜】**','**【正文】**','**【发布带话题推荐】**','**【平台调性 & CTA】**','**【Flyelep 落地工具】**'];
   let firstIdx = -1;
   for(const m of markers){
     const i = t.indexOf(m);
@@ -2480,17 +2502,18 @@ function renderScriptSections(raw){
   const classify = (t) => {
     if(/视频标题/.test(t)) return 'sec-title';
     if(/开头.*钩子/.test(t) || /3\s*秒/.test(t)) return 'sec-hook';
-    if(/正文/.test(t) || /分镜/.test(t)) return 'sec-body';
-    if(/平台调性/.test(t) || /CTA/.test(t)) return 'sec-cta';
-    if(/Flyelep/.test(t) || /落地工具/.test(t)) return 'sec-flyelep';
+    if(/前置概要|脚本前置|前置/.test(t)) return 'sec-preview';
+    if(/文案脚本|视频文案|分镜|正文/.test(t)) return 'sec-body';
+    if(/发布|话题|CTA/.test(t)) return 'sec-cta';
+    if(/Flyelep|落地/.test(t)) return 'sec-cta';   // 兜底（兼容老格式）
     return 'sec-body';
   };
   const icons = {
     'sec-title':   {icon:'🎯', tag:'TITLE'},
     'sec-hook':    {icon:'⚡', tag:'HOOK'},
-    'sec-body':    {icon:'🎬', tag:'BODY'},
-    'sec-cta':     {icon:'📣', tag:'CTA'},
-    'sec-flyelep': {icon:'⚡', tag:'FLYELEP'},
+    'sec-preview': {icon:'👤', tag:'BRIEF'},
+    'sec-body':    {icon:'🎬', tag:'SCRIPT'},
+    'sec-cta':     {icon:'📣', tag:'PUBLISH'},
   };
 
   const html = sections.map(sec => {
@@ -2543,6 +2566,22 @@ function renderScriptSections(raw){
       bodyHtml = `<div class="gen-cta-text">${markdownLite(body)}</div>`;
     } else if(cls === 'sec-flyelep'){
       bodyHtml = `<div class="gen-flyelep-body">${markdownLite(body)}</div>`;
+    } else if(cls === 'sec-preview'){
+      // 脚本前置概要：把 "- 用户画像：..." "- 视频结构：..." "- 主推功能：..." 拆 3 行展示
+      const lines = body.split('\n').map(l=>l.trim()).filter(Boolean);
+      const items = [];
+      for(const l of lines){
+        const m = l.match(/^[-•·]?\s*(.+?)[：:]\s*(.+)$/);
+        if(m) items.push({label:m[1].trim(), text:m[2].trim()});
+        else items.push({label:'', text:l});
+      }
+      bodyHtml = '<div class="gen-preview-list">' + items.map(it=>{
+        const cls = /用户画像|人群/.test(it.label)?'gen-preview-persona'
+                   : /视频结构|结构/.test(it.label)?'gen-preview-struct'
+                   : /主推功能|功能/.test(it.label)?'gen-preview-func'
+                   : 'gen-preview-default';
+        return `<div class="gen-preview-row ${cls}"><span class="gen-preview-label">${escapeHtml(it.label||'·')}</span><span class="gen-preview-text">${escapeHtml(it.text)}</span></div>`;
+      }).join('') + '</div>';
     } else {
       bodyHtml = `<div class="gen-sec-body-text">${markdownLite(body)}</div>`;
     }
@@ -2609,6 +2648,7 @@ function parseBeat(b){
 
 function buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf){
   const hook=st.hook(h.title||h.product||'这个热点');
+  const personaKey = (a.audience || a.position || '').trim() || '中小跨境卖家（个人/小团队）';
   const steps=st.steps.map((s,i)=>{
     let extra='';
     if(i===0 && h.script) extra=`\n　· 画面（${vt.shoot}）：${firstSentence(h.script)}`;
@@ -2617,22 +2657,26 @@ function buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf){
     return `【${i+1}】${s}${extra}`;
   }).join('\n');
   const tone=PLAT_TONE[plat]||PLAT_TONE['默认'];
-  const audienceTag=(a.audience||a.position)?`（人群画像：${a.audience||a.position}）`:'';
-  return `【视频标题】${hook}
-【开头钩子】${hook}
-【发布账号】${plat} · ${a.name}${audienceTag}
-【视频前置】类型：${vt.label} · 时长：${vd.label} · 主推：${vf.label}
-【脚本结构】${st.label}
-【节奏公式】${vd.pace}
+  return `**【视频标题】**
+${hook}
 
+**【开头 3 秒钩子】**
+${hook}
+
+**【脚本前置概要】**
+- 用户画像：${personaKey}
+- 视频结构：${st.label}
+- 主推功能：「${vf.label}」 —— ${vf.desc}
+
+**【视频文案脚本】**
 ${steps}
 
-【素材清单】
-${h.material||`（自行补充：热点原图 / 参考详情页 / 白底图 / 场景图 / Flyelep 用「${vf.label}」生成的效果图）`}
-
-【Flyelep 落地】用「${vf.label}」功能——${vf.desc}。${h.playbook?`对应玩法：${h.playbook}`:''}
-
-【平台调性】${tone}`;
+**【发布带话题推荐】**
+- 平台：${plat} · 账号：${a.name}
+- 发布时间：根据目标人群活跃时段（建议晚 7-10 点）
+- 话题标签：#${vf.label} #跨境电商 #热点营销 #电商运营 #AI工具
+- 收尾引导：把「${vf.label}」怎么用 1 句话自然落到发布语里（不硬喊"用 Flyelep"）
+- 平台调性：${tone}`.trim();
 }
 
 function buildLocalScript(h,a,st,plat,fn,vt,vd,vf){
@@ -3805,6 +3849,18 @@ const FLYELEP_FEATURES=[
   {key:'brandt',   label:'品牌模板',    desc:'使用预设专业模板快速生成营销物料'}
 ];
 
+// ====== 用户画像差异化模板（不同人群用不同口吻、不同痛点、不同 CTA）=======
+// 按哪个 a.audience 就走哪条 persona，让脚本真正"对人说人话"。
+const PERSONA_PROFILES = {
+  '电商美工': '你面对的是电商美工 / 视觉设计师，每天要处理 50+ 主图详情页，苦 PS、AI 模板久矣。\n痛点（必须命中）：设计产能不够 / 主图转化率上不去 / 客户改稿改到崩溃 / 不会做 A/B 风格对比。\n语气：同行话术，懂技术圈黑话（图层/蒙版/出血位/钢笔工具），爱看对比图与设计原理拆解，喜欢"1 张变 50 张""10 秒出 3 套"这种省时间话术。\nCTA：让对方立刻试用，强调"模板复用、改图快速、不用抠细节"。',
+  '电商运营': '你面对的是电商运营，背 GMV / ROI / 转化率指标。\n痛点（必须命中）：主图点击率低 / 详情页跳出高 / 投流素材耗得快 / 不会做 A/B 测试 / 不会算投产比。\n语气：数据驱动、爱看 ROI 数字、爱看 A/B 结果对比、关注投产比和点击率。\nCTA：用数据证明效果，强调"点击率提升 X%""投产比翻倍""爆款素材复用"。',
+  '中小跨境卖家（个人/小团队）': '你面对的是 1-3 人小团队跨境卖家，自己身兼数职（选品/上架/客服/美工都做）。\n痛点（必须命中）：人手不够 / 美工外包贵 / 多语言不会翻 / 不懂本地审美 / 上新慢。\n语气：接地气、爱算账、爱看"省了多少钱/多少时间"对比、关心"一个人能搞定吗"。\nCTA：强调"一个人搞定全链路""省去美工外包""一键出海"。',
+  '自媒体博主': '你面对的是做短视频/小红书/TikTok 内容的博主。\n痛点（必须命中）：产能跟不上 / 风格难统一 / 没有模特/场景 / 想做矩阵号 / 爆款复刻不出第二遍。\n语气：潮流、爱看爆款拆解、关注涨粉和完播率、爱看"封面/标题/脚本"全流程技巧。\nCTA：强调"快速出图""风格统一""矩阵号批量做""爆款复刻"。',
+  '货源厂家': '你面对的是工厂/货源方，要给分销商/客户出展示图与详情页。\n痛点（必须命中）：批量出图慢 / 客户要定制不同风格 / 没有模特场景 / 设计成本高。\n语气：B 端话术、关心"批量""标准化""降本增效"，强调一套模板多套场景。\nCTA：强调"批量出图""降低设计成本""支持 OEM/ODM 定制"。',
+  '外贸工厂': '你面对的是做 OEM/ODM 大单的外贸工厂。\n痛点（必须命中）：客户来自不同国家审美不同 / 多语言物料 / 海外平台合规（亚马逊/TikTok Shop/Shopee）/ 产品图不符合海外调性。\n语气：B2B 专业、强调"合规原创""多语种""海外审美"。\nCTA：强调"符合 XX 国审美""多语言一键""合规原创不踩坑""出图快过交期"。',
+  '中型跨境公司': '你面对的是 50-500 人跨境公司运营/设计/品牌负责人。\n痛点（必须命中）：团队协作效率低 / 风格难统一 / 需要数据看板 / 多账号矩阵 / 跨部门沟通成本高。\n语气：管理者视角、强调"团队效率""标准化流程""数据驱动""可复用资产"。\nCTA：强调"团队协作""标准化模板""可复用资产""效率提升 X 倍"。',
+  '服务商、代运营': '你面对的是服务商 / 代运营公司，要同时服务多个客户。\n痛点（必须命中）：每个客户风格不同 / 重复劳动多 / 客户改稿多 / 要���速出提案 / 一个团队服务 10+ 客户。\n语气：乙方视角、关心"服务效率""客户满意度""提案速度""降本"。\nCTA：强调"1 套工具服务 10 个客户""模板复用""快速提案""按客户切换风格"。',
+};
 const PLAT_TONE={
   '抖音':'节奏极快、口语炸裂、前 3 秒必须抛钩子或制造冲突；全程多用"你 / 咱们 / 家人们"，像跟朋友唠嗑；情绪拉满、画面切得快；结尾强引导点主页 / 进橱窗。',
   '小红书':'种草清单风、真实分享口吻；多用 emoji 把段落切小，标题带数字 + 痛点 + 情绪词（踩坑 / 亲测 / 后悔没早买）；像闺蜜安利，强调省时省钱省力。',
