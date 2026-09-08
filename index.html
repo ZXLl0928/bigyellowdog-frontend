@@ -318,6 +318,10 @@ tr:hover td{background:#fbfaf7}
 .filter-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 10px;padding:10px 12px;background:#fafaf6;border:1px solid var(--line);border-radius:10px}
 .filter-bar .lbl{font-size:12px;color:var(--muted);margin-right:2px;font-weight:600}
 .filter-bar select,.filter-bar input[type=text]{font-size:12.5px;padding:5px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);outline:none}
+.filter-bar select.gv-select{font-weight:600;border-color:#bcd0f5;background:#f3f7ff;color:#1a56a3;min-width:236px}
+.filter-bar select.gv-select:focus{border-color:#1a56a3;box-shadow:0 0 0 2px rgba(26,86,163,.12)}
+.gv-tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:#1a56a3;background:#eef4ff;border:1px solid #cfe0fb;border-radius:999px;padding:3px 11px;white-space:nowrap}
+.gv-tag b{color:#0b3d80}
 .filter-bar select:focus,.filter-bar input[type=text]:focus{border-color:var(--brand)}
 .filter-bar .kw{flex:1;min-width:160px}
 .filter-bar .spacer{flex:1}
@@ -987,6 +991,9 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       </div>
       <!-- 简化筛选器：只保留关键词 + 状态；分类请用上面 4 大类 Tab -->
       <div class="filter-bar">
+        <select id="gradeView" class="gv-select" onchange="renderHotspot()" title="评级视角：按谁的画像给热点评级（选了之后整列等级按该卖家重算）">
+          <option value="">🎯 评级视角：通用（不区分卖家）</option>
+        </select>
         <input type="text" class="kw" id="filterHKeyword" placeholder="🔍 搜标题 / 商品 / 玩法 / 评级理由" oninput="renderHotspot()">
         <select id="filterHStatus" onchange="renderHotspot()" title="内容状态">
           <option value="">全部状态</option>
@@ -4223,23 +4230,111 @@ const PERSONA_TREE = [
   ]},
 ];
 
-// 由树生成 平台·类型 → profile 映射 & 一级兜底
+// 🆕 评级用：画像对 5 类玩法的偏好权重（0-100），命中热点 angle 即该值
+const DEF_PREFER = {带货:60,蹭热:50,痛点规则:55,节日:55,其他:45};
+const CAT_DEFAULT_PREFER = {
+  '国内电商':{带货:80,蹭热:60,痛点规则:55,节日:75,其他:45},
+  '跨境电商（出口）':{带货:75,蹭热:40,痛点规则:70,节日:55,其他:40},
+  '外贸 B2B':{带货:45,蹭热:30,痛点规则:70,节日:40,其他:35},
+  '内容自媒体':{带货:65,蹭热:80,痛点规则:65,节日:65,其他:75},
+  '服务/SaaS':{带货:50,蹭热:55,痛点规则:70,节日:45,其他:70},
+};
+const PERSONA_PREFER = {
+  '淘宝/天猫·静默铺货':{带货:85,蹭热:55,痛点规则:50,节日:70,其他:40},
+  '淘宝/天猫·精品运营':{带货:88,蹭热:60,痛点规则:70,节日:78,其他:50},
+  '拼多多·爆款铺货':{带货:90,蹭热:35,痛点规则:55,节日:80,其他:35},
+  '抖音电商·短视频带货':{带货:90,蹭热:85,痛点规则:60,节日:82,其他:55},
+  '抖音电商·直播带货':{带货:92,蹭热:88,痛点规则:72,节日:85,其他:55},
+  '小红书电商·种草博主':{带货:85,蹭热:88,痛点规则:55,节日:85,其他:70},
+  '国内美工设计':{带货:80,蹭热:55,痛点规则:35,节日:60,其他:55},
+  '亚马逊·精品FBA':{带货:82,蹭热:30,痛点规则:78,节日:55,其他:50},
+  '亚马逊·精铺多店':{带货:80,蹭热:30,痛点规则:60,节日:50,其他:40},
+  '亚马逊·铺货老卖家':{带货:65,蹭热:25,痛点规则:55,节日:40,其他:35},
+  '亚马逊·Listing美工':{带货:80,蹭热:50,痛点规则:35,节日:55,其他:50},
+  'TikTok Shop·美区达人':{带货:88,蹭热:85,痛点规则:75,节日:80,其他:70},
+  'TikTok Shop·东南亚小店':{带货:85,蹭热:60,痛点规则:55,节日:65,其他:55},
+  'Temu/SHEIN·全托管供货':{带货:85,蹭热:30,痛点规则:78,节日:80,其他:35},
+  'Shopee/Lazada·东南亚多店':{带货:82,蹭热:55,痛点规则:60,节日:78,其他:45},
+  '速卖通/eBay·铺货玩家':{带货:70,蹭热:30,痛点规则:55,节日:55,其他:40},
+  'Shopify独立站·投流型':{带货:85,蹭热:55,痛点规则:72,节日:55,其他:55},
+  'Shopify独立站·品牌DTC':{带货:82,蹭热:55,痛点规则:55,节日:78,其他:75},
+  '跨境培训/服务商·讲师/陪跑':{带货:55,蹭热:60,痛点规则:85,节日:50,其他:80},
+  '外贸工厂·阿里国际站':{带货:55,蹭热:25,痛点规则:60,节日:50,其他:40},
+  '外贸SOHO/小公司·询盘转化':{带货:50,蹭热:25,痛点规则:80,节日:35,其他:45},
+  '抖音/视频号·知识口播':{带货:55,蹭热:82,痛点规则:82,节日:55,其他:80},
+  '小红书·生活方式种草':{带货:78,蹭热:88,痛点规则:55,节日:82,其他:82},
+  'B站/YouTube·中视频创作者':{带货:55,蹭热:80,痛点规则:55,节日:55,其他:82},
+  '代运营公司·项目经理':{带货:55,蹭热:55,痛点规则:78,节日:50,其他:78},
+  'SaaS/营销工具·服务商':{带货:55,蹭热:55,痛点规则:60,节日:45,其他:82},
+};
+// 由树生成 平台·类型 → profile 映射 & 一级兜底（含 prefer）
 const PERSONA_MAP = {};
 const DEFAULT_BY_CAT = {};
 for(const g of PERSONA_TREE){
   const first = g.platforms[0].types[0];
-  DEFAULT_BY_CAT[g.cat] = { label:g.cat+'卖家', pain:first.pain, voice:first.voice, cta:first.cta };
+  DEFAULT_BY_CAT[g.cat] = { label:g.cat+'卖家', pain:first.pain, voice:first.voice, cta:first.cta, prefer:CAT_DEFAULT_PREFER[g.cat]||DEF_PREFER };
   for(const p of g.platforms){
     if(p.types.length===1){
       const only = p.types[0];
-      PERSONA_MAP[p.name] = { label:p.name, pain:only.pain, voice:only.voice, cta:only.cta };
+      PERSONA_MAP[p.name] = { label:p.name, pain:only.pain, voice:only.voice, cta:only.cta, prefer:PERSONA_PREFER[p.name]||CAT_DEFAULT_PREFER[g.cat]||DEF_PREFER };
     } else {
       for(const t of p.types){
-        PERSONA_MAP[p.name+'·'+t.t] = { label:p.name+'·'+t.t, pain:t.pain, voice:t.voice, cta:t.cta };
+        const key=p.name+'·'+t.t;
+        PERSONA_MAP[key] = { label:key, pain:t.pain, voice:t.voice, cta:t.cta, prefer:PERSONA_PREFER[key]||CAT_DEFAULT_PREFER[g.cat]||DEF_PREFER };
       }
     }
   }
 }
+// 画像匹配度：热点 angle 命中该画像 prefer 的程度（0-100）
+function personaMatchOf(angle, persona){
+  if(!persona||!persona.prefer) return 50;
+  const v = persona.prefer[angle];
+  return (v==null?50:v);
+}
+// 取当前「评级视角」画像（列表下拉）
+function getGradeViewPersona(){
+  const v=$('#gradeView')?.value||'';
+  if(!v) return null;
+  if(v.startsWith('cat:')) return DEFAULT_BY_CAT[v.slice(4)]||null;
+  if(v.startsWith('key:')) return PERSONA_MAP[v.slice(4)]||null;
+  return null;
+}
+function gradeViewLabel(){
+  const v=$('#gradeView')?.value||'';
+  if(!v) return '通用（不区分卖家）';
+  if(v.startsWith('cat:')) return DEFAULT_BY_CAT[v.slice(4)]?.label||v.slice(4);
+  if(v.startsWith('key:')) return PERSONA_MAP[v.slice(4)]?.label||v.slice(4);
+  return v;
+}
+// 填充「评级视角」下拉：通用 + 5 类目通用 + 按类目分组 26 个终端画像
+function populateGradeView(){
+  const sel=$('#gradeView'); if(!sel) return;
+  let html='<option value="">🎯 评级视角：通用（不区分卖家）</option>';
+  for(const g of PERSONA_TREE){
+    html+=`<option value="cat:${g.cat}">${g.cat}卖家（通用）</option>`;
+  }
+  for(const g of PERSONA_TREE){
+    html+=`<optgroup label="${g.cat}">`;
+    for(const p of g.platforms){
+      if(p.types.length===1){
+        html+=`<option value="key:${p.name}">${p.name}</option>`;
+      }else{
+        for(const t of p.types){
+          html+=`<option value="key:${p.name}·${t.t}">${p.name}·${t.t}</option>`;
+        }
+      }
+    }
+    html+=`</optgroup>`;
+  }
+  sel.innerHTML=html;
+}
+// 🆕 视角下的展示价值 / 等级（不污染原 h.value）
+function dispValue(h, persona){
+  if(!persona) return h.value||0;
+  const pm = personaMatchOf(h.angle, persona);
+  return Math.round(0.4*(h.heat||0) + 0.3*(h.fitScore||0) + 0.3*pm);
+}
+function dispGrade(v){ return v>=80?'S' : v>=60?'A' : v>=40?'B' : 'C'; }
 const PLAT_TONE={
   '抖音':'节奏极快、口语炸裂、前 3 秒必须抛钩子或制造冲突；全程多用"你 / 咱们 / 家人们"，像跟朋友唠嗑；情绪拉满、画面切得快；结尾强引导点主页 / 进橱窗。',
   '小红书':'种草清单风、真实分享口吻；多用 emoji 把段落切小，标题带数字 + 痛点 + 情绪词（踩坑 / 亲测 / 后悔没早买）；像闺蜜安利，强调省时省钱省力。',
@@ -4334,6 +4429,8 @@ function renderHotspot(){
   }
 
   // ===== 排序 =====
+  const gv=getGradeViewPersona();          // 🆕 评级视角画像（null=通用）
+  const gvLbl=gradeViewLabel();
   if(sortBy==='heat'){
     arr.sort((a,b)=>(b.heat||0)-(a.heat||0) || ts(b)-ts(a));
   }else if(sortBy==='added'){
@@ -4341,7 +4438,7 @@ function renderHotspot(){
   }else if(sortBy==='date'){
     arr.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   }else{
-    arr.sort((a,b)=>(b.value||0)-(a.value||0) || (b.heat||0)-(a.heat||0) || ts(b)-ts(a));
+    arr.sort((a,b)=>dispValue(b,gv)-dispValue(a,gv) || (b.heat||0)-(a.heat||0) || ts(b)-ts(a));
   }
 
   // ===== Top 20 截断（用户硬性需求：每个 Tab 内只显示综合价值前 20 条） =====
@@ -4355,14 +4452,17 @@ function renderHotspot(){
   }
 
   // KPI 概览（4 列简约现代风）
-  const sa=arr.filter(h=>['S','A'].includes(h.grade)).length;
+  const gradeOf = h => gv ? dispGrade(dispValue(h,gv)) : (h.grade||'-');
+  const valOf = h => dispValue(h,gv);
+  const sa=arr.filter(h=>['S','A'].includes(gradeOf(h))).length;
   const new24=arr.filter(h=>(h.addedAt||0)>=now-86400000).length;
-  const avgValue = arr.length ? Math.round(arr.reduce((s,h)=>s+(h.value||0),0)/arr.length) : 0;
+  const avgValue = arr.length ? Math.round(arr.reduce((s,h)=>s+valOf(h),0)/arr.length) : 0;
   const archivedCount = (state.hotspots||[]).filter(h=>h.archived).length;
   const liveCount = (state.hotspots||[]).filter(h=>!h.archived).length;
+  const gvSub = gv ? ` · 评级视角：<b style="color:#0b3d80">${gvLbl}</b>` : '';
   $('#hotspotKpiGrid').innerHTML=`
-    <div class="kpi"><span class="glow"></span><div class="lbl"><span class="ico">📋</span>显示条数</div><div class="num">${arr.length}<span class="kpi-cap">/ 20</span></div><div class="sub">${_showArchived?'归档视图':'本分类综合 Top'} · 库内 ${liveCount}${archivedCount>0?` · 已归档 <b style="color:#b45309">${archivedCount}</b>`:''}</div></div>
-    <div class="kpi b2"><span class="glow"></span><div class="lbl"><span class="ico">📊</span>平均价值</div><div class="num">${avgValue}</div><div class="sub">${arr.length} 条综合价值均值</div></div>
+    <div class="kpi"><span class="glow"></span><div class="lbl"><span class="ico">📋</span>显示条数</div><div class="num">${arr.length}<span class="kpi-cap">/ 20</span></div><div class="sub">${_showArchived?'归档视图':'本分类综合 Top'} · 库内 ${liveCount}${archivedCount>0?` · 已归档 <b style="color:#b45309">${archivedCount}</b>`:''}${gvSub}</div></div>
+    <div class="kpi b2"><span class="glow"></span><div class="lbl"><span class="ico">📊</span>平均价值</div><div class="num">${avgValue}</div><div class="sub">${arr.length} 条${gv?`· 视角：${gvLbl}`:'综合价值均值'}</div></div>
     <div class="kpi b3"><span class="glow"></span><div class="lbl"><span class="ico">⭐</span>S / A 级</div><div class="num">${sa}</div><div class="sub">${arr.length} 条中的高价值</div></div>
     <div class="kpi b4"><span class="glow"></span><div class="lbl"><span class="ico">🆕</span>24h 新增</div><div class="num">${new24}</div><div class="sub">${_showArchived?'归档中新增':'本 Tab 内'}</div></div>
   `;
@@ -4416,7 +4516,10 @@ function renderHotspot(){
 
   tbody.innerHTML=arr.map(h=>{
     const [aCls,aTxt]=angleMap[h.angle]||['','—'];
-    const [gCls,gTxt]=gradeMap[h.grade]||['','—'];
+    const dv = dispValue(h, gv);
+    const dg = dispGrade(dv);
+    const pm = gv ? personaMatchOf(h.angle, gv) : null;
+    const [gCls,gTxt]=gradeMap[dg]||['','—'];
     const [fCls,fTxt]=fitMap[h.flyelepFit]||['',h.flyelepFit||'—'];
     const [sCls,sTxt]=statusMap[h.status]||statusMap.pending;
     const hasDetail=h.topic||h.script||h.material||h.reasons||h.url||h.note||h.flyelepAngle;
@@ -4455,7 +4558,7 @@ function renderHotspot(){
         </div>
       </td>
       <td class="hs-grade">
-        <span class="grade-chip ${gCls}"><span class="gc-l">${gTxt}</span><span class="gc-s">级</span><span class="gc-n" title="综合价值">${h.value||0}</span></span>
+        <span class="grade-chip ${gCls}"><span class="gc-l">${gTxt}</span><span class="gc-s">级</span><span class="gc-n" title="${gv?('评级视角：'+gvLbl+' · 画像匹配 '+(pm??'-')):'综合价值'}">${dv}</span></span>
       </td>
       <td class="hs-act">
         <button class="btn sm" onclick="toggleHsDetail('${h.id}')" title="查看评级理由 / 选题 / 脚本要点 / 素材清单">详情</button>
@@ -5096,6 +5199,7 @@ function evalHotspot(h){
   h.flyelepAngle=fv.angle||'';
   h.flyelepFit = fv.score>=4?'强' : fv.score>=2?'中' : '弱';
   let fitScore = fv.score>=5?100 : fv.score>=3?82 : fv.score>=2?65 : fv.score>=1?50 : 30;
+  h.fitScore=fitScore;   // 🆕 存分量，供「评级视角」展示层重算
   // 玩法类型（仅显示标签，不影响 value）
   const angle=classifyAngle(h, h.heat, fv);
   h.angle=angle;
@@ -5578,6 +5682,7 @@ async function fetchShowHN(){
 /* ================== Init ================== */
 (async function init(){
   load();
+  populateGradeView();   // 🆕 填充「评级视角」下拉
   try{   // 包裹：任何初始化异常都不能阻断末尾的 initCloud()（云端 UI + 登录框）
   // 恢复上次的数据文件句柄（浏览器已授权时直接重连，无需重选）
   if(supportsFS()){
