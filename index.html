@@ -552,6 +552,8 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .gen-step.filled .step-num{background:linear-gradient(135deg,#aedb9c,#82b366);color:#fff}
 .gen-step .req{color:#d6336c;font-weight:700;margin-left:1px}
 .gen-step .opt{color:#1d4ed8;font-weight:600;font-size:11px;background:#dbeafe;padding:1px 7px;border-radius:999px;margin-left:2px}
+.gen-step[data-step="profile"]{grid-column:1/-1;background:linear-gradient(180deg,#f5f8ff,#fff);border-color:#c7d8f0;border-style:dashed}
+.gen-step[data-step="profile"].filled{border-style:solid;border-color:#82b366}
 .gen-profile-row{display:flex;gap:8px}
 .gen-profile-row select{flex:1;min-width:0}
 .gen-step select{width:100%;min-width:0;font-size:13px;padding:7px 10px;border-radius:8px;background:#fafafa}
@@ -1064,7 +1066,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         <div class="gen-step" data-step="profile">
           <div class="step-head"><span class="step-num">7</span>用户画像 <span class="opt">可选</span></div>
           <div class="gen-profile-row">
-            <select id="genProfilePlatform" onchange="onGenProfilePlatformChange()"><option value="">— 跟随账号定位（不细分）—</option></select>
+            <select id="genProfilePlatform" onchange="onGenProfilePlatformChange()"><option value="">— 跟账号定位走 —</option></select>
             <select id="genProfileType" onchange="renderGenStepInfo()"><option value="">— 选卖家类型 —</option></select>
           </div>
           <div class="gen-step-info" id="infoProfile"></div>
@@ -1980,7 +1982,7 @@ function fillProfilePlatformsByAccount(){
   const a=$('#genAccount')?.value ? state.accounts.find(x=>x.id===$('#genAccount').value) : null;
   const cat = a ? (a.category||a.audience||'') : '';
   const grp = PERSONA_TREE.find(g=>g.cat===cat);
-  let opts='<option value="">— 跟随账号定位（不细分）—</option>';
+  let opts='<option value="">— 跟账号定位走 —</option>';
   if(grp) grp.platforms.forEach(p=>opts+='<option value="'+escapeHtml(p.name)+'">'+escapeHtml(p.name)+'</option>');
   gpEl.innerHTML=opts; gpEl.value='';
   const gtEl=document.getElementById('genProfileType');
