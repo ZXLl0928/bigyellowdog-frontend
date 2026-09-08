@@ -2305,7 +2305,7 @@ async function callArk(messages, retry=0, opts={}){
   const { model='doubao-seed-2-1-pro-260628', onToken=null } = opts;
   if(!API_BASE) throw new Error('未连接团队云后端（Yellow Dog Seed-2.1-pro 需后端代理）');
   const base = API_BASE.replace(/\/$/,'');
-  const body = { messages, model, stream: !!onToken };
+  const body = { messages, model, stream: !!onToken, max_tokens: 8192 };
   const ctrl = new AbortController();
   const tid = setTimeout(()=>ctrl.abort(), 150000);  // 长生成脚本最多 ~100-120s，150s 留 buffer
   try{
