@@ -573,6 +573,41 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .gen-loading{display:flex;align-items:center;gap:14px;padding:24px;background:#fffdf5;border-top:1px solid #f0dfae}
 .spinner{width:24px;height:24px;border:3px solid #f0dfae;border-top-color:var(--brand);border-radius:50%;animation:spin .9s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ============ 结构化脚本卡片（5 段式渲染）============ */
+.gen-sections{padding:14px 16px 18px;display:flex;flex-direction:column;gap:12px;max-height:560px;overflow:auto;background:linear-gradient(180deg,#fafcff 0%,#fff 100%)}
+.gen-section{border-radius:10px;padding:11px 14px;border:1px solid var(--line);background:#fff;position:relative}
+.gen-section.sec-title{background:linear-gradient(135deg,#fff7e6 0%,#fff 100%);border-color:#f5d99b}
+.gen-section.sec-hook{background:linear-gradient(135deg,#fef3e8 0%,#fff 100%);border-color:#f7c799}
+.gen-section.sec-body{background:linear-gradient(180deg,#f0f7ff 0%,#fff 100%);border-color:#bfd7f3}
+.gen-section.sec-cta{background:linear-gradient(135deg,#f0fdf4 0%,#fff 100%);border-color:#b6e4c2}
+.gen-section.sec-flyelep{background:linear-gradient(135deg,#faf5ff 0%,#fff 100%);border-color:#d7c3ee;border-width:1.5px}
+.gen-sec-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:700;font-size:13.5px;color:var(--ink)}
+.gen-sec-icon{width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.gen-section.sec-title .gen-sec-icon{background:#fef3c7;color:#b45309}
+.gen-section.sec-hook .gen-sec-icon{background:#fed7aa;color:#c2410c}
+.gen-section.sec-body .gen-sec-icon{background:#dbeafe;color:#1d4ed8}
+.gen-section.sec-cta .gen-sec-icon{background:#bbf7d0;color:#15803d}
+.gen-section.sec-flyelep .gen-sec-icon{background:#e9d5ff;color:#7e22ce}
+.gen-sec-tag{font-size:10.5px;padding:2px 7px;border-radius:999px;background:#f3f4f6;color:#6b7280;font-weight:500;margin-left:auto}
+.gen-sec-body-text{font-size:13.5px;line-height:1.7;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.gen-titles-list{display:flex;flex-direction:column;gap:6px}
+.gen-title-item{display:flex;align-items:flex-start;gap:8px;padding:6px 10px;background:#fff7e0;border:1px solid #f5d99b;border-radius:6px;font-size:13.5px;color:#92400e;line-height:1.5}
+.gen-title-num{width:18px;height:18px;border-radius:50%;background:#f59e0b;color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;margin-top:1px}
+.gen-hook-text{font-size:14.5px;font-weight:700;color:#9a3412;line-height:1.5;padding:8px 12px;background:#fff;border:1px dashed #f7c799;border-radius:8px;text-align:center}
+.gen-beat{border-left:3px solid #93c5fd;padding:8px 10px 8px 12px;margin-bottom:8px;background:#f8fbff;border-radius:0 6px 6px 0}
+.gen-beat:last-child{margin-bottom:0}
+.gen-beat-time{font-size:11px;font-weight:700;color:#1d4ed8;background:#dbeafe;padding:2px 8px;border-radius:999px;display:inline-block;margin-bottom:6px}
+.gen-beat-row{display:flex;gap:6px;align-items:flex-start;font-size:13px;line-height:1.6;margin-bottom:3px;color:var(--ink)}
+.gen-beat-row:last-child{margin-bottom:0}
+.gen-beat-label{font-weight:700;color:#475569;min-width:54px;flex-shrink:0}
+.gen-beat-row b.gen-beat-label{color:#475569;font-weight:700}
+.gen-beat-visual{color:#7c3aed}
+.gen-beat-line{color:var(--ink)}
+.gen-beat-sell{color:#dc2626}
+.gen-cta-text{font-size:13.5px;line-height:1.7;color:#14532d;white-space:pre-wrap}
+.gen-flyelep-body{font-size:13.5px;line-height:1.7;color:#581c87;white-space:pre-wrap}
+.gen-flyelep-body b{color:#7e22ce;font-weight:700}
 /* 热点状态切换 pill 组（脚本结果卡内） */
 .gen-status-group{display:inline-flex;align-items:center;gap:3px;padding:3px 8px 3px 4px;border-radius:999px;background:#fafafa;border:1px solid var(--line);font-size:11.5px;color:var(--muted);margin-right:6px}
 .gen-status-group .lbl{margin-right:2px}
@@ -2009,8 +2044,23 @@ ${rules}${fewShotBlock}${learnedBlock}
 
 【重要 · 直接成稿】
 - 你的最终输出就是脚本本身，**不要在回复中包含任何思考、规划、分析过程**
-- 不要输出"好的我来分析""下面是我的方案"这类前置废话，直接开始 【视频标题】 段
+- 不要输出"好的我来分析""下面是我的方案""现在我开始写"这类前置废话
+- 你的回复**必须以【视频标题】开头**，第一行就是 **【视频标题】**，前面不允许有任何铺垫
 - 你的回复 100% 都是最终脚本文本
+
+【严禁 · 这些句子绝对不能出现】（以前每次都会冒出来的反面教材，列出来帮你避雷）
+- ❌ "用户现在需要写..." / "我会紧扣..." / "我会按照..."
+- ❌ "我已经敲定..." / "我已经确定了..." / "我已经起草了..." / "我已拟定..."
+- ❌ "接下来我会按要求撰写..." / "接下来我会..." / "接下来..."
+- ❌ "我正在优化脚本内容..." / "我正在..."
+- ❌ "经核对..." / "经检查..." / "经校验..." / "经复核..."
+- ❌ "让我来..." / "好的，下面..." / "好的，我..."
+- ❌ "以下是脚本..." / "下面我为你..." / "下面是..."
+- ❌ "我先...然后再..." / "我会先...再..."
+- ❌ 任何"我"开头的元叙述（我是指作者自己，不是脚本里的人物）
+- ❌ 任何过程汇报、状态更新、播报类、思路讲解类句子
+
+【唯一允许的输出】—— 一份完整的 5 段式 Markdown 脚本，开头第一行就是 **【视频标题】**
 
 【重要 · 去 AI 味（必须做到）】
 - 像真人创作者写的，不是机器生成的：口语、自然、有情绪起伏，句子长短交错
@@ -2279,7 +2329,9 @@ function renderStreamingScript(h, full, modelLabel){
   const box=$('#genResult');
   if(!box) return;
   box.classList.remove('hidden');
-  const html=markdownLite(full)+'<span class="caret">▋</span>';
+  // 清洗模型元叙述（避免"我已经敲定..."这种思考过程漏到前端）
+  const cleaned = scrubScriptNarration(full);
+  const html = renderScriptSections(cleaned);
   box.innerHTML=`<div class="gen-card">
     <div class="gen-head"><span>🎬 ${escapeHtml(h.title)}</span>
       <div style="display:flex;gap:6px;align-items:center">
@@ -2287,7 +2339,7 @@ function renderStreamingScript(h, full, modelLabel){
         ${genStatusPillsHtml(h)}
       </div>
     </div>
-    <div id="genScriptText" class="gen-script markdown">${html}</div>
+    <div id="genScriptText">${html}<span class="caret">▋</span></div>
   </div>`;
 }
 
@@ -2304,15 +2356,21 @@ function showGenLoading(h, engine, ctx){
     </div></div>`;
 }
 
+// 缓存最近一次脚本的清洗后原始 Markdown（供"复制脚本"按钮用，避免 innerText 把卡片标签也算进去）
+let _lastGenScriptRaw = '';
+
 function renderAiScript(h, r, fallbackError, fallbackScript){
   if(_strTimer){ clearTimeout(_strTimer); _strTimer=null; } // 清掉挂起的节流帧，避免终版前闪烁
   const box=$('#genResult');
   const content=r?r.content:(fallbackScript||'(空)');
   const badge=r?`<span class="badge-grade g-A" title="由 ${r.model_used} 生成">🤖 ${r.model_used}</span>`
                 :`<span class="badge-grade g-C" title="引擎调用失败，自动回退">📝 Yellow Dog 本地模板（兜底）</span>`;
-  const errLine=fallbackError?`<div style="background:#fff5f5;border:1px solid #fdd;padding:8px 10px;border-radius:6px;font-size:12px;color:#a33;margin:8px 0">${escapeHtml(fallbackError)}</div>`:'';
-  // Markdown 渲染：简单两手准备（标题加粗 / 段落分隔）
-  const html=markdownLite(content);
+  const errLine=fallbackError?`<div style="background:#fff5f5;border:1px solid #fdd;padding:8px 10px;border-radius:6px;font-size:12px;color:#a33;margin:8px 16px 0">${escapeHtml(fallbackError)}</div>`:'';
+  // 清洗元叙述（处理 Seed-2.1-pro 推理模型把思考塞进正文的问题）
+  const cleaned = scrubScriptNarration(content);
+  _lastGenScriptRaw = cleaned;
+  // 结构化渲染：5 段卡片 + 分镜 beat 拆行
+  const html = renderScriptSections(cleaned);
   box.innerHTML=`<div class="gen-card">
     <div class="gen-head"><span>🎬 ${escapeHtml(h.title)}</span><div style="display:flex;gap:6px;align-items:center">${badge}
       ${genStatusPillsHtml(h)}
@@ -2320,7 +2378,7 @@ function renderAiScript(h, r, fallbackError, fallbackScript){
       <button class="btn sm" onclick="regenScript()">🔁 重生成</button>
     </div></div>
     ${errLine}
-    <div id="genScriptText" class="gen-script markdown">${html}</div>
+    <div id="genScriptText">${html}</div>
   </div>`;
   box.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -2333,6 +2391,220 @@ function markdownLite(s){
     .replace(/\*\*([^*]+)\*\*/g, '<b style="color:var(--brand)">$1</b>')
     .replace(/\n\n+/g, '<br><br>')
     .replace(/\n/g, '<br>');
+}
+
+// ====== 清洗模型"元叙述"——只保留真正的脚本内容 ======
+// 现象：Seed-2.1-pro 是推理模型，经常把思考过程作为"我已敲定..." / "接下来我会..." 这种文字塞进正文。
+//       后端虽然过滤了 reasoning 字段，但模型仍把"叙述"塞进 message.content，必须用启发式再清一遍。
+function scrubScriptNarration(s){
+  if(!s) return s;
+  // 1) 把所有 **【X】** / 【X】 标准化成 **【X】**
+  let t = s.replace(/\*\*\s*(\*{【1,2}[^*]+】{1,2})\s*\*\*/g, '**$1**');
+  // 2) 找出第一个 5 段标题里的任意一个，从这里开始
+  const markers = ['**【视频标题】**','**【开头 3 秒钩子】**','**【正文 / 分镜】**','**【正文/分镜】**','**【正文】**','**【平台调性 & CTA】**','**【Flyelep 落地工具】**'];
+  let firstIdx = -1;
+  for(const m of markers){
+    const i = t.indexOf(m);
+    if(i>=0 && (firstIdx<0 || i<firstIdx)) firstIdx = i;
+  }
+  if(firstIdx>0) t = t.slice(firstIdx);
+  // 3) 启发式：删掉"我..." / "接下来..." / "经核对..." 等元叙述行（即使夹在脚本里）
+  const narrationPatterns = [
+    /^我[已将会正在打算准备需要先将]\s*[经定敲定起草写好完成按照按照][^\n]*$/,
+    /^我已经[^\n]*$/,
+    /^我会[^\n]*$/,
+    /^接下来我[^\n]*$/,
+    /^接下来[^\n]*$/,
+    /^我正在[^\n]*$/,
+    /^经核[对查校复][^\n]*$/,
+    /^让我[^\n]*$/,
+    /^好的[，,。\s][^\n]*$/,
+    /^好的[，,。\s]?[^\n]*$/,
+    /^下面[是为][^\n]*$/,
+    /^以下是[^\n]*$/,
+    /^我先[^\n]*$/,
+    /^我打算[^\n]*$/,
+    /^为了[^\n]*$/,
+    /^请按[^\n]*$/,
+    /^下面[^\n]*脚本[^\n]*$/,
+    /^���我[^\n]*脚本[^\n]*$/,
+    /^现在[我来为][^\n]*$/,
+    /^我(?:会|已)按(?:照|照|需求)?[^\n]*$/,
+    /^[（(]\s*[^\n]*\s*[)）]\s*$/,    // 纯括号注释
+  ];
+  const lines = t.split('\n');
+  const cleaned = [];
+  for(const line of lines){
+    const trimmed = line.trim();
+    if(!trimmed){ cleaned.push(line); continue; }
+    let isNarration = false;
+    for(const p of narrationPatterns){
+      if(p.test(trimmed)){ isNarration = true; break; }
+    }
+    if(!isNarration) cleaned.push(line);
+  }
+  return cleaned.join('\n').trim();
+}
+
+// ====== 把 5 段式 Markdown 脚本渲染成结构化卡片 ======
+// 输入：清洗后的原始脚本文本（含 5 段【】标题）
+// 输出：HTML 字符串
+function renderScriptSections(raw){
+  const text = (raw||'').trim();
+  if(!text) return '<div style="color:var(--muted);font-size:13px;padding:8px">（脚本为空）</div>';
+
+  // 用正则把 5 段切出来（兼容 **【X】** 与 【X】 两种写法）
+  const secRegex = /\*{0,2}【([^】]+)】\s*\*{0,2}/g;
+  const sections = [];
+  let lastEnd = 0, m;
+  while((m = secRegex.exec(text)) !== null){
+    if(m.index > lastEnd){
+      // 段前若有残留文字，作为前一段的尾巴
+      if(sections.length){
+        sections[sections.length-1].body += '\n' + text.slice(lastEnd, m.index);
+      }
+    }
+    sections.push({ title: m[1].trim(), body: '' });
+    lastEnd = m.index + m[0].length;
+  }
+  if(lastEnd < text.length && sections.length){
+    sections[sections.length-1].body += '\n' + text.slice(lastEnd);
+  }
+
+  if(!sections.length) {
+    // 没识别到任何段 → 回退原 markdownLite
+    return `<div class="gen-sections"><div class="gen-section sec-body"><div class="gen-sec-body-text">${markdownLite(text)}</div></div></div>`;
+  }
+
+  // 5 段标题 → 类型映射
+  const classify = (t) => {
+    if(/视频标题/.test(t)) return 'sec-title';
+    if(/开头.*钩子/.test(t) || /3\s*秒/.test(t)) return 'sec-hook';
+    if(/正文/.test(t) || /分镜/.test(t)) return 'sec-body';
+    if(/平台调性/.test(t) || /CTA/.test(t)) return 'sec-cta';
+    if(/Flyelep/.test(t) || /落地工具/.test(t)) return 'sec-flyelep';
+    return 'sec-body';
+  };
+  const icons = {
+    'sec-title':   {icon:'🎯', tag:'TITLE'},
+    'sec-hook':    {icon:'⚡', tag:'HOOK'},
+    'sec-body':    {icon:'🎬', tag:'BODY'},
+    'sec-cta':     {icon:'📣', tag:'CTA'},
+    'sec-flyelep': {icon:'⚡', tag:'FLYELEP'},
+  };
+
+  const html = sections.map(sec => {
+    const cls = classify(sec.title);
+    const head = icons[cls];
+    const body = sec.body.trim();
+    let bodyHtml = '';
+    if(cls === 'sec-title'){
+      // 把标题候选拆成数组（按换行 / 数字编号 / 中文序号 / ● / "1." "2."）
+    const lines = body.split('\n').map(l=>l.trim()).filter(Boolean);
+      const titles = [];
+      let buf = '';
+      for(const l of lines){
+        if(/^[\d①-⑩]/.test(l) || /^[\d]+[.\)、]/.test(l) || /^[•·]/.test(l)){
+          if(buf) titles.push(buf.trim());
+          buf = l.replace(/^[\d①-⑩][.\)、]?\s*/, '').replace(/^[•·]\s*/, '').trim();
+        } else if(buf){
+          buf += ' ' + l;
+        } else {
+          buf = l;
+        }
+      }
+      if(buf) titles.push(buf.trim());
+      // 兜底：实在拆不开就把整段当一段
+      const list = titles.length ? titles : (body ? [body.replace(/\n+/g,' ').trim()] : ['（未生成标题）']);
+      bodyHtml = '<div class="gen-titles-list">' + list.map((t,i)=>`<div class="gen-title-item"><span class="gen-title-num">${i+1}</span><span>${escapeHtml(t)}</span></div>`).join('') + '</div>';
+    } else if(cls === 'sec-hook'){
+      bodyHtml = `<div class="gen-hook-text">${escapeHtml(body || '（未生成钩子）')}</div>`;
+    } else if(cls === 'sec-body'){
+      // 按 ⏱秒XX｜👀画面｜🎙台词｜🎯卖点 拆 beat
+      const lines = body.split('\n').map(l=>l.trim()).filter(Boolean);
+      const beats = [];
+      let cur = null;
+      for(const l of lines){
+        const m = l.match(/^(?:⏱\s*秒?\s*)?(\d+)\s*秒?\s*[\|｜]/);
+        if(m){
+          if(cur) beats.push(cur);
+          cur = { time: m[1]+'秒', raw: l };
+        } else if(cur){
+          cur.raw += '\n' + l;
+        } else {
+          // 没有 ⏱ 标记的行 → 作为 preamble
+          cur = { time:'', raw: l };
+        }
+      }
+      if(cur) beats.push(cur);
+
+      bodyHtml = beats.length ? beats.map(parseBeat).join('') : `<div class="gen-sec-body-text">${markdownLite(body)}</div>`;
+    } else if(cls === 'sec-cta'){
+      bodyHtml = `<div class="gen-cta-text">${markdownLite(body)}</div>`;
+    } else if(cls === 'sec-flyelep'){
+      bodyHtml = `<div class="gen-flyelep-body">${markdownLite(body)}</div>`;
+    } else {
+      bodyHtml = `<div class="gen-sec-body-text">${markdownLite(body)}</div>`;
+    }
+
+    return `<div class="gen-section ${cls}">
+      <div class="gen-sec-head">
+        <span class="gen-sec-icon">${head.icon}</span>
+        <span>${escapeHtml(sec.title)}</span>
+        <span class="gen-sec-tag">${head.tag}</span>
+      </div>
+      ${bodyHtml}
+    </div>`;
+  }).join('');
+
+  return `<div class="gen-sections">${html}</div>`;
+}
+
+// 解析单段 beat：⏱秒XX｜👀画面｜🎙台词｜🎯卖点
+function parseBeat(b){
+  const lines = b.raw.split('\n');
+  const timeBadge = b.time ? `<span class="gen-beat-time">⏱ ${b.time}</span>` : '';
+  // 第一行按 | 拆字段；后续行作为附加
+  const first = lines[0] || '';
+  const parts = first.split(/[\|｜]/).map(p=>p.trim());
+  // 提取 ⏱ 秒数（如果首部包含 ⏱XX秒）
+  let time = '';
+  let rest = parts;
+  if(/^⏱/.test(parts[0]) || /^\d+\s*秒/.test(parts[0])){
+    const m = parts[0].match(/(\d+)\s*秒/);
+    if(m) time = m[1]+'秒';
+    rest = parts.slice(1);
+  }
+  // 识别 4 段（画面/台词/卖点）：用 emoji 前缀 👀/🎙/🎯 也兼容无 emoji 的「画面：」/「台词：」/「卖点：」
+  const rows = [];
+  for(const p of rest){
+    if(!p) continue;
+    let label = '', text = p;
+    const lm = p.match(/^(?:([👀🎙🎯])\s*)?(.+?)[：:]\s*(.+)$/);
+    if(lm){
+      const [, , l, t] = lm;
+      text = t;
+      if(/画面/.test(l)) label='👀 画面';
+      else if(/台词|口播/.test(l)) label='🎙 台词';
+      else if(/卖点/.test(l)) label='🎯 卖点';
+      else label = l ? l+' ' : '';
+    } else {
+      const em = p.match(/^([👀🎙🎯])\s*(.+)$/);
+      if(em){ label = em[1]+' '; text = em[2]; }
+    }
+    if(!label){
+      // 兜底：按出现顺序画面/台词/卖点
+      const guess = ['👀 画面','🎙 台词','🎯 卖点'][rows.length] || '·';
+      label = guess;
+    }
+    rows.push({label, text});
+  }
+  const finalTime = time || (b.time||'');
+  const rowsHtml = rows.map(r=>{
+    const cls = /画面/.test(r.label)?'gen-beat-visual':/台词/.test(r.label)?'gen-beat-line':'gen-beat-sell';
+    return `<div class="gen-beat-row"><span class="gen-beat-label">${r.label}</span><span class="${cls}">${escapeHtml(r.text)}</span></div>`;
+  }).join('');
+  return `<div class="gen-beat">${finalTime?`<span class="gen-beat-time">⏱ ${finalTime}</span>`:''}${rowsHtml}</div>`;
 }
 
 function buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf){
@@ -2367,13 +2639,15 @@ function buildLocalScript(h,a,st,plat,fn,vt,vd,vf){
   const script=buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf);
   const box=$('#genResult');
   box.classList.remove('hidden');
+  _lastGenScriptRaw = script;
+  const html = renderScriptSections(script);
   box.innerHTML=`<div class="gen-card">
     <div class="gen-head"><span>🎬 ${escapeHtml(h.title)}</span><div class="gen-actions">
       ${genStatusPillsHtml(h)}
       <button class="btn sm" onclick="copyGenScript()">📋 复制脚本</button>
       <button class="btn sm" onclick="regenScript()">🔁 重生成</button>
     </div></div>
-    <pre id="genScriptText" class="gen-script">${escapeHtml(script)}</pre>
+    <div id="genScriptText">${html}</div>
   </div>`;
   box.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -2472,8 +2746,9 @@ function showEngineInfo(){
 }
 
 async function copyGenScript(){
-  const el=$('#genScriptText'); if(!el) return;
-  const txt=el.innerText;
+  // 优先复制清洗后的原始 Markdown 文本（不带卡片标签），回退到 innerText
+  const txt = _lastGenScriptRaw || ($('#genScriptText')?.innerText || '');
+  if(!txt) return;
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(txt).then(()=>toast('脚本已复制到剪贴板')).catch(()=>fallbackCopy(txt));
   } else fallbackCopy(txt);
