@@ -201,12 +201,16 @@ tr.hs-cant .hs-title{color:#9a958c;text-decoration:line-through}
 /* 表格列宽与排版（重设计版） */
 .hs-title-col{font-size:13px;line-height:1.45;padding:6px 0}
 .hs-title-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.hs-title-row .hs-title{font-size:13.5px;font-weight:600;line-height:1.35}
+.hs-title-row .hs-title{font-size:15px;font-weight:700;line-height:1.35;letter-spacing:-.2px}
 .hs-title-row .hs-title:not(a){color:var(--ink)}
 /* 表格整体行高压缩 */
 #hotspotTable tbody td{padding:6px 8px;vertical-align:middle;line-height:1.35}
-#hotspotTable tbody td.hs-title-col{padding:7px 10px;vertical-align:middle}
-.hs-title-col .hs-title{font-size:13.5px;line-height:1.35;font-weight:600;color:var(--ink)}
+#hotspotTable tbody td.hs-title-col{padding:7px 10px 7px 14px;vertical-align:middle;position:relative;background:linear-gradient(90deg,rgba(254,215,170,.28) 0%,rgba(254,215,170,0) 35%)}
+#hotspotTable tbody td.hs-title-col::before{content:'';position:absolute;left:0;top:5px;bottom:5px;width:3px;background:linear-gradient(180deg,#fb923c,#ea580c 55%,#c2410c);border-radius:0 3px 3px 0;box-shadow:0 0 6px rgba(234,88,12,.35)}
+.hs-title-col .hs-title{font-size:15px;line-height:1.35;font-weight:700;letter-spacing:-.2px;color:var(--ink)}
+.hs-title-col .hs-title:hover{color:#c2410c}
+a.hs-title{color:#c2410c;text-decoration:none;background-image:linear-gradient(transparent calc(100% - 1.5px),rgba(234,88,12,.45) calc(100% - 1.5px));background-size:0 100%;background-repeat:no-repeat;transition:background-size .25s ease,color .2s}
+a.hs-title:hover{background-size:100% 100%;color:#9a3412}
 .hs-meta-row{display:flex;gap:7px;align-items:center;font-size:11px;color:var(--muted);margin-top:2px;flex-wrap:wrap}
 .hs-meta-row .hs-date{font-feature-settings:"tnum";color:#9a8b6e}
 .hs-meta-row .hs-mkt{display:inline-block;padding:0 6px;border-radius:4px;font-size:10px;font-weight:600}
@@ -229,13 +233,13 @@ tr.hs-cant .hs-title{color:#9a958c;text-decoration:line-through}
 .hs-sales{font-size:11px;color:var(--accent);font-weight:600;margin-top:2px}
 /* 🆕 推荐关联功能列：3 个 Flyelep 功能 chip */
 .hs-bind-th{text-align:center;color:#b45309;font-weight:700}
-#hotspotTable td.hs-bind{font-size:12px;line-height:1.5;padding:10px 10px;vertical-align:middle}
-.hs-binds{display:flex;flex-direction:column;gap:4px;align-items:flex-start;justify-content:center;min-height:88px}
+#hotspotTable td.hs-bind{font-size:12px;line-height:1.5;padding:10px 10px;vertical-align:top}
+.hs-binds{display:flex;flex-direction:column;gap:4px;align-items:flex-start;justify-content:flex-start;min-height:88px;padding:4px 0 0;box-sizing:border-box}
 .hs-bind-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:linear-gradient(135deg,#fff5e6,#ffe8c2);border:1px solid #f0c674;border-left:3px solid #ea580c;border-radius:6px;font-size:11.5px;font-weight:600;color:#7c3a00;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;box-shadow:0 1px 2px rgba(240,198,116,.25);transition:all .15s;cursor:default}
 .hs-bind-chip:hover{background:linear-gradient(135deg,#ffe8c2,#ffd9a3);transform:translateX(2px);box-shadow:0 2px 6px rgba(234,88,12,.18)}
 .hs-bind-regen{flex-shrink:0;align-self:flex-end;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;font-size:13px;background:#fafaf6;border:1px solid var(--line);border-radius:5px;color:var(--muted);cursor:pointer;transition:all .15s}
 .hs-bind-regen:hover{background:#fff;border-color:#f0c674;color:#b45309}
-.hs-bind-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;background:linear-gradient(135deg,#fff8e1,#ffe8c2);border:1px solid #f0c674;border-radius:7px;font-size:11.5px;font-weight:600;color:#8a5a00;cursor:pointer;white-space:nowrap;transition:all .18s;letter-spacing:.2px;line-height:1.3;min-height:30px;align-self:center}
+.hs-bind-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;background:linear-gradient(135deg,#fff8e1,#ffe8c2);border:1px solid #f0c674;border-radius:7px;font-size:11.5px;font-weight:600;color:#8a5a00;cursor:pointer;white-space:nowrap;transition:all .18s;letter-spacing:.2px;line-height:1.3;min-height:30px;align-self:flex-start}
 .hs-bind-btn:hover{background:linear-gradient(135deg,#ffe8c2,#ffd9a3);color:#5a3a00;box-shadow:0 2px 6px rgba(234,88,12,.18)}
 .hs-bind-btn:disabled{opacity:.6;cursor:wait}
 /* 热度列 */
@@ -362,8 +366,8 @@ tbody tr.selected td{background:#fff5d0}
 tbody tr.selected:hover td{background:#ffefb8}
 /* 热点表格-标题 2 行省略 */
 .hs-title{display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;word-break:break-word;line-height:1.4;color:var(--ink);text-decoration:none}
-a.hs-title{color:var(--brand)}
-a.hs-title:hover{text-decoration:underline}
+a.hs-title{color:#c2410c;text-decoration:none}
+a.hs-title:hover{color:#9a3412;text-decoration:none}
 /* AI 推荐小按钮（商品/玩法为空时的兜底入口） */
 .ai-mini{display:inline-flex;align-items:center;gap:3px;height:24px;padding:0 8px;font-size:11.5px;border-radius:6px;border:1px dashed var(--brand);background:#fff8e1;color:var(--brand);cursor:pointer;font-weight:600;white-space:nowrap}
 .ai-mini:hover{background:#f3eccb;border-style:solid}
@@ -3676,7 +3680,7 @@ function renderHotspot(){
     // 🆕 关联功能：3 个能与 Flyelep 挂钩的具体功能；没有时显示 AI 推按钮
     const bindingsBlock = (h.bindings && h.bindings.length)
       ? `<div class="hs-binds">${h.bindings.slice(0,3).map(b=>`<span class="hs-bind-chip" title="${escapeHtml(b)}">⚡ ${escapeHtml(b)}</span>`).join('')}${h.bindingsGeneratedAt?`<span class="hs-bind-regen" onclick="aiSuggestBindings('${h.id}')" title="重新生成">↻</span>`:''}</div>`
-      : `<button class="hs-bind-btn" data-bindrow="${h.id}" onclick="aiSuggestBindings('${h.id}')">⚡ AI 推关联功能</button>`;
+      : `<div class="hs-binds hs-binds-empty"><button class="hs-bind-btn" data-bindrow="${h.id}" onclick="aiSuggestBindings('${h.id}')">⚡ AI 推关联功能</button></div>`;
     const isCant = h.grade==='C';
     const rowCls = [sel?'selected':'', isCant?'hs-cant':''].filter(Boolean).join(' ');
     const cantBadge = isCant ? '<span class="hs-cant-badge" title="综合价值 &lt; 40，与脚本/Flyelep 无明显结合点">🚫 无法结合</span>' : '';
