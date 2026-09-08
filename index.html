@@ -982,8 +982,9 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       </div>
       <div class="gen-actionbar">
         <button class="btn primary gen-primary-btn" id="genGoBtn" onclick="generateScript()">🎬 AI 生成脚本</button>
-        <select id="genEngine" class="gen-engine-select" title="生成引擎选择 — 默认项适合大多数场景；其他可按需切换">
-          <option value="ai" selected>⚡ Yellow Dog GLM-4-Flash</option>
+        <select id="genEngine" class="gen-engine-select" title="生成引擎选择 — 默认 Seed-2.1-pro 适合大多数场景；其他可按需切换">
+          <option value="ark" selected>🦄 Yellow Dog Seed-2.1-pro</option>
+          <option value="ai">⚡ Yellow Dog GLM-4-Flash</option>
           <option value="zhipu-pro">☁️ Yellow Dog GLM-5.3</option>
           <option value="siliconflow">🌊 Yellow Dog DeepSeek</option>
           <option value="local">📝 Yellow Dog 本地模板</option>
@@ -1894,7 +1895,7 @@ function firstSentence(s){
   return t;
 }
 /* ================== Script Generation（智谱 GLM-5.3 + 本地模板兜底） ================== */
-const GEN_ENGINE='ai'; // 默认 'ai'，运行时可被 #genEngine.value 覆盖
+const GEN_ENGINE='ark'; // 默认 'ark'（火山方舟 Seed-2.1-pro），运行时可被 #genEngine.value 覆盖
 async function generateScript(){
   const hid=$('#genHotspot').value, aid=$('#genAccount').value,
         vtk=$('#genVidType').value, vdk=$('#genVidDur').value,
@@ -1918,6 +1919,11 @@ async function generateScript(){
     toast('⚠️ 备用通道未启用（owner 需在 Render 设 SILICONFLOW_KEY）。已用 Yellow Dog 本地模板兜底，或切到默认引擎。');
     buildLocalScript(h,a,st,plat,fn,vt,vd,vf); return;
   }
+  // 火山方舟 Seed-2.1-pro：未连后端或后端无 ARK Key 时直接回退本地模板，避免用户报"什么都出不来"
+  if(engine==='ark' && (!API_BASE || (window.__engines && window.__engines.ark===false))){
+    toast('⚠️ 团队云未启用 Yellow Dog Seed-2.1-pro（owner 需配 ARK_KEY），已用 Yellow Dog 本地模板兜底。');
+    buildLocalScript(h,a,st,plat,fn,vt,vd,vf); return;
+  }
   const prompt=buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid);
   const btn=$('#genGoBtn'); if(btn) btn.disabled=true;
   let lastFull='';
@@ -1926,6 +1932,8 @@ async function generateScript(){
     let r;
     if(engine==='siliconflow'){
       r=await callSiliconflow([{role:'system',content:prompt.system},{role:'user',content:prompt.user}], 0, { onToken });
+    }else if(engine==='ark'){
+      r=await callArk([{role:'system',content:prompt.system},{role:'user',content:prompt.user}], 0, { model:'doubao-seed-2-1-pro-260628', onToken });
     }else{
       const m = engine==='ai' ? 'glm-4-flash' : 'glm-5.3';
       r=await callZhipu([{role:'system',content:prompt.system},{role:'user',content:prompt.user}], 0, { model:m, onToken });
@@ -1938,17 +1946,18 @@ async function generateScript(){
       // 已流式部分内容 → 保留已生成部分 + 中断提示
       renderAiScript(h, {content: lastFull, model_used: engineLabel(engine)}, '⚠️ 生成中断（'+reason+'），已保留已生成部分。', lastFull);
       toast('生成中断，已保留已生成内容');
-    }else if(engine==='zhipu-pro' || engine==='siliconflow'){
-      // GLM-5.3 (推理) 或 DeepSeek (备用) 失败 → 自动 fallback 到默认 Yellow Dog GLM-4-Flash（非推理·稳）
-      toast('⚠️ '+engineLabel(engine)+' 失败（'+reason+'），自动改用 '+engineLabel('ai')+' 重试…');
+    }else if(engine==='zhipu-pro' || engine==='siliconflow' || engine==='ark'){
+      // Seed-2.1-pro / GLM-5.3 (推理) / DeepSeek (备用) 失败 → 自动 fallback 到 Yellow Dog GLM-4-Flash（非推理·稳）
+      const fallback = engine==='ark' ? 'Yellow Dog Seed-2.1-pro' : engineLabel(engine);
+      toast('⚠️ '+fallback+' 失败（'+reason+'），自动改用 '+engineLabel('ai')+' 重试…');
       try{
         const r2=await callZhipu([{role:'system',content:prompt.system},{role:'user',content:prompt.user}], 0, { model:'glm-4-flash', onToken:null });
-        renderAiScript(h, {content: (r2&&r2.content||'').trim(), model_used: r2?r2.model_used:engineLabel('ai')}, '⚠️ '+engineLabel(engine)+' 失败，已自动改用 '+engineLabel('ai')+' 完成出稿（原失败原因：'+reason+'）。', null);
+        renderAiScript(h, {content: (r2&&r2.content||'').trim(), model_used: r2?r2.model_used:engineLabel('ai')}, '⚠️ '+fallback+' 失败，已自动改用 '+engineLabel('ai')+' 完成出稿（原失败原因：'+reason+'）。', null);
         return;
       }catch(e2){
         const reason2=(e2&&e2.message)?e2.message:'未知错误';
         const fallbackScript=buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf);
-        renderAiScript(h, null, '⚠️ '+engineLabel(engine)+' 与默认引擎均失败，已用 Yellow Dog 本地模板兜底：'+reason2+'。', fallbackScript);
+        renderAiScript(h, null, '⚠️ '+fallback+' 与默认引擎均失败，已用 Yellow Dog 本地模板兜底：'+reason2+'。', fallbackScript);
         toast('所有 Yellow Dog 引擎均不可用，已用本地模板兜底');
         return;
       }
@@ -2190,6 +2199,34 @@ async function _readSSE(resp, onToken, modelLabel){
   return {content: full.trim(), model_used: modelLabel};
 }
 
+// 火山方舟代理（Yellow Dog Seed-2.1-pro 主力通道 · 走团队云后端 /api/ark，浏览器直连 ark 有 CORS 必须走后端）
+async function callArk(messages, retry=0, opts={}){
+  const { model='doubao-seed-2-1-pro-260628', onToken=null } = opts;
+  if(!API_BASE) throw new Error('未连接团队云后端（Yellow Dog Seed-2.1-pro 需后端代理）');
+  const base = API_BASE.replace(/\/$/,'');
+  const body = { messages, model, stream: !!onToken };
+  const ctrl = new AbortController();
+  const tid = setTimeout(()=>ctrl.abort(), 150000);  // 长生成脚本最多 ~100-120s，150s 留 buffer
+  try{
+    const resp = await fetch(base+'/api/ark/v1/responses', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:ctrl.signal
+    });
+    if(!resp.ok){ const j=await resp.json().catch(()=>({error:'HTTP '+resp.status})); throw new Error(j.error||('HTTP '+resp.status)); }
+    if(!onToken){
+      const j = await resp.json().catch(()=>({ok:false,error:'非 JSON 响应'}));
+      if(!j.ok) throw new Error(j.error||'HTTP '+resp.status);
+      const txt = (j.raw?.choices?.[0]?.message?.content || '').trim();
+      if(!txt) throw new Error('Yellow Dog Seed-2.1-pro 返回内容为空');
+      return { content: txt, model_used: j.model_used||model };
+    }
+    return await _readSSE(resp, onToken, model);
+  }catch(e){
+    if(e.name==='AbortError') throw new Error('超时 150s');
+    if(retry<1){ await new Promise(r=>setTimeout(r,1500)); return callArk(messages, retry+1, opts); }
+    throw e;
+  }finally{ clearTimeout(tid); }
+}
+
 // 硅基流动代理（走团队云后端 /api/siliconflow，OpenAI 兼容，读后端 SILICONFLOW_KEY；一个 Key 调 100+ 免费开源模型）
 async function callSiliconflow(messages, retry=0, opts={}){
   const { model='deepseek-ai/DeepSeek-V3', onToken=null } = opts;
@@ -2221,6 +2258,7 @@ async function callSiliconflow(messages, retry=0, opts={}){
 function engineLabel(e){
   return e==='siliconflow' ? 'Yellow Dog DeepSeek'
        : e==='zhipu-pro'   ? 'Yellow Dog GLM-5.3'
+       : e==='ark'         ? 'Yellow Dog Seed-2.1-pro'
        : e==='local'       ? 'Yellow Dog 本地模板'
        : 'Yellow Dog GLM-4-Flash';
 }
@@ -2353,6 +2391,7 @@ async function probeZhipuStatus(){
       const ej=await er.json();
       if(ej && ej.siliconflow) window.__engines.siliconflow = !!ej.siliconflow.configured;
       if(ej && ej.zhipu) window.__engines.zhipu = !!ej.zhipu.configured;
+      if(ej && ej.ark) window.__engines.ark = !!ej.ark.configured;
     }catch(_){ /* 老后端无此接口，忽略 */ }
   }
   const clientKey=(localStorage.getItem('flyelep_zhipu_key')||'').trim();
@@ -2427,7 +2466,8 @@ function showEngineInfo(){
 
 【第 6 步】脚本结构（10 选 1）：悬念 / 发问 / 反差 / 对比 / 反认知 / 故事 / 误区 / 揭秘 / 现象 / 认知
 
-【引擎】默认 ⚡ Yellow Dog GLM-4-Flash（候选自动回退：GLM-4-Flash → GLM-5.3 → GLM-4-Plus → GLM-4-Air）；失败自动回退 Yellow Dog 本地模板（含全 6 项前置）。
+【引擎】默认 🦄 Yellow Dog Seed-2.1-pro（火山方舟豆包主力，260B MoE，长脚本/中文带货场景最强）；可用引擎：Seed-2.1-pro / GLM-4-Flash / GLM-5.3 / DeepSeek / 本地模板。
+【失败回退】Seed-2.1-pro / GLM-5.3 / DeepSeek 任一失败 → 自动改用 GLM-4-Flash（非推理稳）；再失败 → Yellow Dog 本地模板兜底。
 【未配 Key】点右下角「🔑 配置引擎 Key」填入，立即可用真· Yellow Dog 出稿。`);
 }
 
