@@ -2509,8 +2509,8 @@ function renderScriptSections(raw){
   const text = (raw||'').trim();
   if(!text) return '<div style="color:var(--muted);font-size:13px;padding:8px">（脚本为空）</div>';
 
-  // 用正则把 5 段切出来（兼容 **【X】** 与 【X】 两种写法）
-  const secRegex = /\*{0,2}【([^】]+)】\s*\*{0,2}/g;
+  // 用正则把 5 段切出来（兼容 **【X】** / 【X】 / ### 【X】 / ## 【X】 等写法）
+  const secRegex = /(?:#{1,6}\s*)?\*{0,2}【([^】]+)】\s*\*{0,2}/g;
   const sections = [];
   let lastEnd = 0, m;
   while((m = secRegex.exec(text)) !== null){
@@ -2744,7 +2744,12 @@ const BEAT_EMOJI_RE = /^(?:[👀🎙🎯]\s*|(?:画面|镜头|台词|口播|卖�
 const BEAT_NUM_RE   = /^\s*(?:[\d]{1,2}\s*[\.\)、]|[①-⑳]\s*[\.\)、]?)\s*\S/;
 
 function splitBeats(body){
-  const lines = String(body||'').split('\n').map(l=>l.trim()).filter(Boolean);
+  const lines = String(body||'').split('\n').map(l=>l.trim()).filter(Boolean)
+    // 滤掉模型常夹带的噪音：markdown 标题标记（###）、段数元信息括号（（严格5段））、空括号
+    // 这些若不过滤会被当成"无时间的 beat"渲染成空卡片
+    .filter(l => !/^#{1,6}\s*$/.test(l)
+              && !/^[（(]\s*[^）)]{0,16}段\s*[）)]$/.test(l)
+              && !/^[（(]\s*[）)]$/.test(l));
   if(!lines.length) return [];
   const beats = [];
 
