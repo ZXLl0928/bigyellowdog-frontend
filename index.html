@@ -204,9 +204,10 @@ tr.hs-cant .hs-title{color:#9a958c;text-decoration:line-through}
 .filter-bar .fill{flex:1}
 /* 表格列宽与排版（重设计版） */
 .hs-title-col{font-size:13px;line-height:1.45;padding:6px 0}
-.hs-title-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.hs-title-row .hs-title{font-size:15px;font-weight:700;line-height:1.35;letter-spacing:-.2px}
-.hs-title-row .hs-title:not(a){color:var(--ink)}
+.hs-title-row{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-bottom:3px}
+.hs-title-row .hs-title{font-size:16.5px;font-weight:700;line-height:1.3;letter-spacing:-.3px;color:#1f1611}
+.hs-title-row a.hs-title{color:#1f1611;text-decoration:none;border-bottom:1px solid transparent}
+.hs-title-row a.hs-title:hover{color:#9a5b00;border-bottom-color:#f0c674}
 /* 表格整体行高压缩 */
 #hotspotTable tbody td{padding:6px 8px;vertical-align:middle;line-height:1.35}
 #hotspotTable tbody td.hs-title-col{padding:10px 14px 10px 18px;vertical-align:middle;position:relative;background:linear-gradient(90deg,rgba(232,213,170,.10) 0%,rgba(232,213,170,0) 40%)}
@@ -215,15 +216,31 @@ tr.hs-cant .hs-title{color:#9a958c;text-decoration:line-through}
 .hs-title-col .hs-title:hover{color:#c2410c}
 a.hs-title{color:#c2410c;text-decoration:none;background-image:linear-gradient(transparent calc(100% - 1.5px),rgba(234,88,12,.45) calc(100% - 1.5px));background-size:0 100%;background-repeat:no-repeat;transition:background-size .25s ease,color .2s}
 a.hs-title:hover{background-size:100% 100%;color:#9a3412}
-.hs-meta-row{display:flex;gap:7px;align-items:center;font-size:11px;color:var(--muted);margin-top:2px;flex-wrap:wrap}
-.hs-meta-row .hs-date{font-feature-settings:"tnum";color:#9a8b6e}
-.hs-meta-row .hs-mkt{display:inline-block;padding:0 6px;border-radius:4px;font-size:10px;font-weight:600}
+.hs-meta-row{display:flex;gap:6px;align-items:center;font-size:11px;color:#9a8b6e;margin-top:0;flex-wrap:wrap;margin-bottom:5px}
+.hs-meta-row .hs-date{font-feature-settings:"tnum";color:#9a8b6e;font-weight:500}
+.hs-meta-row .hs-mkt{display:inline-block;padding:0 6px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.3px}
 .hs-meta-row .hs-mkt-cn{background:#e6f7ed;color:#1a6e3f}
 .hs-meta-row .hs-mkt-overseas{background:#e6f0fa;color:#1a56a3}
 .hs-meta-row .hs-mkt-global{background:#f5f0fa;color:#5b2d8a}
-.hs-meta-row .hs-src{color:var(--muted);display:none}
-.hs-meta-row .hs-status{margin-left:auto}
-.hs-meta-row .hs-status .pill{padding:1px 7px;font-size:10.5px}
+.hs-meta-row .hs-src{color:#a8a094;display:none}
+.hs-meta-row .hs-angle-inline{font-weight:600;color:#7c3aed;letter-spacing:.2px}
+/* 🆕 可用画像 chip — 替代原 status pill */
+.hs-personas{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+.hs-personas-empty{color:#c4c0b8;font-size:11px;font-weight:600;margin-top:3px}
+.persona-chip{display:inline-flex;align-items:center;gap:5px;padding:2px 8px 2px 9px;background:#fff;border:1px solid;border-radius:6px;font-size:11.5px;font-weight:600;letter-spacing:.1px;line-height:1.45;transition:all .15s;cursor:default}
+.persona-chip .pc-label{white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.persona-chip .pc-score{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:15px;padding:0 4px;border-radius:3px;font-size:10.5px;font-weight:700;font-feature-settings:"tnum";background:rgba(255,255,255,.7);color:#1f1611}
+.persona-chip.cat-dn{border-color:#bfd4ff;color:#1a56a3;background:#eff5ff}
+.persona-chip.cat-dn .pc-score{background:#d6e3fb;color:#1a56a3}
+.persona-chip.cat-cross{border-color:#f0c674;color:#7c3a00;background:#fff8e6}
+.persona-chip.cat-cross .pc-score{background:#ffe8b8;color:#7c3a00}
+.persona-chip.cat-b2b{border-color:#f8c6a0;color:#a04000;background:#fff3e6}
+.persona-chip.cat-b2b .pc-score{background:#ffd9b0;color:#a04000}
+.persona-chip.cat-media{border-color:#d0b0f0;color:#5b2d8a;background:#f5f0fa}
+.persona-chip.cat-media .pc-score{background:#e0c8f5;color:#5b2d8a}
+.persona-chip.cat-saas{border-color:#f0b8d0;color:#8a2d5b;background:#fce8f0}
+.persona-chip.cat-saas .pc-score{background:#f5c8e0;color:#8a2d5b}
+.persona-chip:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.06)}
 /* Flyelep 角度行：紧凑小灰条（已不再在标题列下展示，保留类以兼容历史数据） */
 .hs-angle{display:flex;align-items:center;gap:6px;margin-top:3px;padding:3px 8px;background:#f5f5f0;border:1px solid #e6e4dc;border-left:2px solid #a855f7;border-radius:5px;font-size:11px;line-height:1.45;color:#5b6470;word-break:break-word}
 .hs-angle-tag{flex-shrink:0;display:inline-block;padding:0 7px;border-radius:100px;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:600;line-height:1.6}
@@ -314,22 +331,23 @@ tr:hover td{background:#fbfaf7}
 }
 .feed-status{font-size:12px;color:var(--ink2)}
 .feed-status.ok{color:var(--ok)} .feed-status.warn{color:var(--warn)}
-/* 筛选工具条 + 批量操作 */
-.filter-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 10px;padding:10px 12px;background:#fafaf6;border:1px solid var(--line);border-radius:10px}
+/* 筛选工具条 + 批量操作 — 突出评级视角 */
+.filter-bar{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;margin:0 0 10px;padding:10px 12px;background:#fafaf6;border:1px solid var(--line);border-radius:12px}
 .filter-bar .lbl{font-size:12px;color:var(--muted);margin-right:2px;font-weight:600}
-.filter-bar select,.filter-bar input[type=text]{font-size:12.5px;padding:5px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);outline:none}
-.filter-bar select.gv-select{font-weight:600;border-color:#bcd0f5;background:#f3f7ff;color:#1a56a3;min-width:236px}
-.filter-bar select.gv-select:focus{border-color:#1a56a3;box-shadow:0 0 0 2px rgba(26,86,163,.12)}
+.filter-bar .gv-hero{display:flex;align-items:center;gap:12px;padding:8px 14px 8px 12px;background:linear-gradient(135deg,#eef4ff 0%,#f3f0ff 100%);border:1px solid #b8caf5;border-radius:10px;box-shadow:0 1px 3px rgba(26,86,163,.08)}
+.filter-bar .gv-icon{font-size:22px;line-height:1;filter:drop-shadow(0 1px 1px rgba(26,86,163,.2))}
+.filter-bar .gv-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.filter-bar .gv-label{font-size:10.5px;font-weight:700;color:#1a56a3;letter-spacing:.6px;text-transform:uppercase}
+.filter-bar select.gv-select{font-size:13.5px;font-weight:700;color:#0b3d80;border:1px solid #b8caf5;background:#fff;border-radius:7px;padding:5px 10px;outline:none;cursor:pointer;min-width:280px;max-width:400px;box-shadow:0 1px 0 rgba(255,255,255,.8) inset}
+.filter-bar select.gv-select:focus{border-color:#1a56a3;box-shadow:0 0 0 3px rgba(26,86,163,.15)}
 .gv-tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:#1a56a3;background:#eef4ff;border:1px solid #cfe0fb;border-radius:999px;padding:3px 11px;white-space:nowrap}
 .gv-tag b{color:#0b3d80}
-.filter-bar select:focus,.filter-bar input[type=text]:focus{border-color:var(--brand)}
-.filter-bar .kw{flex:1;min-width:160px}
-.filter-bar .spacer{flex:1}
+.filter-bar select:focus{outline:none}
 .filter-bar .reset{font-size:11px;color:var(--muted);cursor:pointer;background:none;border:none;text-decoration:underline;padding:4px 6px}
 .filter-bar .reset:hover{color:var(--brand)}
-.filter-bar .translate-all{font-size:12px;padding:5px 11px;border:1px solid #d6e3fb;background:#eef4ff;color:#1a56a3;border-radius:6px;cursor:pointer;font-weight:600;transition:all .15s}
+.filter-bar .translate-all{font-size:12px;padding:8px 12px;border:1px solid #d6e3fb;background:#eef4ff;color:#1a56a3;border-radius:7px;cursor:pointer;font-weight:600;transition:all .15s;align-self:center}
 .filter-bar .translate-all:hover{background:#d6e3fb;box-shadow:0 1px 4px rgba(26,86,163,.18)}
-.filter-bar .archive-toggle{font-size:12px;padding:5px 11px;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:6px;cursor:pointer;font-weight:600;transition:all .15s}
+.filter-bar .archive-toggle{font-size:12px;padding:8px 12px;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:7px;cursor:pointer;font-weight:600;transition:all .15s;align-self:center}
 .filter-bar .archive-toggle:hover{background:#f5f5f0;color:var(--ink)}
 /* 批量操作条（仅当选中 ≥1 时浮现） */
 .bulk-bar{position:sticky;top:0;z-index:5;display:none;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding:8px 12px;background:#fff5f0;border:1px solid #f1c0b0;border-radius:10px;box-shadow:0 4px 12px rgba(193,74,43,.08);font-size:13px;color:var(--ink)}
@@ -989,19 +1007,17 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         </label>
         <button class="nab-close" onclick="dismissNewBanner()" title="收起">×</button>
       </div>
-      <!-- 简化筛选器：只保留关键词 + 状态；分类请用上面 4 大类 Tab -->
+      <!-- 简化筛选器：聚焦「评级视角」+ 高级筛选开关 + 库管 -->
       <div class="filter-bar">
-        <select id="gradeView" class="gv-select" onchange="renderHotspot()" title="评级视角：按谁的画像给热点评级（选了之后整列等级按该卖家重算）">
-          <option value="">🎯 评级视角：通用（不区分卖家）</option>
-        </select>
-        <input type="text" class="kw" id="filterHKeyword" placeholder="🔍 搜标题 / 商品 / 玩法 / 评级理由" oninput="renderHotspot()">
-        <select id="filterHStatus" onchange="renderHotspot()" title="内容状态">
-          <option value="">全部状态</option>
-          <option value="pending">⏳ 未用</option>
-          <option value="used">✓ 已用</option>
-          <option value="discard">✗ 弃用</option>
-        </select>
-        <button class="reset" onclick="resetHotspotFilters()" title="清空所有筛选">清空筛选</button>
+        <div class="gv-hero">
+          <span class="gv-icon">🎯</span>
+          <div class="gv-body">
+            <div class="gv-label">评级视角 · 按谁的画像给热点打分</div>
+            <select id="gradeView" class="gv-select" onchange="renderHotspot()" title="选了之后整列等级按该卖家重算">
+              <option value="">通用（不区分卖家）</option>
+            </select>
+          </div>
+        </div>
         <span class="fill"></span>
         <button class="archive-toggle" onclick="toggleArchivedView()" id="showArchivedBtn" title="显示已归档的旧热点（库内 > 500 条时自动归档）">📦 已归档 (<span id="archivedCount">0</span>)</button>
         <button class="translate-all" onclick="translateAllForeign()" title="一键翻译库内所有未翻译的外文标题">🌐 翻译外文</button>
@@ -1030,7 +1046,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         <span class="advanced-hint">💡 分类请用上面 4 个 Tab，这里只做精细过滤</span>
       </div>
 <div class="table-scroll"><table id="hotspotTable"><thead><tr>
-        <th class="hs-cb"><input type="checkbox" id="hsSelectAll" onchange="toggleSelectAll(this.checked)" title="全选当前可见行"></th><th class="hs-title-th" style="width:60%">标题 / 综合指标</th><th class="hs-grade-th" style="width:120px">评级 / 价值</th><th class="hs-act-th" style="width:170px">操作</th>
+        <th class="hs-cb"><input type="checkbox" id="hsSelectAll" onchange="toggleSelectAll(this.checked)" title="全选当前可见行"></th><th class="hs-title-th" style="width:62%">标题 / 可用画像</th><th class="hs-grade-th" style="width:100px">评级 / 价值</th><th class="hs-act-th" style="width:158px">操作</th>
 </tr></thead><tbody></tbody></table></div>
     </div>
 
@@ -4291,6 +4307,29 @@ function personaMatchOf(angle, persona){
   const v = persona.prefer[angle];
   return (v==null?50:v);
 }
+// 画像 key → 一级类目（按 PERSONA_TREE 反查，给 chip 着色用）
+const PERSONA_CAT_BY_KEY = {};
+const PERSONA_CAT_CLASS = {'国内电商':'cat-dn','跨境电商（出口）':'cat-cross','外贸 B2B':'cat-b2b','内容自媒体':'cat-media','服务/SaaS':'cat-saas'};
+for(const g of PERSONA_TREE){
+  for(const p of g.platforms){
+    if(p.types.length===1){ PERSONA_CAT_BY_KEY[p.name] = {cat:g.cat, cls:PERSONA_CAT_CLASS[g.cat]||'cat-dn'}; }
+    for(const t of p.types){ PERSONA_CAT_BY_KEY[p.name+'·'+t.t] = {cat:g.cat, cls:PERSONA_CAT_CLASS[g.cat]||'cat-dn'}; }
+  }
+}
+// 热点 angle → 推荐 top3 画像（score≥65，按分排序取前 3）
+function top3PersonasForAngle(angle){
+  const out=[];
+  for(const key in PERSONA_MAP){
+    const p=PERSONA_MAP[key];
+    const v = p.prefer?p.prefer[angle] : null;
+    if(v==null) continue;
+    if(v<65) continue;
+    const meta = PERSONA_CAT_BY_KEY[key] || {cat:'通用', cls:'cat-dn'};
+    out.push({key, label:p.label||key, score:v, cat:meta.cat, cls:meta.cls});
+  }
+  out.sort((a,b)=>b.score-a.score);
+  return out.slice(0,3);
+}
 // 取当前「评级视角」画像（列表下拉）
 function getGradeViewPersona(){
   const v=$('#gradeView')?.value||'';
@@ -4509,7 +4548,6 @@ function renderHotspot(){
     tbody.innerHTML=emptyHtml;
     updateBulkBar(); return;
   }
-  const statusMap={used:['st-used','已用'],pending:['st-pending','未用'],discard:['st-discard','弃用']};
   const angleMap={'带货':['an-dai','🔥 带货'],'蹭热':['an-ride','🌊 蹭热度'],'痛点规则':['an-rule','🛡️ 痛点规则'],'节日':['an-fest','🎉 节日'],'AI资讯':['an-ai','🤖 AI 资讯'],'其他':['an-other','📦 其他']};
   const gradeMap={S:['g-S','S'],A:['g-A','A'],B:['g-B','B'],C:['g-C','C']};
   const fitMap={'强':['fit-strong','💪 强'],'中':['fit-mid','🤝 中'],'弱':['fit-weak','😶 弱']};
@@ -4521,7 +4559,6 @@ function renderHotspot(){
     const pm = gv ? personaMatchOf(h.angle, gv) : null;
     const [gCls,gTxt]=gradeMap[dg]||['','—'];
     const [fCls,fTxt]=fitMap[h.flyelepFit]||['',h.flyelepFit||'—'];
-    const [sCls,sTxt]=statusMap[h.status]||statusMap.pending;
     const hasDetail=h.topic||h.script||h.material||h.reasons||h.url||h.note||h.flyelepAngle;
     const sel=state.hotspotSelections&&state.hotspotSelections.has(h.id);
     const isNew=(h.addedAt||0) >= now-86400000;
@@ -4532,6 +4569,11 @@ function renderHotspot(){
     const isCant = h.grade==='C';
     const rowCls = [sel?'selected':'', isCant?'hs-cant':''].filter(Boolean).join(' ');
     const cantBadge = isCant ? '<span class="hs-cant-badge" title="综合价值 &lt; 40，与脚本/Flyelep 无明显结合点">🚫 无法结合</span>' : '';
+    // 🆕 推荐 3 个可用画像：按命中 prefer 排序 ≥65
+    const topPersonas = top3PersonasForAngle(h.angle||'其他');
+    const personaChips = topPersonas.length
+      ? `<div class="hs-personas">${topPersonas.map(p=>`<span class="persona-chip ${p.cls}" title="${escapeHtml(p.cat)} · 匹配 ${p.score}"><span class="pc-label">${escapeHtml(p.label)}</span><span class="pc-score">${p.score}</span></span>`).join('')}</div>`
+      : `<div class="hs-personas-empty">—</div>`;
     return `<tr${rowCls?' class="'+rowCls+'"':''} data-id="${h.id}">
       <td class="hs-cb"><input type="checkbox" data-hid="${h.id}" ${sel?'checked':''} onchange="toggleHotspotSelect('${h.id}', this.checked)"></td>
       <td class="hs-title-col">
@@ -4545,17 +4587,11 @@ function renderHotspot(){
         </div>
         <div class="hs-meta-row">
           <span class="hs-date">${h.date||'—'}</span>
-          ${h.platform?`<span class="hs-platform">· ${escapeHtml(h.platform)}</span>`:''}
           ${h.market?`<span class="hs-mkt mkt-${h.market==='国内'?'cn':h.market==='海外'?'overseas':'global'}">${escapeHtml(h.market)}</span>`:''}
           <span class="hs-src">· ${escapeHtml(h.source||'')}</span>
-          <span class="hs-status"><span class="pill ${sCls}">${sTxt}</span></span>
+          <span class="hs-angle-inline">· ${aTxt}</span>
         </div>
-        <div class="hs-chips">
-          ${h.angle?`<span class="pill ${aCls}">${aTxt}</span>`:''}
-          <span class="heat-bar" title="热度 ${heat}/100"><span style="width:${Math.max(4,heat)}%;background:${heatColor}"></span></span>
-          <span class="hs-heat-num-inline">🔥${heat}</span>
-          <span class="pill ${fCls}">${fTxt}</span>
-        </div>
+        ${personaChips}
       </td>
       <td class="hs-grade">
         <span class="grade-chip ${gCls}"><span class="gc-l">${gTxt}</span><span class="gc-s">级</span><span class="gc-n" title="${gv?('评级视角：'+gvLbl+' · 画像匹配 '+(pm??'-')):'综合价值'}">${dv}</span></span>
