@@ -551,6 +551,9 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .gen-step .step-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#fce5a8,#f3c971);color:#7a5400;font-size:13px;font-weight:700;flex-shrink:0;box-shadow:inset 0 -1px 0 rgba(0,0,0,.06)}
 .gen-step.filled .step-num{background:linear-gradient(135deg,#aedb9c,#82b366);color:#fff}
 .gen-step .req{color:#d6336c;font-weight:700;margin-left:1px}
+.gen-step .opt{color:#1d4ed8;font-weight:600;font-size:11px;background:#dbeafe;padding:1px 7px;border-radius:999px;margin-left:2px}
+.gen-profile-row{display:flex;gap:8px}
+.gen-profile-row select{flex:1;min-width:0}
 .gen-step select{width:100%;min-width:0;font-size:13px;padding:7px 10px;border-radius:8px;background:#fafafa}
 .gen-step.filled select{background:#fff}
 .gen-arrow{display:none}
@@ -881,19 +884,16 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       <div class="form-grid col4" style="margin-bottom:10px">
         <div><label>平台</label><select id="aPlatform"><option value="抖音">抖音</option><option value="小红书">小红书</option><option value="视频号">视频号</option></select></div>
         <div><label>账号名</label><input type="text" id="aName" placeholder="如：Flyelep 抖音主号"></div>
-        <div><label>人群画像</label><div class="pos-input-wrap"><input type="text" id="aAudience" placeholder="如：电商美工 / 货源厂家" list="audiencePresets"><button type="button" class="btn sm ghost add-aud" onclick="addAudiencePreset()" title="新增自定义人群画像">+ 新增</button></div></div>
+        <div><label>账号定位</label><select id="aCategory">
+          <option value="">— 选账号定位 —</option>
+          <option value="国内电商">国内电商</option>
+          <option value="跨境电商（出口）">跨境电商（出口）</option>
+          <option value="外贸 B2B">外贸 B2B</option>
+          <option value="内容自媒体">内容自媒体</option>
+          <option value="服务/SaaS">服务/SaaS</option>
+        </select></div>
         <div><label>备注</label><input type="text" id="aNote" placeholder="如：主推号 / 测试号"></div>
       </div>
-      <datalist id="audiencePresets">
-        <option value="电商美工"></option>
-        <option value="电商运营"></option>
-        <option value="中小跨境卖家（个人/小团队）"></option>
-        <option value="自媒体博主"></option>
-        <option value="货源厂家"></option>
-        <option value="外贸工厂"></option>
-        <option value="中型跨境公司"></option>
-        <option value="服务商、代运营"></option>
-      </datalist>
       <button class="btn primary sm" onclick="addAccount()">+ 添加账号</button>
       <div class="acct-list" id="acctList"></div>
     </div>
@@ -1038,7 +1038,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         </div>
         <div class="gen-step" data-step="account">
           <div class="step-head"><span class="step-num">2</span>选账号 <span class="req">*</span></div>
-          <select id="genAccount" onchange="renderGenStepInfo()"><option value="">— 选择发布账号 —</option></select>
+          <select id="genAccount" onchange="onGenAccountChange()"><option value="">— 选择发布账号 —</option></select>
           <div class="gen-step-info" id="infoAccount"></div>
         </div>
         <div class="gen-step" data-step="vidType">
@@ -1060,6 +1060,14 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <div class="step-head"><span class="step-num">6</span>选结构 <span class="req">*</span></div>
           <select id="genStruct" onchange="renderGenStepInfo()"><option value="">— 选择脚本结构 —</option></select>
           <div class="gen-step-info" id="infoStruct"></div>
+        </div>
+        <div class="gen-step" data-step="profile">
+          <div class="step-head"><span class="step-num">7</span>用户画像 <span class="opt">可选</span></div>
+          <div class="gen-profile-row">
+            <select id="genProfilePlatform" onchange="onGenProfilePlatformChange()"><option value="">— 跟随账号定位（不细分）—</option></select>
+            <select id="genProfileType" onchange="renderGenStepInfo()"><option value="">— 选卖家类型 —</option></select>
+          </div>
+          <div class="gen-step-info" id="infoProfile"></div>
         </div>
       </div>
       <div class="gen-actionbar">
@@ -1611,12 +1619,13 @@ function hydrateAudiencePresets(){
 function addAccount(){
   const platform=$('#aPlatform').value,
         name=$('#aName').value.trim(),
-        audience=$('#aAudience').value.trim(),
+        category=$('#aCategory').value,
         note=$('#aNote').value.trim();
   if(!name){ toast('请填写账号名'); return; }
-  state.accounts.push({id:uid(),platform,name,audience,note});
+  if(!category){ toast('请选择账号定位'); return; }
+  state.accounts.push({id:uid(),platform,name,category,note});
   save(); renderAccountList(); refreshAccountOptions('vAccount');
-  $('#aName').value=''; $('#aAudience').value=''; $('#aNote').value='';
+  $('#aName').value=''; $('#aCategory').value=''; $('#aNote').value='';
   toast('账号已添加');
 }
 function removeAccount(id){
@@ -1631,7 +1640,7 @@ function renderAccountList(){
     <div class="acct-row">
       <span class="pill ${getPlatformClass(a.platform)}">${a.platform}</span>
       <b>${a.name}</b>
-      <span class="pill pos" title="人群画像">📍 ${a.audience||a.position||'未填人群画像'}</span>
+      <span class="pill pos" title="账号定位">📍 ${a.category||a.audience||a.position||'未设账号定位'}</span>
       <span style="font-size:12px;color:var(--muted)">${a.note||'—'}</span>
       <button class="btn sm danger icon" onclick="removeAccount('${a.id}')">✕</button>
     </div>`).join('');
@@ -1898,10 +1907,12 @@ function populateGenSelects(){
   }).join('');
   const a=$('#genAccount');
   if(a) a.innerHTML='<option value="">— 选择发布账号 —</option>'+state.accounts.map(x=>{
-    const aud=x.audience||x.position||'';
-    const pos=aud?` · ${aud}`:'';
-    return `<option value="${x.id}">${x.platform}·${escapeHtml(x.name)}${pos}</option>`;
+    const pos=x.category||x.audience||x.position||'';
+    const tag=pos?` · ${pos}`:'';
+    return `<option value="${x.id}">${x.platform}·${escapeHtml(x.name)}${tag}</option>`;
   }).join('');
+  // 用户画像「平台」下拉：按当前账号定位联动填充（未选账号则为空）
+  fillProfilePlatformsByAccount();
   // 视频类型（3 种固定）
   const vt=$('#genVidType');
   if(vt) vt.innerHTML='<option value="">— 选视频类型 —</option>'+VIDEO_TYPES.map(x=>`<option value="${x.key}">${x.label}</option>`).join('');
@@ -1952,6 +1963,71 @@ function renderGenStepInfo(){
   const struct=SCRIPT_STRUCTS.find(x=>x.key===sk);
   $('#infoStruct').innerHTML = struct?`<b>${struct.label}</b>${struct.tip?' · '+struct.tip:''}`:'';
   setFilled('struct',sk);
+
+  // ===== 用户画像（可选）：联动账号定位，只显示该大类下的平台；选平台后才出卖家类型 =====
+  const gp=document.getElementById('genProfilePlatform')?.value||'';
+  const gt=document.getElementById('genProfileType')?.value||'';
+  const pk = gp ? (gt ? gp+'·'+gt : gp) : '';
+  $('#infoProfile').innerHTML = pk
+    ? `已选：<b>${escapeHtml(pk)}</b> · 脚本按此精细化画像写`
+    : '（未细分 · 按账号定位写）';
+  setFilled('profile', gp||gt);
+}
+
+// 根据当前账号的「账号定位」填充用户画像的「平台」下拉
+function fillProfilePlatformsByAccount(){
+  const gpEl=document.getElementById('genProfilePlatform'); if(!gpEl) return;
+  const a=$('#genAccount')?.value ? state.accounts.find(x=>x.id===$('#genAccount').value) : null;
+  const cat = a ? (a.category||a.audience||'') : '';
+  const grp = PERSONA_TREE.find(g=>g.cat===cat);
+  let opts='<option value="">— 跟随账号定位（不细分）—</option>';
+  if(grp) grp.platforms.forEach(p=>opts+='<option value="'+escapeHtml(p.name)+'">'+escapeHtml(p.name)+'</option>');
+  gpEl.innerHTML=opts; gpEl.value='';
+  const gtEl=document.getElementById('genProfileType');
+  if(gtEl){ gtEl.innerHTML='<option value="">— 选卖家类型 —</option>'; gtEl.value=''; gtEl.disabled=false; }
+}
+
+// 切换账号 → 重置用户画像联动
+function onGenAccountChange(){
+  fillProfilePlatformsByAccount();
+  renderGenStepInfo();
+}
+
+// 切换平台 → 填「卖家类型」（单类型平台自动选中唯一类型并禁用）
+function onGenProfilePlatformChange(){
+  const gpEl=document.getElementById('genProfilePlatform');
+  const gtEl=document.getElementById('genProfileType');
+  if(!gpEl||!gtEl) return;
+  const gp=gpEl.value;
+  if(!gp){ gtEl.innerHTML='<option value="">— 选卖家类型 —</option>'; gtEl.value=''; gtEl.disabled=false; renderGenStepInfo(); return; }
+  const a=$('#genAccount')?.value ? state.accounts.find(x=>x.id===$('#genAccount').value) : null;
+  const cat = a ? (a.category||a.audience||'') : '';
+  const grp = PERSONA_TREE.find(g=>g.cat===cat);
+  const plat = grp ? grp.platforms.find(p=>p.name===gp) : null;
+  if(plat && plat.types.length===1){
+    gtEl.innerHTML='<option value="'+escapeHtml(plat.types[0].t)+'">'+escapeHtml(plat.types[0].t)+'</option>';
+    gtEl.value=plat.types[0].t; gtEl.disabled=true;
+  }else{
+    let opts='<option value="">— 选卖家类型 —</option>';
+    if(plat) plat.types.forEach(t=>opts+='<option value="'+escapeHtml(t.t)+'">'+escapeHtml(t.t)+'</option>');
+    gtEl.innerHTML=opts; gtEl.value=''; gtEl.disabled=false;
+  }
+  renderGenStepInfo();
+}
+
+// 取当前生效的精确画像 key（平台·类型）；单类型平台直接返回平台名；都没选返回 ''
+function getGenProfileKey(){
+  const gp=document.getElementById('genProfilePlatform')?.value||'';
+  const gt=document.getElementById('genProfileType')?.value||'';
+  if(!gp) return '';
+  const a=$('#genAccount')?.value ? state.accounts.find(x=>x.id===$('#genAccount').value) : null;
+  const cat = a ? (a.category||a.audience||'') : '';
+  const grp = PERSONA_TREE.find(g=>g.cat===cat);
+  const plat = grp ? grp.platforms.find(p=>p.name===gp) : null;
+  if(!plat) return '';
+  if(plat.types.length===1) return plat.name;
+  if(!gt) return '';
+  return gp+'·'+gt;
 }
 /* 选热点后，若其自带结构/主推功能则自动带入（用户可手动改） */
 function genOnHotspotChange(){
@@ -2068,8 +2144,13 @@ function buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid){
     ? ('\n【重要 · 本团队已学到的爆款规律（必须融进脚本）】\n'+learnedTxt)
     : '';
   // ===== 用户画像差异化（不同人群用不同口吻、不同痛点、不同 CTA）=====
-  const personaKey = (a.audience || a.position || '').trim() || '中小跨境卖家（个人/小团队）';
-  const personaGuide = PERSONA_PROFILES[personaKey] || PERSONA_PROFILES['中小跨境卖家（个人/小团队）'];
+  // 用户画像：生成弹窗选的精确画像(genProfile) 优先，否则用账号定位(a.category)的一级兜底
+  const genProfile = (typeof getGenProfileKey==='function') ? getGenProfileKey() : '';
+  let persona;
+  if(genProfile && PERSONA_MAP[genProfile]) persona = PERSONA_MAP[genProfile];
+  else persona = DEFAULT_BY_CAT[a.category] || DEFAULT_BY_CAT['跨境电商（出口）'];
+  const personaKey = persona.label;
+  const personaGuide = `痛点（必须命中）：${persona.pain}\n口吻风格：${persona.voice}\nCTA 取向：${persona.cta}`;
   const sys = `你是「Flyelep 大黄狗运营」团队的资深短视频脚本编剧，专门给电商/带货账号写口播脚本。
 
 【你的风格】
@@ -2088,8 +2169,7 @@ function buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid){
 
 【用户画像 · ${personaKey}】（不同人群用不同内容写，必须严格遵守）
 ${personaGuide}
-- 脚本里的台词、画面、举例、CTA 全部按这个画像的真实工作场景和痛点设计
-- 比如：电商美工 → 谈"图层/蒙版/改稿"；电商运营 → 谈"点击率/转化率/ROI"；中小卖家 → 谈"省外包费/一个人搞定"；自媒体 → 谈"爆款/涨粉/矩阵号"；货源厂家 → 谈"批量出图/降本"；外贸工厂 → 谈"合规原创/多语种/海外审美"；中型跨境 → 谈"团队效率/标准化"；服务商/代运营 → 谈"服务 10 个客户/模板复用"
+- 脚本里的台词、画面、举例、CTA 全部按上面【用户画像】的真实工作场景和痛点设计，不要泛泛而谈、不要套话
 
 【平台调性 · ${plat}】
 调性：${tone}
@@ -2856,7 +2936,10 @@ function parseBeat(b){
 
 function buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf){
   const hook=st.hook(h.title||h.product||'这个热点');
-  const personaKey = (a.audience || a.position || '').trim() || '中小跨境卖家（个人/小团队）';
+  // 本地模板同样用新画像逻辑（生成弹窗精确画像优先，否则账号定位兜底）
+  const _gp = (typeof getGenProfileKey==='function') ? getGenProfileKey() : '';
+  const _persona = (_gp && PERSONA_MAP[_gp]) ? PERSONA_MAP[_gp] : (DEFAULT_BY_CAT[a.category] || DEFAULT_BY_CAT['跨境电商（出口）']);
+  const personaKey = _persona.label;
   const steps=st.steps.map((s,i)=>{
     let extra='';
     if(i===0 && h.script) extra=`\n　· 画面（${vt.shoot}）：${firstSentence(h.script)}`;
@@ -4059,16 +4142,103 @@ const FLYELEP_FEATURES=[
 
 // ====== 用户画像差异化模板（不同人群用不同口吻、不同痛点、不同 CTA）=======
 // 按哪个 a.audience 就走哪条 persona，让脚本真正"对人说人话"。
-const PERSONA_PROFILES = {
-  '电商美工': '你面对的是电商美工 / 视觉设计师，每天要处理 50+ 主图详情页，苦 PS、AI 模板久矣。\n痛点（必须命中）：设计产能不够 / 主图转化率上不去 / 客户改稿改到崩溃 / 不会做 A/B 风格对比。\n语气：同行话术，懂技术圈黑话（图层/蒙版/出血位/钢笔工具），爱看对比图与设计原理拆解，喜欢"1 张变 50 张""10 秒出 3 套"这种省时间话术。\nCTA：让对方立刻试用，强调"模板复用、改图快速、不用抠细节"。',
-  '电商运营': '你面对的是电商运营，背 GMV / ROI / 转化率指标。\n痛点（必须命中）：主图点击率低 / 详情页跳出高 / 投流素材耗得快 / 不会做 A/B 测试 / 不会算投产比。\n语气：数据驱动、爱看 ROI 数字、爱看 A/B 结果对比、关注投产比和点击率。\nCTA：用数据证明效果，强调"点击率提升 X%""投产比翻倍""爆款素材复用"。',
-  '中小跨境卖家（个人/小团队）': '你面对的是 1-3 人小团队跨境卖家，自己身兼数职（选品/上架/客服/美工都做）。\n痛点（必须命中）：人手不够 / 美工外包贵 / 多语言不会翻 / 不懂本地审美 / 上新慢。\n语气：接地气、爱算账、爱看"省了多少钱/多少时间"对比、关心"一个人能搞定吗"。\nCTA：强调"一个人搞定全链路""省去美工外包""一键出海"。',
-  '自媒体博主': '你面对的是做短视频/小红书/TikTok 内容的博主。\n痛点（必须命中）：产能跟不上 / 风格难统一 / 没有模特/场景 / 想做矩阵号 / 爆款复刻不出第二遍。\n语气：潮流、爱看爆款拆解、关注涨粉和完播率、爱看"封面/标题/脚本"全流程技巧。\nCTA：强调"快速出图""风格统一""矩阵号批量做""爆款复刻"。',
-  '货源厂家': '你面对的是工厂/货源方，要给分销商/客户出展示图与详情页。\n痛点（必须命中）：批量出图慢 / 客户要定制不同风格 / 没有模特场景 / 设计成本高。\n语气：B 端话术、关心"批量""标准化""降本增效"，强调一套模板多套场景。\nCTA：强调"批量出图""降低设计成本""支持 OEM/ODM 定制"。',
-  '外贸工厂': '你面对的是做 OEM/ODM 大单的外贸工厂。\n痛点（必须命中）：客户来自不同国家审美不同 / 多语言物料 / 海外平台合规（亚马逊/TikTok Shop/Shopee）/ 产品图不符合海外调性。\n语气：B2B 专业、强调"合规原创""多语种""海外审美"。\nCTA：强调"符合 XX 国审美""多语言一键""合规原创不踩坑""出图快过交期"。',
-  '中型跨境公司': '你面对的是 50-500 人跨境公司运营/设计/品牌负责人。\n痛点（必须命中）：团队协作效率低 / 风格难统一 / 需要数据看板 / 多账号矩阵 / 跨部门沟通成本高。\n语气：管理者视角、强调"团队效率""标准化流程""数据驱动""可复用资产"。\nCTA：强调"团队协作""标准化模板""可复用资产""效率提升 X 倍"。',
-  '服务商、代运营': '你面对的是服务商 / 代运营公司，要同时服务多个客户。\n痛点（必须命中）：每个客户风格不同 / 重复劳动多 / 客户改稿多 / 要���速出提案 / 一个团队服务 10+ 客户。\n语气：乙方视角、关心"服务效率""客户满意度""提案速度""降本"。\nCTA：强调"1 套工具服务 10 个客户""模板复用""快速提案""按客户切换风格"。',
-};
+// ====== 三级用户画像树：市场大类(一级) → 平台(二级) → 卖家类型(三级) ======
+// 每个终端画像含 pain(痛点) / voice(口吻) / cta(CTA取向)
+// key 规则：多类型平台 = `平台·类型`；单类型平台 = `平台`
+const PERSONA_TREE = [
+  { cat:'国内电商', platforms:[
+    { name:'淘宝/天猫', types:[
+      { t:'静默铺货', pain:'多店群 SKU 管理乱、违规被罚、客服回复慢、上新靠堆量', voice:'效率直白、开口算账、爱听“省多少时间/多少人力”', cta:'一键批量出图、自动规避违规词、多店素材复用' },
+      { t:'精品运营', pain:'主图点击率低、详情页跳出高、直通车成本高、A/B 测不过来', voice:'数据派、张口 ROI、看点击率与投产比', cta:'用数据证明“点击率+X%、投产比翻倍”、爆款素材复用' },
+    ]},
+    { name:'拼多多', types:[
+      { t:'爆款铺货', pain:'极致低价毛利薄、退货率高、平台压价、9.9 秒杀卷不动', voice:'算账派、关心每单净利', cta:'降本出图、批量改价素材、少人工' },
+    ]},
+    { name:'抖音电商', types:[
+      { t:'短视频带货', pain:'完播率低、千川烧钱不出单、追不上爆款节奏', voice:'节奏快、追爆款、口语炸', cta:'蹭热点快速出素材、挂车短视频模板' },
+      { t:'直播带货', pain:'在线人数低、停留短、转粉差、话术太平', voice:'现场感强、制造紧迫、像主播喊', cta:'主播话术+实时贴片、引导进橱窗' },
+    ]},
+    { name:'小红书电商', types:[
+      { t:'种草博主', pain:'笔记爆款率低、合规卡、挂车转化弱', voice:'种草腔、生活化、像闺蜜安利', cta:'封面+正文模板、强调省时省力' },
+    ]},
+    { name:'国内美工设计', types:[
+      { t:'主图/详情设计', pain:'改稿改到崩溃、跨平台尺寸多、产能跟不上', voice:'视觉导向、看审美、懂图层蒙版', cta:'模板复用、改图快、一套多尺寸' },
+    ]},
+  ]},
+  { cat:'跨境电商（出口）', platforms:[
+    { name:'亚马逊', types:[
+      { t:'精品FBA', pain:'选品难、库存周转慢、ACOS 高、备货压钱', voice:'数据严谨、长期主义、讲利润', cta:'高转化主图+A+页面、用转化数据说话' },
+      { t:'精铺多店', pain:'多店管理乱、怕关联封号、利润被摊薄', voice:'效率至上、爱工具、讲自动化', cta:'批量多店素材、一套模板多站点' },
+      { t:'铺货老卖家', pain:'合规风险高、平台政策变、利润率一路降', voice:'保守、怕封号、求稳', cta:'合规原创不踩坑、规避侵权图' },
+      { t:'Listing美工', pain:'英文不地道、本地化审美差、关键词埋不准', voice:'细节派、抠字眼、讲转化', cta:'本地化审美主图、A+图文优化' },
+    ]},
+    { name:'TikTok Shop', types:[
+      { t:'美区达人', pain:'完播低、达人佣金谈不拢、选品踩雷', voice:'美式、年轻化、native', cta:'爆款短视频模板、本土化口播' },
+      { t:'东南亚小店', pain:'选品难、物流时效长、本地化弱', voice:'东南亚视角、讲性价比', cta:'本地化素材、短时效承诺图' },
+    ]},
+    { name:'Temu/SHEIN', types:[
+      { t:'全托管供货', pain:'核价压价狠、回款周期长、只供货不运营', voice:'工厂/供货商口吻、讲产能', cta:'供货图快速出、强调交期稳' },
+    ]},
+    { name:'Shopee/Lazada', types:[
+      { t:'东南亚多店', pain:'多语种翻译乱、本地化运营难', voice:'本地化、精细、讲多站', cta:'多语翻译+本地审美、一套多国' },
+    ]},
+    { name:'速卖通/eBay', types:[
+      { t:'铺货玩家', pain:'流量下降、毛利低、求转型', voice:'求变、略焦虑、讲出路', cta:'转型素材、低成本测款图' },
+    ]},
+    { name:'Shopify独立站', types:[
+      { t:'投流型', pain:'ROAS 低、广告政策严、测款慢', voice:'投手思维、张口 ROAS、看数据', cta:'广告素材+落地页、快速测款' },
+      { t:'品牌DTC', pain:'复购低、私域弱、品牌没沉淀', voice:'品牌叙事、长期、讲调性', cta:'品牌视觉沉淀、复购向内容' },
+    ]},
+    { name:'跨境培训/服务商', types:[
+      { t:'讲师/陪跑', pain:'获客难、口碑要维护、缺案例', voice:'权威、案例多、讲结果', cta:'案例包装、成果展示模板' },
+    ]},
+  ]},
+  { cat:'外贸 B2B', platforms:[
+    { name:'外贸工厂', types:[
+      { t:'阿里国际站', pain:'询盘质量差、客户不信任、转化低', voice:'工厂人、踏实、讲实力', cta:'工厂实力图、产能背书素材' },
+    ]},
+    { name:'外贸SOHO/小公司', types:[
+      { t:'询盘转化', pain:'找客户难、议价被动、收款风险', voice:'精明、轻资产、讲灵活', cta:'获客素材、信任背书图' },
+    ]},
+  ]},
+  { cat:'内容自媒体', platforms:[
+    { name:'抖音/视频号', types:[
+      { t:'知识口播', pain:'选题荒、完播低、人设立不住', voice:'导师感、干货密、讲方法', cta:'干货脚本、人设强化模板' },
+    ]},
+    { name:'小红书', types:[
+      { t:'生活方式种草', pain:'笔记爆款率低、合规卡', voice:'闺蜜腔、生活化、真实', cta:'种草模板、封面公式' },
+    ]},
+    { name:'B站/YouTube', types:[
+      { t:'中视频创作者', pain:'选题难、变现长尾弱', voice:'深度、理性、讲逻辑', cta:'长视频脚本、系列化结构' },
+    ]},
+  ]},
+  { cat:'服务/SaaS', platforms:[
+    { name:'代运营公司', types:[
+      { t:'项目经理', pain:'多客户并行、续约压力、预期难管', voice:'项目化、稳、讲交付', cta:'多客户提案、交付模板' },
+    ]},
+    { name:'SaaS/营销工具', types:[
+      { t:'服务商', pain:'客户成功难、销售线索少、ROI 难证', voice:'解决方案式、ROI 导向', cta:'ROI 证明、客户案例包装' },
+    ]},
+  ]},
+];
+
+// 由树生成 平台·类型 → profile 映射 & 一级兜底
+const PERSONA_MAP = {};
+const DEFAULT_BY_CAT = {};
+for(const g of PERSONA_TREE){
+  const first = g.platforms[0].types[0];
+  DEFAULT_BY_CAT[g.cat] = { label:g.cat+'卖家', pain:first.pain, voice:first.voice, cta:first.cta };
+  for(const p of g.platforms){
+    if(p.types.length===1){
+      const only = p.types[0];
+      PERSONA_MAP[p.name] = { label:p.name, pain:only.pain, voice:only.voice, cta:only.cta };
+    } else {
+      for(const t of p.types){
+        PERSONA_MAP[p.name+'·'+t.t] = { label:p.name+'·'+t.t, pain:t.pain, voice:t.voice, cta:t.cta };
+      }
+    }
+  }
+}
 const PLAT_TONE={
   '抖音':'节奏极快、口语炸裂、前 3 秒必须抛钩子或制造冲突；全程多用"你 / 咱们 / 家人们"，像跟朋友唠嗑；情绪拉满、画面切得快；结尾强引导点主页 / 进橱窗。',
   '小红书':'种草清单风、真实分享口吻；多用 emoji 把段落切小，标题带数字 + 痛点 + 情绪词（踩坑 / 亲测 / 后悔没早买）；像闺蜜安利，强调省时省钱省力。',
