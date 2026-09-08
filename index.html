@@ -618,6 +618,23 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .gen-cta-text{font-size:13.5px;line-height:1.7;color:#14532d;white-space:pre-wrap}
 .gen-flyelep-body{font-size:13.5px;line-height:1.7;color:#581c87;white-space:pre-wrap}
 .gen-flyelep-body b{color:#7e22ce;font-weight:700}
+/* 缺段提示（5 段少一段时显示） */
+.gen-missing{font-size:12.5px;padding:14px;text-align:center;background:#fff7ed;border:1.5px dashed #fb923c;border-radius:8px;color:#9a3412;font-weight:600}
+/* sec-cta 子卡片（按二级小标签拆） */
+.gen-cta-subs{display:flex;flex-direction:column;gap:8px}
+.cta-sub{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border-radius:7px;font-size:13px;line-height:1.65;border:1px solid}
+.cta-sub-icon{width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px;font-weight:700}
+.cta-sub-body{flex:1;white-space:pre-wrap;word-break:break-word;color:var(--ink)}
+.cta-sub-tip{background:#f0f9ff;border-color:#bae6fd}
+.cta-sub-tip .cta-sub-icon{background:#dbeafe;color:#0369a1}
+.cta-sub-tags{background:#fef3e8;border-color:#fcd9a4}
+.cta-sub-tags .cta-sub-icon{background:#fed7aa;color:#c2410c}
+.cta-sub-flyelep{background:#faf5ff;border-color:#d8b4fe}
+.cta-sub-flyelep .cta-sub-icon{background:#e9d5ff;color:#7e22ce}
+.cta-sub-cta{background:#f0fdf4;border-color:#bbf7d0}
+.cta-sub-cta .cta-sub-icon{background:#bbf7d0;color:#15803d}
+.cta-sub-default{background:#f9fafb;border-color:#e5e7eb}
+.cta-sub-default .cta-sub-icon{background:#f3f4f6;color:#6b7280}
 /* 热点状态切换 pill 组（脚本结果卡内） */
 .gen-status-group{display:inline-flex;align-items:center;gap:3px;padding:3px 8px 3px 4px;border-radius:999px;background:#fafafa;border:1px solid var(--line);font-size:11.5px;color:var(--muted);margin-right:6px}
 .gen-status-group .lbl{margin-right:2px}
@@ -2091,12 +2108,14 @@ ${rules}${fewShotBlock}${learnedBlock}
 - 功效夸大禁用：治疗 / 治愈 / 防癌 / 保证涨粉 / 保证销量 / 100% 有效
 - 涉及商品功效时，用"我用时""个人感受"代替绝对承诺
 
-【输出格式】（严格按这个 5 段式，不要加额外段落）
+【输出格式】（严格按这个 5 段式，不要加额外段落 · **5 段一段都不能少**）
 **【视频标题】**
 给 2-3 个备选，每条 ≤ 24 字，含数字 / 情绪词 / 钩子点
+（**严禁省略** · 不要用"秋天的第一件燕麦系卫衣"这种标题写在这里）
 
 **【开头 3 秒钩子】**
 一句口语化、有冲击力的开场（必须符合 ${plat} 调性 + 命中 ${personaKey} 痛点）
+（**必须独立成段** · 严禁把钩子塞进【视频文案脚本】里）
 
 **【脚本前置概要】**
 3 行说明，明确告诉用户这条脚本是为谁写、按什么结构走、主推什么 Flyelep 功能：
@@ -2104,16 +2123,17 @@ ${rules}${fewShotBlock}${learnedBlock}
 - 视频结构：${st.label}
 - 主推功能：「${vf.label}」 —— ${vf.desc}
 
-**【视频文案脚本】**（分 ${vd.beats} 段，严格对应总时长 ${vd.label}）
+**【视频文案脚本】**（必须**严格分 ${vd.beats} 段**，一段都不能少 · 总时长 ${vd.label}）
 每段格式：⏱ 秒 XX｜👀 画面（按 ${vt.shoot} 描述）｜🎙 台词｜🎯 卖点什么
 节奏公式：${vd.pace}
+（**硬规则**：${vd.beats} 段必须写满 ${vd.beats} 段，每段都以 ⏱XX秒 开头，最后一段也必须写）
 （注：上一版叫【正文 / 分镜】，本次统一叫【视频文案脚本】，**不要**再写【正文 / 分镜】或【正文】）
 
-**【发布带话题推荐】**
-- 针对 ${plat} 的发布技巧 + 发布时间建议 + 收尾引导语（必须合规，不踩违禁词）
-- 话题标签推荐：5-8 个 #话题，混合「大流量标签 + 精准人群标签 + 热点相关标签」，便于系统推流
-- 把主推功能「${vf.label}」怎么用一句话自然落到发布语里（不硬喊"用 Flyelep"）
-- 字数控制在 350-${vd.beats*100} 字之间。`;
+**【发布带话题推荐】**（这一段必须用 **三个二级小标签** 开头，分三段写清楚）
+- **发布技巧**：针对 ${plat} 的发布时间建议 + 收尾引导语（必须合规，不踩违禁词）—— **不要** 在这一段混 Flyelep 落地工具的内容
+- **话题标签**：5-8 个 #话题，混合「大流量标签 + 精准人群标签 + 热点相关标签」，便于系统推流
+- **Flyelep 落地**：把主推功能「${vf.label}」怎么用一句话自然落到发布语里（不硬喊"用 Flyelep"）
+- 总字数控制在 350-${vd.beats*100} 字之间，三段加起来的总字数。`;
 
   const user = `请按你的设定给我写一份可直接开拍的脚本（平台：${plat}，人群：${personaKey}，必须按上面【用户画像 · ${personaKey}】的口吻/痛点/CTA 写，且不能有任何 AI 腔、不能有元叙述）。
 
@@ -2516,27 +2536,75 @@ function renderScriptSections(raw){
     'sec-cta':     {icon:'📣', tag:'PUBLISH'},
   };
 
-  const html = sections.map(sec => {
-    const cls = classify(sec.title);
-    const head = icons[cls];
+  // ====== 缺段补位（5 段必须全有，缺啥补啥占位）======
+  const REQUIRED = [
+    {cls:'sec-title',   title:'视频标题',      icon:'🎯', tag:'TITLE'},
+    {cls:'sec-hook',    title:'开头 3 秒钩子', icon:'⚡', tag:'HOOK'},
+    {cls:'sec-preview', title:'脚本前置概要',  icon:'👤', tag:'BRIEF'},
+    {cls:'sec-body',    title:'视频文案脚本',  icon:'🎬', tag:'SCRIPT'},
+    {cls:'sec-cta',     title:'发布带话题推荐',icon:'📣', tag:'PUBLISH'},
+  ];
+  // 按 REQUIRED 顺序查 sections 里有没有对应 cls，有就拿出来，没就补占位
+  const orderedSecs = [];
+  for(const req of REQUIRED){
+    const hit = sections.find(s => classify(s.title) === req.cls);
+    if(hit){
+      orderedSecs.push({ ...hit, cls: req.cls, icon: req.icon, tag: req.tag });
+    } else {
+      orderedSecs.push({
+        title: req.title,
+        body: '',
+        cls: req.cls,
+        icon: req.icon,
+        tag: req.tag,
+        _missing: true,
+      });
+    }
+  }
+  // sections 里多余的段（不在 REQUIRED 中的）也保留，追加到末尾
+  for(const s of sections){
+    const cls = classify(s.title);
+    if(!REQUIRED.find(r => r.cls === cls)){
+      orderedSecs.push({ ...s, cls, icon: (icons[cls]||icons['sec-body']).icon, tag: (icons[cls]||icons['sec-body']).tag });
+    }
+  }
+
+  const html = orderedSecs.map(sec => {
+    const cls = sec.cls;
+    const icon = sec.icon;
+    const tag = sec.tag;
     const body = sec.body.trim();
     let bodyHtml = '';
+
+    // ====== 缺段占位 ======
+    if(sec._missing){
+      bodyHtml = `<div class="gen-missing">⚠️ 模型未输出此段（可点 🔁 重生成）</div>`;
+      return `<div class="gen-section ${cls}">
+        <div class="gen-sec-head">
+          <span class="gen-sec-icon">${icon}</span>
+          <span>${escapeHtml(sec.title)}</span>
+          <span class="gen-sec-tag">${tag}</span>
+        </div>
+        <div class="gen-sec-body-text">${bodyHtml}</div>
+      </div>`;
+    }
+
     if(cls === 'sec-title'){
-      // 把标题候选拆成数组（按换行 / 数字编号 / 中文序号 / ● / "1." "2."）
-    const lines = body.split('\n').map(l=>l.trim()).filter(Boolean);
+      // 把标题候选拆成数组：默认每行 1 个候选；只有遇到"明显编号前缀"才合并到下一行
+      const lines = body.split('\n').map(l=>l.trim()).filter(Boolean);
       const titles = [];
-      let buf = '';
+      // 明显编号前缀：1. xxx  /  ① xxx  /  • xxx  /  1）xxx  /  1、xxx  （数字+标点+空格）
+      const numPrefix = /^(\s*(?:[\d]+[\.\)、]\s+|[①-⑩][.\)、]?\s+|[•·]\s+|[-*]\s+))(.+)$/;
       for(const l of lines){
-        if(/^[\d①-⑩]/.test(l) || /^[\d]+[.\)、]/.test(l) || /^[•·]/.test(l)){
-          if(buf) titles.push(buf.trim());
-          buf = l.replace(/^[\d①-⑩][.\)、]?\s*/, '').replace(/^[•·]\s*/, '').trim();
-        } else if(buf){
-          buf += ' ' + l;
+        const m = l.match(numPrefix);
+        if(m){
+          // 编号行：把"编号"剥掉，存为 1 个候选
+          titles.push(m[2].trim());
         } else {
-          buf = l;
+          // 无编号行：每行独立成 1 个候选（最稳，避免误合并）
+          titles.push(l);
         }
       }
-      if(buf) titles.push(buf.trim());
       // 兜底：实在拆不开就把整段当一段
       const list = titles.length ? titles : (body ? [body.replace(/\n+/g,' ').trim()] : ['（未生成标题）']);
       bodyHtml = '<div class="gen-titles-list">' + list.map((t,i)=>`<div class="gen-title-item"><span class="gen-title-num">${i+1}</span><span>${escapeHtml(t)}</span></div>`).join('') + '</div>';
@@ -2561,9 +2629,15 @@ function renderScriptSections(raw){
       }
       if(cur) beats.push(cur);
 
-      bodyHtml = beats.length ? beats.map(parseBeat).join('') : `<div class="gen-sec-body-text">${markdownLite(body)}</div>`;
+      if(beats.length === 0){
+        bodyHtml = `<div class="gen-missing">⚠️ 模型未输出分镜 beat（可点 🔁 重生成）</div>`;
+      } else {
+        bodyHtml = beats.map(parseBeat).join('');
+      }
     } else if(cls === 'sec-cta'){
-      bodyHtml = `<div class="gen-cta-text">${markdownLite(body)}</div>`;
+      // ====== 按二级小标签自动拆 sub-card（发布技巧 / 话题标签 / Flyelep 落地）======
+      const subHtml = renderCtaSubCards(body);
+      bodyHtml = subHtml || `<div class="gen-cta-text">${markdownLite(body)}</div>`;
     } else if(cls === 'sec-flyelep'){
       bodyHtml = `<div class="gen-flyelep-body">${markdownLite(body)}</div>`;
     } else if(cls === 'sec-preview'){
@@ -2588,15 +2662,67 @@ function renderScriptSections(raw){
 
     return `<div class="gen-section ${cls}">
       <div class="gen-sec-head">
-        <span class="gen-sec-icon">${head.icon}</span>
+        <span class="gen-sec-icon">${icon}</span>
         <span>${escapeHtml(sec.title)}</span>
-        <span class="gen-sec-tag">${head.tag}</span>
+        <span class="gen-sec-tag">${tag}</span>
       </div>
       ${bodyHtml}
     </div>`;
   }).join('');
 
   return `<div class="gen-sections">${html}</div>`;
+}
+
+// ====== sec-cta 长段按二级小标签自动拆 sub-card ======
+function renderCtaSubCards(body){
+  if(!body || !body.trim()) return null;
+  const text = body.replace(/\r/g, '');
+  // 三个小标签的匹配正则（兼容：**【发布技巧】** / **发布技巧** / 发布技巧： / 「发布技巧」 / 【发布技巧】）
+  // 要求：标签前是行首或换行；标签后必须有 ":" 或 "：" 之类的分隔符（至少 1 个）
+  const subRegex = /(?:\n|^)\s*(?:\*\*|##)?\s*[\[【「"']?\s*(?:发布技巧|发布时间|发布时段|话题标签|话题推荐|推荐话题|Flyelep\s*落地|Flyelep\s*工具落地|Flyelep\s*落地工具|工具落地|落地工具|CTA|发布引导|收尾引导)\s*(?:\*\*|##)?\s*[\]】」"']?\s*[：:]/g;
+  const matches = [];
+  let m;
+  while((m = subRegex.exec(text)) !== null){
+    matches.push({ start: m.index, end: m.index + m[0].length, label: m[0].replace(/[\n\r*\[\]【】「」「"'\s：:]/g,'').replace(/^[\d.]+/, '').trim() });
+  }
+  if(matches.length < 2){
+    // 没找到 2 个以上子标题，不拆，原样渲染
+    return null;
+  }
+  // 把 matches 转成 segments
+  const segments = [];
+  for(let i=0;i<matches.length;i++){
+    const nextStart = i+1<matches.length ? matches[i+1].start : text.length;
+    const seg = text.slice(matches[i].end, nextStart).trim();
+    if(seg) segments.push({ label: matches[i].label, text: seg });
+  }
+  // 第一个 matches 之前的内容作为 preamble
+  const preamble = text.slice(0, matches[0].start).trim();
+  // 分类每段
+  const clsByLabel = (label) => {
+    if(/发布/.test(label)) return 'cta-sub-tip';
+    if(/话题|tag/i.test(label)) return 'cta-sub-tags';
+    if(/Flyelep|落地/.test(label)) return 'cta-sub-flyelep';
+    if(/CTA|引导/.test(label)) return 'cta-sub-cta';
+    return 'cta-sub-default';
+  };
+  const iconByCls = {
+    'cta-sub-tip':     '📅',
+    'cta-sub-tags':    '#️⃣',
+    'cta-sub-flyelep': '⚡',
+    'cta-sub-cta':     '📣',
+    'cta-sub-default': '·',
+  };
+  let html = '';
+  if(preamble){
+    html += `<div class="cta-sub cta-sub-default"><span class="cta-sub-icon">·</span><div class="cta-sub-body">${markdownLite(preamble)}</div></div>`;
+  }
+  for(const seg of segments){
+    const cls = clsByLabel(seg.label);
+    const icon = iconByCls[cls];
+    html += `<div class="cta-sub ${cls}"><span class="cta-sub-icon">${icon}</span><div class="cta-sub-body">${markdownLite(seg.text)}</div></div>`;
+  }
+  return `<div class="gen-cta-subs">${html}</div>`;
 }
 
 // 解析单段 beat：⏱秒XX｜👀画面｜🎙台词｜🎯卖点
