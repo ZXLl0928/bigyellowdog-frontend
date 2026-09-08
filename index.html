@@ -4322,20 +4322,72 @@ for(const g of PERSONA_TREE){
   }
 }
 // 热点 angle → 推荐 top3 画像；geoCat 限定同类目（不传则全画像池里挑）
-function top3PersonasForAngle(angle, geoCat){
+// 热点 → 推荐 top3 画像（geoCat 限定同类目；同池高分不足时用一级兜底）
+// 设计：① 平台强相关画像前置（Amazon 热点必须把 Amazon 系列画推上去）→
+//       ② 同类目高分 ≥65 排序补满 →
+//       ③ 一级通用画像兜底
+// 绝不跨类目乱推（如国内节日绝不会出现 TikTok）
+function top3PersonasForAngle(angle, geoCat, h){
   const out=[];
-  const pool = geoCat ? PERSONA_PREFER_BY_CAT[geoCat] : null;   // null 表示全画像
-  const keys = pool || Object.keys(PERSONA_MAP);
+  if(!geoCat) return out;
+  const catCls = PERSONA_CAT_CLASS[geoCat]||'cat-dn';
+
+  // ① 平台强相关画像前置：把『platform 关键词命中』的画像置顶
+  const plat = String((h&&h.platform)||'');
+  // (平台关键词 → PERSONA_PREFER 的 key 列表，强相关放最前)
+  const PLAT_MATCHERS = [
+    {kw:/Amazon|亚马逊/i,                                            keys:['亚马逊·精品FBA','亚马逊·精铺多店','亚马逊·Listing美工','亚马逊·铺货老卖家']},
+    {kw:/TikTok Shop|TikTok/i,                                       keys:['TikTok Shop·美区达人','TikTok Shop·东南亚小店']},
+    {kw:/Temu|SHEIN/i,                                                keys:['Temu/SHEIN·全托管供货']},
+    {kw:/Shopee|Lazada/i,                                             keys:['Shopee/Lazada·东南亚多店']},
+    {kw:/Shopify|独立站/i,                                            keys:['Shopify独立站·投流型','Shopify独立站·品牌DTC']},
+    {kw:/速卖通|eBay|Wish/i,                                          keys:['速卖通/eBay·铺货玩家']},
+    {kw:/淘宝|天猫/i,                                                 keys:['淘宝/天猫·精品运营','淘宝/天猫·静默铺货']},
+    {kw:/拼多多|1688|快手电商/i,                                      keys:['拼多多·爆款铺货']},
+    {kw:/抖音电商|抖音小店/i,                                         keys:['抖音电商·直播带货','抖音电商·短视频带货']},
+    {kw:/小红书电商/i,                                                keys:['小红书电商·种草博主']},
+    {kw:/阿里国际站|国际站|外贸工厂|Made-in-China/i,                  keys:['外贸工厂·阿里国际站','外贸SOHO/小公司·询盘转化']},
+    {kw:/抖音|视频号/i,                                               keys:['抖音/视频号·知识口播']},
+    {kw:/小红书/i,                                                    keys:['小红书·生活方式种草']},
+    {kw:/B站|YouTube|bilibili|哔哩哔哩/i,                             keys:['B站/YouTube·中视频创作者']},
+  ];
+  let pinned=[];
+  for(const m of PLAT_MATCHERS){
+    if(m.kw.test(plat)){
+      for(const k of m.keys){
+        if(PERSONA_CAT_BY_KEY[k]===geoCat){           // 仅前置同类目内的画像
+          pinned.push({key:k, label:k, score:1000-(pinned.length), cat:geoCat, cls:catCls});
+          if(pinned.length>=3) break;
+        }
+      }
+    }
+    if(pinned.length>=3) break;
+  }
+  out.push(...pinned);
+
+  // ② 同类目高分 ≥65 补满（按 prefer 排序）
+  const keys = PERSONA_PREFER_BY_CAT[geoCat] || [];
+  const used=new Set(out.map(x=>x.key));
+  const cands=[];
   for(const key of keys){
-    const p=PERSONA_MAP[key];
-    if(!p) continue;
-    const v = p.prefer?p.prefer[angle] : null;
+    if(used.has(key)) continue;
+    let v=null;
+    const indiv = PERSONA_PREFER[key];
+    if(indiv && indiv[angle]!=null) v = indiv[angle];
+    else { const cd = CAT_DEFAULT_PREFER[geoCat]; if(cd && cd[angle]!=null) v = cd[angle]; }
     if(v==null) continue;
     if(v<65) continue;
-    const meta = PERSONA_CAT_BY_KEY[key] || {cat:'通用', cls:'cat-dn'};
-    out.push({key, label:p.label||key, score:v, cat:meta.cat, cls:meta.cls});
+    cands.push({key, label:key, score:v, cat:geoCat, cls:catCls});
   }
-  out.sort((a,b)=>b.score-a.score);
+  cands.sort((a,b)=>b.score-a.score);
+  for(const c of cands){ if(out.length>=3) break; out.push(c); }
+
+  // ③ 不足 3 个 → 用一级通用画像兜底（绝不跨类目）
+  while(out.length<3){
+    const fb = DEFAULT_BY_CAT[geoCat];
+    const v = (fb && fb.prefer && fb.prefer[angle]!=null) ? fb.prefer[angle] : 50;
+    out.push({key: geoCat+'卖家·通用', label: geoCat+'卖家（通用）', score: Math.max(40, v-5), cat: geoCat, cls: catCls});
+  }
   return out.slice(0,3);
 }
 // 取当前「评级视角」画像（列表下拉）
@@ -4442,9 +4494,12 @@ function renderHotspot(){
         onlyNew=$('#onlyNewBtn')?.classList.contains('on')||false,
         onlyBindable=true,    // 🆕 默认隐藏 grade=C「无法结合」（UI 已隐藏「只看可结合」按钮；C 级永不显示，但保留后门）
         sortBy=$('#sortBy')?.value||'value';
-  // 补全老数据评级（无 value/heat/angle 字段时实时计算一次）
+  // 补全老数据评级（无 value/heat/angle 字段时实时计算一次）；同步补 geoCat
   let needSave=false;
-  for(const h of state.hotspots){ if(h.value==null || h.heat==null || h.angle==null){ evalHotspot(h); needSave=true; } }
+  for(const h of state.hotspots){
+    if(h.value==null || h.heat==null || h.angle==null){ evalHotspot(h); needSave=true; }
+    if(!h.geoCat){ h.geoCat = deriveGeoCat(h); needSave=true; }
+  }
   if(needSave){ try{ save(); }catch(_){} }
 
   // ===== Tab 数量徽章（用全量 state.hotspots） =====
@@ -4589,7 +4644,7 @@ function renderHotspot(){
     const rowCls = [sel?'selected':'', isCant?'hs-cant':''].filter(Boolean).join(' ');
     const cantBadge = isCant ? '<span class="hs-cant-badge" title="综合价值 &lt; 40，与脚本/Flyelep 无明显结合点">🚫 无法结合</span>' : '';
     // 🆕 推荐 3 个可用画像：按命中 prefer 排序 ≥65
-    const topPersonas = top3PersonasForAngle(h.angle||'其他', h.geoCat);
+    const topPersonas = top3PersonasForAngle(h.angle||'其他', h.geoCat, h);
     const personaChips = topPersonas.length
       ? `<div class="hs-personas">${topPersonas.map(p=>`<span class="persona-chip ${p.cls}" title="${escapeHtml(p.cat)} · 匹配 ${p.score}"><span class="pc-label">${escapeHtml(p.label)}</span><span class="pc-score">${p.score}</span></span>`).join('')}</div>`
       : `<div class="hs-personas-empty">—</div>`;
