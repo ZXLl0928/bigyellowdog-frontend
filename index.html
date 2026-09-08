@@ -4286,17 +4286,22 @@ const PERSONA_PREFER = {
 // 由树生成 平台·类型 → profile 映射 & 一级兜底（含 prefer）
 const PERSONA_MAP = {};
 const DEFAULT_BY_CAT = {};
+const PERSONA_PREFER_BY_CAT = {'国内电商':[],'跨境电商（出口）':[],'外贸 B2B':[],'内容自媒体':[],'服务/SaaS':[]};
 for(const g of PERSONA_TREE){
   const first = g.platforms[0].types[0];
   DEFAULT_BY_CAT[g.cat] = { label:g.cat+'卖家', pain:first.pain, voice:first.voice, cta:first.cta, prefer:CAT_DEFAULT_PREFER[g.cat]||DEF_PREFER };
   for(const p of g.platforms){
+    const add = (key, profile)=>{
+      PERSONA_MAP[key] = profile;
+      (PERSONA_PREFER_BY_CAT[g.cat] = PERSONA_PREFER_BY_CAT[g.cat]||[]).push(key);
+    };
     if(p.types.length===1){
       const only = p.types[0];
-      PERSONA_MAP[p.name] = { label:p.name, pain:only.pain, voice:only.voice, cta:only.cta, prefer:PERSONA_PREFER[p.name]||CAT_DEFAULT_PREFER[g.cat]||DEF_PREFER };
+      add(p.name, { label:p.name, pain:only.pain, voice:only.voice, cta:only.cta, prefer:PERSONA_PREFER[p.name]||CAT_DEFAULT_PREFER[g.cat]||DEF_PREFER });
     } else {
       for(const t of p.types){
         const key=p.name+'·'+t.t;
-        PERSONA_MAP[key] = { label:key, pain:t.pain, voice:t.voice, cta:t.cta, prefer:PERSONA_PREFER[key]||CAT_DEFAULT_PREFER[g.cat]||DEF_PREFER };
+        add(key, { label:key, pain:t.pain, voice:t.voice, cta:t.cta, prefer:PERSONA_PREFER[key]||CAT_DEFAULT_PREFER[g.cat]||DEF_PREFER });
       }
     }
   }
@@ -4316,11 +4321,14 @@ for(const g of PERSONA_TREE){
     for(const t of p.types){ PERSONA_CAT_BY_KEY[p.name+'·'+t.t] = {cat:g.cat, cls:PERSONA_CAT_CLASS[g.cat]||'cat-dn'}; }
   }
 }
-// 热点 angle → 推荐 top3 画像（score≥65，按分排序取前 3）
-function top3PersonasForAngle(angle){
+// 热点 angle → 推荐 top3 画像；geoCat 限定同类目（不传则全画像池里挑）
+function top3PersonasForAngle(angle, geoCat){
   const out=[];
-  for(const key in PERSONA_MAP){
+  const pool = geoCat ? PERSONA_PREFER_BY_CAT[geoCat] : null;   // null 表示全画像
+  const keys = pool || Object.keys(PERSONA_MAP);
+  for(const key of keys){
     const p=PERSONA_MAP[key];
+    if(!p) continue;
     const v = p.prefer?p.prefer[angle] : null;
     if(v==null) continue;
     if(v<65) continue;
@@ -4345,6 +4353,14 @@ function gradeViewLabel(){
   if(v.startsWith('key:')) return PERSONA_MAP[v.slice(4)]?.label||v.slice(4);
   return v;
 }
+// 取当前视角的所属一级类目（'国内电商' / '跨境电商（出口）' / ...），空=通用不区分
+function gradeViewCat(){
+  const v=$('#gradeView')?.value||'';
+  if(!v) return '';
+  if(v.startsWith('cat:')) return v.slice(4);
+  if(v.startsWith('key:')) return PERSONA_CAT_BY_KEY[v.slice(4)]?.cat || '';
+  return '';
+}
 // 填充「评级视角」下拉：通用 + 5 类目通用 + 按类目分组 26 个终端画像
 function populateGradeView(){
   const sel=$('#gradeView'); if(!sel) return;
@@ -4368,9 +4384,11 @@ function populateGradeView(){
   sel.innerHTML=html;
 }
 // 🆕 视角下的展示价值 / 等级（不污染原 h.value）
-function dispValue(h, persona){
+// gvCat：当前视角画像所属的一级类目；与 hotspot.geoCat 不一致时 personaMatch 失效（避免跨境热点给国内卖家画像打高分）
+function dispValue(h, persona, gvCat){
   if(!persona) return h.value||0;
-  const pm = personaMatchOf(h.angle, persona);
+  let pm = personaMatchOf(h.angle, persona);
+  if(gvCat && h.geoCat && gvCat!==h.geoCat) pm = 0;
   return Math.round(0.4*(h.heat||0) + 0.3*(h.fitScore||0) + 0.3*pm);
 }
 function dispGrade(v){ return v>=80?'S' : v>=60?'A' : v>=40?'B' : 'C'; }
@@ -4470,6 +4488,7 @@ function renderHotspot(){
   // ===== 排序 =====
   const gv=getGradeViewPersona();          // 🆕 评级视角画像（null=通用）
   const gvLbl=gradeViewLabel();
+  const gvCat=gradeViewCat();
   if(sortBy==='heat'){
     arr.sort((a,b)=>(b.heat||0)-(a.heat||0) || ts(b)-ts(a));
   }else if(sortBy==='added'){
@@ -4477,7 +4496,7 @@ function renderHotspot(){
   }else if(sortBy==='date'){
     arr.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   }else{
-    arr.sort((a,b)=>dispValue(b,gv)-dispValue(a,gv) || (b.heat||0)-(a.heat||0) || ts(b)-ts(a));
+    arr.sort((a,b)=>dispValue(b,gv,gvCat)-dispValue(a,gv,gvCat) || (b.heat||0)-(a.heat||0) || ts(b)-ts(a));
   }
 
   // ===== Top 20 截断（用户硬性需求：每个 Tab 内只显示综合价值前 20 条） =====
@@ -4491,8 +4510,8 @@ function renderHotspot(){
   }
 
   // KPI 概览（4 列简约现代风）
-  const gradeOf = h => gv ? dispGrade(dispValue(h,gv)) : (h.grade||'-');
-  const valOf = h => dispValue(h,gv);
+  const gradeOf = h => gv ? dispGrade(dispValue(h,gv,gvCat)) : (h.grade||'-');
+  const valOf = h => dispValue(h,gv,gvCat);
   const sa=arr.filter(h=>['S','A'].includes(gradeOf(h))).length;
   const new24=arr.filter(h=>(h.addedAt||0)>=now-86400000).length;
   const avgValue = arr.length ? Math.round(arr.reduce((s,h)=>s+valOf(h),0)/arr.length) : 0;
@@ -4554,7 +4573,7 @@ function renderHotspot(){
 
   tbody.innerHTML=arr.map(h=>{
     const [aCls,aTxt]=angleMap[h.angle]||['','—'];
-    const dv = dispValue(h, gv);
+    const dv = dispValue(h, gv, gvCat);
     const dg = dispGrade(dv);
     const pm = gv ? personaMatchOf(h.angle, gv) : null;
     const [gCls,gTxt]=gradeMap[dg]||['','—'];
@@ -4570,7 +4589,7 @@ function renderHotspot(){
     const rowCls = [sel?'selected':'', isCant?'hs-cant':''].filter(Boolean).join(' ');
     const cantBadge = isCant ? '<span class="hs-cant-badge" title="综合价值 &lt; 40，与脚本/Flyelep 无明显结合点">🚫 无法结合</span>' : '';
     // 🆕 推荐 3 个可用画像：按命中 prefer 排序 ≥65
-    const topPersonas = top3PersonasForAngle(h.angle||'其他');
+    const topPersonas = top3PersonasForAngle(h.angle||'其他', h.geoCat);
     const personaChips = topPersonas.length
       ? `<div class="hs-personas">${topPersonas.map(p=>`<span class="persona-chip ${p.cls}" title="${escapeHtml(p.cat)} · 匹配 ${p.score}"><span class="pc-label">${escapeHtml(p.label)}</span><span class="pc-score">${p.score}</span></span>`).join('')}</div>`
       : `<div class="hs-personas-empty">—</div>`;
@@ -5261,7 +5280,24 @@ function evalHotspot(h){
   else if(angle==='节日') reasons.push('🎉 节日');
   h.reasons=reasons.join('；');
   h.match = h.grade==='C'?'low':(h.grade==='B'?'mid':'high');
+  // 🆕 按 market/platform 推导该热点适合的一级类目（用于过滤『可用画像』避免跨类目乱推）
+  h.geoCat = deriveGeoCat(h);
   return h;
+}
+// 推 hotspot 的目标类目：market 优先，再按 platform 关键词命中
+function deriveGeoCat(h){
+  const plat = String(h.platform||'');
+  const mkt = String(h.market||'');
+  // 1) 市场优先级最高
+  if(mkt==='国内') return '国内电商';
+  if(mkt==='海外') return '跨境电商（出口）';
+  // 2) 平台关键词命中（注意：『淘宝/天猫,抖音电商』这种多平台也匹配国内电商）
+  if(/淘宝|天猫|拼多多|京东|抖音电商|小红书电商|1688|视频号小店|快手电商/.test(plat)) return '国内电商';
+  if(/Amazon|亚马逊|TikTok Shop|Temu|SHEIN|Shopee|Lazada|速卖通|eBay|Shopify|独立站|Wish|Walmart/.test(plat)) return '跨境电商（出口）';
+  if(/阿里国际站|国际站|Made-in-China|环球资源|外贸/.test(plat)) return '外贸 B2B';
+  if(/抖音|视频号|小红书|B站|YouTube/.test(plat)) return '内容自媒体';
+  if(mkt==='全球') return '内容自媒体';
+  return '内容自媒体';
 }
 
 // 兼容旧 high/mid/low 推断（保留给历史逻辑）
