@@ -4357,7 +4357,7 @@ function top3PersonasForAngle(angle, geoCat, h){
   for(const m of PLAT_MATCHERS){
     if(m.kw.test(scanText)){
       for(const k of m.keys){
-        if(PERSONA_CAT_BY_KEY[k]===geoCat){           // 仅前置同类目内的画像
+        if(PERSONA_CAT_BY_KEY[k] && PERSONA_CAT_BY_KEY[k].cat===geoCat){   // 仅前置同类目内的画像（注意：值是对象，要比 .cat）
           pinned.push({key:k, label:k, score:1000-(pinned.length), cat:geoCat, cls:catCls});
           if(pinned.length>=3) break;
         }
@@ -5359,16 +5359,19 @@ function deriveGeoCat(h){
   const hasOverseasB2B = /阿里国际站|国际站|made-in-china|环球资源|外贸/.test(title);
   const hasDomestic = /淘宝|天猫|拼多多|京东|1688|抖音电商|视频号小店|快手电商/.test(title);
   const hasCnSocial = /抖音|视频号|小红书|b站|bili|哔哩哔哩/.test(title);
+  // 标题里的强跨境信号（即使数据源错标成『国内/全球』也要纠正）
+  const hasCross = /欧洲|出海|关税|海外仓|跨境|北美站|欧洲站|日本站|全球站|美国站|亚马逊海外/.test(title);
   // 1) 市场优先级最高（mkt 已有明确地域）
-  if(mkt==='国内') return '国内电商';
   if(mkt==='海外') return '跨境电商（出口）';
-  if(mkt==='全球' && (hasAmazon||hasTemu||hasTiktok||hasAliex||hasShopee||hasShopify)) return '跨境电商（出口）';
+  if(mkt==='国内') return hasCross ? '跨境电商（出口）' : '国内电商';
+  if(mkt==='全球' && (hasAmazon||hasTemu||hasTiktok||hasAliex||hasShopee||hasShopify||hasCross)) return '跨境电商（出口）';
   // 2) 平台关键词命中（注意：『淘宝/天猫,抖音电商』这种多平台也匹配国内电商）
   if(/淘宝|天猫|拼多多|京东|抖音电商|小红书电商|1688|视频号小店|快手电商/.test(plat)) return '国内电商';
   if(/Amazon|亚马逊|TikTok Shop|Temu|SHEIN|Shopee|Lazada|速卖通|eBay|Shopify|独立站|Wish|Walmart/.test(plat)) return '跨境电商（出口）';
   if(/阿里国际站|国际站|Made-in-China|环球资源|外贸/.test(plat)) return '外贸 B2B';
   if(/抖音|视频号|小红书|B站|YouTube/.test(plat)) return '内容自媒体';
   // 3) 标题回退（数据源没填 platform 但标题里有明确信号）
+  if(hasCross) return '跨境电商（出口）';
   if(hasAmazon||hasTemu||hasTiktok||hasAliex||hasShopee||hasShopify) return '跨境电商（出口）';
   if(hasOverseasB2B) return '外贸 B2B';
   if(hasDomestic) return '国内电商';
