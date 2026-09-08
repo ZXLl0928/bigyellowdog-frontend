@@ -621,13 +621,20 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .gen-section.sec-body.is-long .gen-beat-wrap{max-height:440px;overflow-y:auto;padding-right:4px}
 .gen-beat:last-child{margin-bottom:0}
 .gen-beat-time{font-size:11px;font-weight:700;color:#1d4ed8;background:#dbeafe;padding:2px 8px;border-radius:999px;display:inline-block;margin-bottom:6px}
-.gen-beat-row{display:flex;gap:6px;align-items:flex-start;font-size:13px;line-height:1.6;margin-bottom:3px;color:var(--ink)}
+.gen-beat-row{display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.65;margin-bottom:6px;color:var(--ink);padding:4px 0}
 .gen-beat-row:last-child{margin-bottom:0}
-.gen-beat-label{font-weight:700;color:#475569;min-width:54px;flex-shrink:0}
-.gen-beat-row b.gen-beat-label{color:#475569;font-weight:700}
-.gen-beat-visual{color:#7c3aed}
-.gen-beat-line{color:var(--ink)}
-.gen-beat-sell{color:#dc2626}
+/* 标签：彩色背景徽章，不再用 emoji —— 任何浏览器/系统都不会塌成方块 */
+.gen-beat-label{display:inline-block;min-width:42px;padding:2px 8px;border-radius:5px;font-size:11.5px;font-weight:700;color:#fff;text-align:center;flex-shrink:0;letter-spacing:.5px;margin-top:2px}
+/* 文字：统一深色，靠徽章颜色 + 左侧色条区分 */
+.gen-beat-text{color:var(--ink);flex:1;word-break:break-word}
+.gen-beat-row[data-type="visual"]{border-left:3px solid #2563eb;padding-left:8px}
+.gen-beat-row[data-type="visual"] .gen-beat-label{background:#2563eb}
+.gen-beat-row[data-type="line"]{border-left:3px solid #059669;padding-left:8px}
+.gen-beat-row[data-type="line"] .gen-beat-label{background:#059669}
+.gen-beat-row[data-type="sell"]{border-left:3px solid #ea580c;padding-left:8px}
+.gen-beat-row[data-type="sell"] .gen-beat-label{background:#ea580c}
+.gen-beat-row[data-type="other"]{border-left:3px solid #94a3b8;padding-left:8px}
+.gen-beat-row[data-type="other"] .gen-beat-label{background:#64748b}
 .gen-cta-text{font-size:13.5px;line-height:1.7;color:#14532d;white-space:pre-wrap}
 .gen-flyelep-body{font-size:13.5px;line-height:1.7;color:#581c87;white-space:pre-wrap}
 .gen-flyelep-body b{color:#7e22ce;font-weight:700}
@@ -2137,7 +2144,8 @@ ${rules}${fewShotBlock}${learnedBlock}
 - 主推功能：「${vf.label}」 —— ${vf.desc}
 
 **【视频文案脚本】**（必须**严格分 ${vd.beats} 段**，一段都不能少 · 总时长 ${vd.label}）
-每段格式（**每一段必须独占一行**）：⏱0-7秒｜👀 画面（按 ${vt.shoot} 描述）｜🎙 台词｜🎯 卖点
+每段格式（**每一段必须独占一行**）：⏱0-7秒｜画面（按 ${vt.shoot} 描述）｜台词｜卖点
+（**严禁使用 emoji**，画面/台词/卖点就用纯文字冒号写法，例如：画面：xxx｜台词：xxx｜卖点：xxx）
 时间写单点（⏱0秒）或区间（⏱0-7秒）都行，但**每段必须独占一行且以 ⏱ 开头**
 节奏公式：${vd.pace}
 （**硬规则**：${vd.beats} 段必须写满 ${vd.beats} 段，每段一行，最后一段也必须写，**严禁把多段挤在同一行**）
@@ -2809,32 +2817,38 @@ function parseBeat(b){
     }
     parts = parts.slice(1);
   }
-  // 识别 3 类字段：emoji 前缀 👀/🎙/🎯，或文字「画面：」「台词：」「卖点：」
+  // 识别 3 类字段：原 emoji 前缀 👀/🎙/🎯（向后兼容，但渲染时不再显示 emoji），或文字「画面：」「台词：」「卖点：」
+  // 强制去掉标签里的所有 emoji，避免无 emoji 字体的浏览器渲染成方块
   const rows = [];
   for(const p of parts){
     if(!p) continue;
-    let label = '', text = p;
-    const lm = p.match(/^(?:([👀🎙🎯])\s*)?(.+?)[：:]\s*(.+)$/);
+    let type = '', label = '', text = p;
+    const lm = p.match(/^(?:[👀🎙🎯]\s*)?(.+?)[：:]\s*(.+)$/);
     if(lm){
-      const l = lm[2];
-      text = lm[3];
-      if(/画面|镜头/.test(l)) label='👀 画面';
-      else if(/台词|口播|文案/.test(l)) label='🎙 台词';
-      else if(/卖点|目的/.test(l)) label='🎯 卖点';
-      else label = l ? l+' ' : '';
+      const l = lm[1].replace(/[👀🎙🎯]/g,'').trim();
+      text = lm[2];
+      if(/画面|镜头|场景/.test(l)) { type='visual'; label='画面'; }
+      else if(/台词|口播|文案|配音/.test(l)) { type='line'; label='台词'; }
+      else if(/卖点|目的|转化/.test(l)) { type='sell'; label='卖点'; }
+      else { type='other'; label=l; }
     } else {
-      const em = p.match(/^([👀🎙🎯])\s*(.+)$/);
-      if(em){ label = em[1]+' '; text = em[2]; }
+      const em = p.match(/^[👀🎙🎯]\s*(.+)$/);
+      if(em){
+        text = em[1];
+        if(/👀/.test(p)) { type='visual'; label='画面'; }
+        else if(/🎙/.test(p)) { type='line'; label='台词'; }
+        else { type='sell'; label='卖点'; }
+      }
     }
-    if(!label){
+    if(!type){
       // 兜底：按出现顺序猜 画面 / 台词 / 卖点
-      label = ['👀 画面','🎙 台词','🎯 卖点'][rows.length] || '·';
+      const fallback = [['visual','画面'],['line','台词'],['sell','卖点']][rows.length] || ['other','·'];
+      type = fallback[0]; label = fallback[1];
     }
-    rows.push({label, text});
+    rows.push({type, label, text});
   }
   const rowsHtml = rows.map(r=>{
-    const cls = /画面/.test(r.label)?'gen-beat-visual':/台词/.test(r.label)?'gen-beat-line':'gen-beat-sell';
-    return `<div class="gen-beat-row"><span class="gen-beat-label">${r.label}</span><span class="${cls}">${escapeHtml(r.text)}</span></div>`;
+    return `<div class="gen-beat-row" data-type="${r.type}"><span class="gen-beat-label">${escapeHtml(r.label)}</span><span class="gen-beat-text">${escapeHtml(r.text)}</span></div>`;
   }).join('');
   const timeHtml = time ? `<span class="gen-beat-time">⏱ ${escapeHtml(time)}</span>` : '';
   return `<div class="gen-beat">${timeHtml}${rowsHtml}</div>`;
