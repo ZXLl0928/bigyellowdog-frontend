@@ -295,7 +295,7 @@ a.hs-title:hover{background-size:100% 100%;color:#9a3412}
 .grade-chip.g-C{background:#f5f5f0;border-color:#dcd9d0}
 .grade-chip.g-C .gc-l{color:#54534e}
 .grade-chip:hover{transform:translateY(-1px);box-shadow:0 2px 5px rgba(0,0,0,.06)}
-/* 玩法类型徽章（带货 / 蹭热 / 痛点规则 / 节日 / 其他） */
+/* 玩法类型徽章（带货 / 蹭热 / 卖家避坑提醒 / 节日 / 其他） */
 .pill.an-dai{background:#fff0e0;color:#b45309;border:1px solid #f2d2ab}
 .pill.an-ride{background:#e7f0ff;color:#1c5fc9;border:1px solid #c3d8f7}
 .pill.an-rule{background:#fdecec;color:#c0392b;border:1px solid #f3c6c6}
@@ -835,10 +835,16 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .v3-bar{display:inline-block;width:52px;height:5px;background:#eee8dc;border-radius:3px;overflow:hidden;vertical-align:middle}
 .v3-bar i{display:block;height:100%;background:#1d9e75;border-radius:3px}
 .v3-s b{color:var(--ink2);font-weight:600;font-variant-numeric:tabular-nums}
-/* V3 行业情报行降级：灰底 + 灰左边条 + 灰标题（不占 Top 视觉重量） */
+/* V3 只能参考行降级：灰底 + 灰左边条 + 灰标题（不占 Top 视觉重量） */
 #hotspotTable tbody tr.v3-info-row td.hs-title-col{background:#faf8f3}
 #hotspotTable tbody tr.v3-info-row .hs-title{color:#5f5e5a}
 #hotspotTable tbody tr.v3-info-row td.hs-title-col::before{background:linear-gradient(180deg,#b4b2a9,#888780)}
+/* 🆕 今日值得追：金色高亮左边条 + 卡片 */
+#hotspotTable tbody tr.hs-featured td.hs-title-col{background:linear-gradient(90deg,#fff7e6,#fffdf8)}
+#hotspotTable tbody tr.hs-featured td.hs-title-col::before{background:linear-gradient(180deg,#f59f00,#e8590c)}
+.feat-badge{display:inline-flex;align-items:center;gap:2px;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:700;
+  background:linear-gradient(90deg,#ff922b,#f76707);color:#fff;margin-left:6px;vertical-align:middle;box-shadow:0 1px 3px rgba(230,90,12,.3)}
+.new-badge{background:#e7f5ff;color:#1c7ed6}
 /* ========== V3 筛选区（用户画像第一行，最突出） ========== */
 .v3-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:9px 12px;margin:0 0 10px;
   background:linear-gradient(180deg,#f6fbf3,#fff);border:1px solid #cfe3c6;border-radius:10px}
@@ -889,7 +895,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
     </div>
   </div>
   <div class="actions">
-    <span id="apiStatus" class="api-status probe" title="uapis.cn 热点 API 状态（免 key、6+ 平台）">⏳ 探测热点 API…</span>
+    <span id="apiStatus" class="api-status probe" title="热点源状态（免 key、6+ 平台）">⏳ 探测热点源…</span>
     <select id="monthPicker" title="切换月份"></select>
     <button class="btn gear" id="gearBtn" onclick="toggleDrawer()" title="数据与设置">⋯</button>
   </div>
@@ -1107,7 +1113,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         <label class="nab-sort" title="表格排序方式">
           排序：
           <select id="sortBy" onchange="renderHotspot()">
-            <option value="value">综合价值 ↓（推荐）</option>
+            <option value="value">推荐度 ↓（推荐）</option>
             <option value="heat">热度 ↓</option>
             <option value="added">新增时间 ↓</option>
             <option value="date">热点日期 ↓</option>
@@ -1117,20 +1123,32 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       </div>
       <!-- 🆕 V3 用户画像筛选（第一行，最突出）：按「这条热点对谁有用」快速筛 -->
       <div class="v3-filter">
-        <span class="vf-label">按画像筛选</span>
+        <span class="vf-label">这条热点对谁有用</span>
         <div class="v3-chips" id="v3PersonaChips"></div>
       </div>
-      <!-- 🆕 V3 链路环节筛选（第二行） -->
+      <!-- 🆕 V3 热点环节筛选（第二行） -->
       <div class="v3-filter v3-filter-sub">
-        <span class="vf-label">链路环节</span>
+        <span class="vf-label">热点环节</span>
         <div class="v3-chips" id="v3StageChips"></div>
+      </div>
+      <!-- 🆕 AI 资讯 Tab 内部二级分组（仅「AI 资讯」Tab 显示） -->
+      <div class="v3-filter v3-filter-sub ai-sub" id="aiSubTabs" style="display:none">
+        <span class="vf-label">AI 资讯分组</span>
+        <div class="v3-chips">
+          <button class="v3-chip ${_aiSub==='all'?'on':''}" onclick="setAiSub('all')" type="button">全部</button>
+          <button class="v3-chip ${_aiSub==='ready'?'on':''}" onclick="setAiSub('ready')" type="button">🔥 直接能拍</button>
+          <button class="v3-chip ${_aiSub==='info'?'on':''}" onclick="setAiSub('info')" type="button">👀 看看就好</button>
+          <button class="v3-chip ${_aiSub==='image'?'on':''}" onclick="setAiSub('image')" type="button">🎨 作图</button>
+          <button class="v3-chip ${_aiSub==='video'?'on':''}" onclick="setAiSub('video')" type="button">🎬 视频</button>
+          <button class="v3-chip ${_aiSub==='llm'?'on':''}" onclick="setAiSub('llm')" type="button">🤖 大模型</button>
+        </div>
       </div>
       <!-- 简化筛选器：聚焦「评级视角」+ 高级筛选开关 + 库管 -->
       <div class="filter-bar">
         <div class="gv-hero">
           <span class="gv-icon">🎯</span>
           <div class="gv-body">
-            <div class="gv-label">评级视角 · 按谁的画像给热点打分</div>
+            <div class="gv-label">推荐看谁的角度 · 选了之后整列按该账号重算</div>
             <select id="gradeView" class="gv-select" onchange="renderHotspot()" title="选了之后整列等级按该卖家重算">
               <option value="">通用（不区分卖家）</option>
             </select>
@@ -1147,7 +1165,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <option value="">全部玩法</option>
           <option value="带货">🔥 带货</option>
           <option value="蹭热">🌊 蹭热度</option>
-          <option value="痛点规则">🛡️ 痛点规则</option>
+          <option value="痛点规则">🛡️ 卖家避坑提醒</option>
           <option value="节日">🎉 节日</option>
           <option value="其他">📦 其他</option>
         </select>
@@ -1175,7 +1193,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       <div class="gen-steps" id="genSteps">
         <div class="gen-step" data-step="hotspot">
           <div class="step-head"><span class="step-num">1</span>选热点 <span class="req">*</span></div>
-          <select id="genHotspot" onchange="genOnHotspotChange()"><option value="">— 选择要拍的热点（按综合价值排序）—</option></select>
+          <select id="genHotspot" onchange="genOnHotspotChange()"><option value="">— 选择要拍的热点（按推荐度排序）—</option></select>
           <div class="gen-step-info" id="infoHotspot"></div>
         </div>
         <div class="gen-step" data-step="account">
@@ -2047,7 +2065,7 @@ function populateGenSelects(){
     const el=document.getElementById(id); if(el) keep[id]=el.value;
   });
   const g=$('#genHotspot');
-  if(g) g.innerHTML='<option value="">— 选择要拍的热点（按综合价值排序）—</option>'+hs.map(h=>{
+  if(g) g.innerHTML='<option value="">— 选择要拍的热点（按推荐度排序）—</option>'+hs.map(h=>{
     const t=HOT_TYPES[h.type]?HOT_TYPES[h.type][2]:'热点';
     const gTxt=h.grade||(h.match==='high'?'S':h.match==='mid'?'B':'C');
     const ang = h.angle||'其他';
@@ -3666,6 +3684,8 @@ function seedAllSamples(){
 function switchHotTab(tab){
   _hotTab=tab;
   $$('#hotTabs .hot-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  // 🆕 AI 资讯分组条只在「AI 资讯」Tab 显示
+  const aiSub=$('#aiSubTabs'); if(aiSub) aiSub.style.display = (tab==='ai') ? '' : 'none';
   renderHotspot();
 }
 const MATCH_MAP={high:['m-high','⭐⭐⭐ 高'],mid:['m-mid','⭐⭐ 中'],low:['m-low','⭐ 低']};
@@ -4701,6 +4721,7 @@ const V3_STAGE_FILTERS=[
 ];
 let _v3Persona='all';
 let _v3Stage='all';
+let _aiSub='all';   // 🆕 AI 资讯 Tab 内部二级分组：all/ready/info/image/video/llm
 function renderV3FilterChips(){
   const pb=$('#v3PersonaChips'); if(pb){
     pb.innerHTML=V3_PERSONA_FILTERS.map(f=>`<button class="v3-chip ${_v3Persona===f.k?'on':''}" onclick="setV3Persona('${f.k}')" type="button">${f.label}</button>`).join('');
@@ -4711,6 +4732,11 @@ function renderV3FilterChips(){
 }
 function setV3Persona(k){ _v3Persona=k; renderV3FilterChips(); renderHotspot(); }
 function setV3Stage(k){ _v3Stage=k; renderV3FilterChips(); renderHotspot(); }
+function setAiSub(k){ _aiSub=k; renderHotspot(); }
+// 🆕 判断某条 AI 热点是否「今日值得追」：高价值 + 作图/视频强能力（image2.5 / Sora 2 这类直接浮顶）
+function isAiFeatured(h){
+  return (_hotTab==='ai') && (h.value||0)>=65 && (h.flyelepCapabilities||[]).some(c=>c==='ai_image'||c==='ai_video');
+}
 
 function renderHotspot(){
   populateGenSelects();
@@ -4761,6 +4787,14 @@ function renderHotspot(){
   if(_v3Persona && _v3Persona!=='all') arr=arr.filter(h=>(h.flyelepCapabilities||[]).includes(_v3Persona));
   if(_v3Stage && _v3Stage!=='all') arr=arr.filter(h=>(h.linkStages||[]).includes(_v3Stage));
   if(_hotTab && _hotTab!=='all') arr=arr.filter(h=>tabOfHot(h)===_hotTab);
+  // 🆕 AI 资讯 Tab 内部二级分组（直接能拍 / 看看就好 / 作图 / 视频 / 大模型）
+  if(_hotTab==='ai' && _aiSub!=='all'){
+    if(_aiSub==='ready')      arr=arr.filter(h=>h.flyelepTier==='content-ready');
+    else if(_aiSub==='info')  arr=arr.filter(h=>h.flyelepTier==='industry-info');
+    else if(_aiSub==='image') arr=arr.filter(h=>(h.flyelepCapabilities||[]).includes('ai_image'));
+    else if(_aiSub==='video') arr=arr.filter(h=>(h.flyelepCapabilities||[]).includes('ai_video'));
+    else if(_aiSub==='llm')   arr=arr.filter(h=>(h.flyelepCapabilities||[]).includes('llm_agent'));
+  }
   // 2) 高级筛选（关键词 / 玩法 / 结合度 / 市场 / 状态）
   if(fk) arr=arr.filter(h=>[h.title,h.source,h.product,h.playbook,h.topic,h.script,h.material,h.reasons,(h.titleOrig||'')].some(x=>(x||'').toLowerCase().includes(fk)));
   if(fa) arr=arr.filter(h=>h.angle===fa);
@@ -4788,7 +4822,15 @@ function renderHotspot(){
   }else if(sortBy==='date'){
     arr.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   }else{
-    arr.sort((a,b)=>dispValue(b,gv,gvCat)-dispValue(a,gv,gvCat) || (b.heat||0)-(a.heat||0) || ts(b)-ts(a));
+    // 🆕 AI 资讯 Tab：高价值作图/视频热点（image2.5 / Sora 2 等）置顶「今日值得追」
+    const featSet = _hotTab==='ai' ? new Set(arr.filter(isAiFeatured).map(h=>h.id)) : null;
+    arr.sort((a,b)=>{
+      if(featSet){
+        const fa=featSet.has(a.id)?1:0, fb=featSet.has(b.id)?1:0;
+        if(fa!==fb) return fb-fa;
+      }
+      return dispValue(b,gv,gvCat)-dispValue(a,gv,gvCat) || (b.heat||0)-(a.heat||0) || ts(b)-ts(a);
+    });
   }
 
   // ===== Top 20 截断（用户硬性需求：每个 Tab 内只显示综合价值前 20 条） =====
@@ -4859,7 +4901,7 @@ function renderHotspot(){
     tbody.innerHTML=emptyHtml;
     updateBulkBar(); return;
   }
-  const angleMap={'带货':['an-dai','🔥 带货'],'蹭热':['an-ride','🌊 蹭热度'],'痛点规则':['an-rule','🛡️ 痛点规则'],'节日':['an-fest','🎉 节日'],'AI资讯':['an-ai','🤖 AI 资讯'],'其他':['an-other','📦 其他']};
+  const angleMap={'带货':['an-dai','🔥 带货'],'蹭热':['an-ride','🌊 蹭热度'],'痛点规则':['an-rule','🛡️ 卖家避坑提醒'],'节日':['an-fest','🎉 节日'],'AI资讯':['an-ai','🤖 AI 资讯'],'其他':['an-other','📦 其他']};
   const gradeMap={S:['g-S','S'],A:['g-A','A'],B:['g-B','B'],C:['g-C','C']};
   const fitMap={'强':['fit-strong','💪 强'],'中':['fit-mid','🤝 中'],'弱':['fit-weak','😶 弱']};
 
@@ -4879,34 +4921,35 @@ function renderHotspot(){
     const origHint = h.titleOrig && h.titleOrig!==h.title ? `title="🌐 原文：${escapeHtml(h.titleOrig)}"` : '';
     const isCant = h.grade==='C';
     const isInfo = h.flyelepTier==='industry-info';   // 🆕 V3 行业情报行（Flyelep 匹配度低，不占 Top）
-    const rowCls = [sel?'selected':'', isCant?'hs-cant':'', isInfo?'v3-info-row':''].filter(Boolean).join(' ');
-    const cantBadge = isCant ? '<span class="hs-cant-badge" title="综合价值 &lt; 40，与脚本/Flyelep 无明显结合点">🚫 无法结合</span>' : '';
+    const isFeat = isAiFeatured(h);   // 🆕 今日值得追（高价值作图/视频能力）
+    const rowCls = [sel?'selected':'', isCant?'hs-cant':'', isInfo?'v3-info-row':'', isFeat?'hs-featured':''].filter(Boolean).join(' ');
+    const cantBadge = isCant ? '<span class="hs-cant-badge" title="这条热点跟你的账号 / Flyelep 暂时接不上">🚫 暂不推荐</span>' : '';
     // 🆕 严肃新闻标记
-    const seriousBadge = h.serious ? '<span class="hs-serious-badge" title="政治/纪念/灾难/事故类新闻，不建议蹭热度">⚠️ 不建议蹭</span>' : '';
+    const seriousBadge = h.serious ? '<span class="hs-serious-badge" title="政治 / 纪念 / 灾难 / 事故类新闻，建议不追">⚠️ 这条不建议追</span>' : '';
     // 🆕 V3 卡片字段：归属 pills（链路+探针）+ 谁用得上 + Flyelep 人话描述 + 3 维评分条
     const stagePills = (h.linkStages||[]).map(s=>`<span class="v3-pill v3-stage">${escapeHtml(s)}</span>`).join('');
     const probePills = (h.probes||[]).map(p=>`<span class="v3-pill v3-probe">${escapeHtml(p)}</span>`).join('');
-    const infoBadge = isInfo ? '<span class="v3-pill v3-info" title="Flyelep 匹配度偏低，不直接产出内容">行业情报</span>' : '';
+    const infoBadge = isInfo ? '<span class="v3-pill v3-info" title="跟 Flyelep 暂时接不上，先了解趋势">只能参考</span>' : '';
     const belongRow = (stagePills||probePills||infoBadge)
       ? `<div class="v3-belong">${infoBadge}${stagePills}${probePills}</div>` : '';
     const whoRow = h.whoFor
       ? `<div class="v3-who"><span class="v3-k">谁用得上</span><span class="v3-v">${escapeHtml(h.whoFor)}</span></div>` : '';
     const flyRow = h.flyelepText
-      ? `<div class="v3-fly"><span class="v3-k">Flyelep</span><span class="v3-v">${escapeHtml(h.flyelepText)}</span></div>` : '';
+      ? `<div class="v3-fly"><span class="v3-k">Flyelep 能帮你</span><span class="v3-v">${escapeHtml(h.flyelepText)}</span></div>` : '';
     const _aud = h.audienceFit!=null ? h.audienceFit : 60;
     const _heat = h.heat||0;
     const _fit = h.fitScore||0;
     const _bar = v=>`<span class="v3-bar"><i style="width:${Math.max(0,Math.min(100,v))}%"></i></span>`;
     const scoreRow = `<div class="v3-scores">
-      <span class="v3-s"><span class="v3-k">画像</span>${_bar(_aud)}<b>${_aud}</b></span>
+      <span class="v3-s"><span class="v3-k">对你的匹配</span>${_bar(_aud)}<b>${_aud}</b></span>
       <span class="v3-s"><span class="v3-k">热度</span>${_bar(_heat)}<b>${_heat}</b></span>
-      <span class="v3-s"><span class="v3-k">Flyelep</span>${_bar(_fit)}<b>${_fit}</b></span>
+      <span class="v3-s"><span class="v3-k">跟 Flyelep 的匹配</span>${_bar(_fit)}<b>${_fit}</b></span>
     </div>`;
     const v3Block = (belongRow||whoRow||flyRow) ? belongRow+whoRow+flyRow+scoreRow : '';
     // 🆕 推荐 3 个可用画像：按命中 prefer 排序 ≥65
     const topPersonas = top3PersonasForAngle(h.angle||'其他', h.geoCat, h);
     const personaChips = topPersonas.length
-      ? `<div class="hs-personas">${topPersonas.map(p=>`<span class="persona-chip ${p.cls}" title="${escapeHtml(p.cat)} · 匹配 ${p.score}"><span class="pc-label">${escapeHtml(p.label)}</span><span class="pc-score">${p.score}</span></span>`).join('')}</div>`
+      ? `<div class="hs-personas">${topPersonas.map(p=>`<span class="persona-chip ${p.cls}" title="这条热点适合：${escapeHtml(p.cat)}"><span class="pc-label">${escapeHtml(p.label)}</span></span>`).join('')}</div>`
       : `<div class="hs-personas-empty">—</div>`;
     return `<tr${rowCls?' class="'+rowCls+'"':''} data-id="${h.id}">
       <td class="hs-cb"><input type="checkbox" data-hid="${h.id}" ${sel?'checked':''} onchange="toggleHotspotSelect('${h.id}', this.checked)"></td>
@@ -4916,6 +4959,7 @@ function renderHotspot(){
             ? `<a href="${h.url}" target="_blank" class="hs-title">${escapeHtml(h.title)}</a>`
             : `<div class="hs-title">${escapeHtml(h.title)}</div>`}
           ${isNew?'<span class="new-badge">🆕 新增</span>':''}
+          ${isFeat?'<span class="feat-badge" title="高价值 AI 作图/视频热点，建议直接追">🔥 今日值得追</span>':''}
           ${h.titleOrig?'<span class="i18n-badge" title="已自动翻译为中文">🌐</span>':''}
           ${cantBadge}
           ${seriousBadge}
@@ -4930,7 +4974,7 @@ function renderHotspot(){
         ${v3Block}
       </td>
       <td class="hs-grade">
-        <span class="grade-chip ${gCls}"><span class="gc-l">${gTxt}</span><span class="gc-s">级</span><span class="gc-n" title="${gv?('评级视角：'+gvLbl+' · 画像匹配 '+(pm??'-')):'综合价值'}">${dv}</span></span>
+        <span class="grade-chip ${gCls}"><span class="gc-l">${gTxt}</span><span class="gc-s">级</span><span class="gc-n" title="${gv?('评级视角：'+gvLbl+' · 跟你的匹配 '+(pm??'-')):'推荐度'}">${dv}</span></span>
       </td>
       <td class="hs-act">
         <button class="btn sm" onclick="toggleHsDetail('${h.id}')" title="查看评级理由 / 选题 / 脚本要点 / 素材清单">详情</button>
@@ -4941,7 +4985,7 @@ function renderHotspot(){
       ${h.topic?`<b>📌 视频选题</b><div>${escapeHtml(h.topic)}</div>`:''}
       ${h.script?`<b>🎬 脚本要点</b><div>${escapeHtml(h.script)}</div>`:''}
       ${h.material?`<b>🧰 素材清单</b><div>${escapeHtml(h.material)}</div>`:''}
-      ${h.reasons?`<b>🎯 评级理由</b><div>${escapeHtml(h.reasons)}</div>`:''}
+      ${h.reasons?`<b>🎯 为什么推荐给你</b><div>${escapeHtml(h.reasons)}</div>`:''}
       ${h.struct?`<b>推荐结构</b><div>${escapeHtml(h.struct)}</div>`:''}
       ${h.note?`<b>备注</b><div>${escapeHtml(h.note)}</div>`:''}
       ${h.url?`<b>链接</b><div><a href="${h.url}" target="_blank" style="color:var(--brand)">${escapeHtml(h.url)}</a></div>`:''}
@@ -5994,12 +6038,12 @@ async function scrapeHotFromApi(){
   }catch(e){ /* 不影响 DailyHotApi 结果 */ }
   if(btn){ btn.disabled=false; btn.textContent='🔥 一键扒热点'; }
   if(usedBase){
-    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心 AI 资讯', 'HN Show':'HN Show HN', '热门选品 / Hacker News':'热门选品 API', '电商资讯 / Hacker News':'电商资讯 API'};
+    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心', 'HN Show':'HN Show', '热门选品 / Hacker News':'热门选品', '电商资讯 / Hacker News':'电商资讯'};
     const src=srcMap[usedBase]||usedBase||'本地/云端';
     const all=state.hotspots;
     const cntA=a=>all.filter(h=>h.angle===a).length;
     const sab=all.filter(h=>['S','A','B'].includes(h.grade)).length;
-    el.textContent='✅ 本次新增 '+total+' 条（来源：'+src+'）｜库内共 '+all.length+' 条：带货 '+cntA('带货')+' · 蹭热 '+cntA('蹭热')+' · 痛点规则 '+cntA('痛点规则')+' · 节日 '+cntA('节日')+' · 其他 '+cntA('其他')+'｜S/A 级可用 '+sab+' 条（默认按综合价值展示全部，不再隐藏非电商）'+(errors.length?'；失败：'+errors.join('/'):'');
+    el.textContent='✅ 本次新增 '+total+' 条（来源：'+src+'）｜库内共 '+all.length+' 条：带货 '+cntA('带货')+' · 蹭热 '+cntA('蹭热')+' · 卖家避坑提醒 '+cntA('痛点规则')+' · 节日 '+cntA('节日')+' · 其他 '+cntA('其他')+'｜S/A 级可用 '+sab+' 条（默认按推荐度展示全部）'+(errors.length?'；失败：'+errors.join('/'):'');
     el.className='feed-status ok';
     toast('扒取到 '+total+' 条新热点');
     // 🆕 顶部"新增快报"横幅 —— 8 秒后自动收起；用户点"立即查看"切到本次新增 + 新增时间排序
@@ -6149,36 +6193,48 @@ async function fetchNewsHN(){
   return added;
 }
 
-/* 国内 AI 资讯 RSS（机器之心 / 新智元）通过后端 /api/rss 代理 */
+/* AI 资讯 RSS：国内 + 国际（官方/高质量博客），解决 image2.5 / Sora 2 / GPT-5 等国际大模型新品抓不到的问题
+ * 通过后端 /api/rss 代理（任意 URL），按 market 区分国内/海外，让 V3 评分正确派类目 */
 const AI_RSS_SOURCES=[
-  {url:'https://www.qbitai.com/feed', name:'量子位'}
+  {url:'https://www.qbitai.com/feed', name:'量子位', market:'国内'},
+  {url:'https://www.jiqizhixin.com/rss', name:'机器之心', market:'国内'},
+  // 🆕 国际官方 / 高质量源（英文标题由 AI_CAPABILITY_KW 能力映射识别作图/视频/大模型）
+  {url:'https://openai.com/news/rss.xml', name:'OpenAI 官方', market:'海外'},
+  {url:'https://www.anthropic.com/news/rss.xml', name:'Anthropic 官方', market:'海外'},
+  {url:'https://simonwillison.net/atom/everything/', name:'Simon Willison', market:'海外'},
+  {url:'https://techcrunch.com/category/artificial-intelligence/feed/', name:'TechCrunch AI', market:'海外'},
+  {url:'https://www.therundown.ai/feed', name:'The Rundown AI', market:'海外'},
+  {url:'https://blog.google/technology/ai/rss/', name:'Google AI Blog', market:'海外'}
 ];
+// 🆕 并行抓取所有 AI RSS 源（单源失败不影响其他；9s 超时防拖垮「一键扒热点」）
 async function fetchAIRSS(){
   if(!API_BASE) return 0;
-  let total=0;
-  for(const src of AI_RSS_SOURCES){
+  const today=todayStr();
+  const jobs=AI_RSS_SOURCES.map(async src=>{
     try{
-      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),12000);
+      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),9000);
       const r=await fetch(API_BASE.replace(/\/$/,'')+'/api/rss?url='+encodeURIComponent(src.url),{signal:ctrl.signal});
       clearTimeout(to);
-      if(!r.ok) continue;
+      if(!r.ok) return 0;
       const j=await r.json();
-      const items=(j.data||[]); if(!items.length) continue;
-      const today=todayStr();
-      for(const d of items.slice(0,15)){
+      const items=(j.data||[]); if(!items.length) return 0;
+      let add=0;
+      for(const d of items.slice(0,10)){
         const o={
-          date:today, type:'ai', source:src.name, market:'国内', platform:src.name,
+          date:today, type:'ai', source:src.name, market:src.market||'国内', platform:src.name,
           title:String(d.title||'').slice(0,140), url:d.url||'',
           product:'', category:'', price:'', sales:'',
           heat: heatFromRecency(d.date||d.pubDate, 15),
           playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
           status:'pending', note:'AI 资讯'
         };
-        total += mergeFeed([evalHotspot(o)]);
+        add += mergeFeed([evalHotspot(o)]);
       }
-    }catch(_){}
-  }
-  return total;
+      return add;
+    }catch(_){ return 0; }
+  });
+  const res=await Promise.all(jobs);
+  return res.reduce((a,b)=>a+b,0);
 }
 
 /* 🆕 热门选品 API：Hacker News 选品/bestseller/trending product 关键词
