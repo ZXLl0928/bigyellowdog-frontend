@@ -229,20 +229,13 @@ a.hs-title:hover{background-size:100% 100%;color:#9a3412}
 .hs-personas-empty{color:#c4c0b8;font-size:11px;font-weight:600;margin-top:3px}
 .persona-chip{display:inline-flex;align-items:center;gap:5px;padding:2px 8px 2px 9px;background:#fff;border:1px solid;border-radius:6px;font-size:11.5px;font-weight:600;letter-spacing:.1px;line-height:1.45;transition:all .15s;cursor:default}
 .persona-chip .pc-label{white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
-.persona-chip .pc-score{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:15px;padding:0 4px;border-radius:3px;font-size:10.5px;font-weight:700;font-feature-settings:"tnum";background:rgba(255,255,255,.7);color:#1f1611}
 .persona-chip.cat-dn{border-color:#bfd4ff;color:#1a56a3;background:#eff5ff}
-.persona-chip.cat-dn .pc-score{background:#d6e3fb;color:#1a56a3}
 .persona-chip.cat-cross{border-color:#f0c674;color:#7c3a00;background:#fff8e6}
-.persona-chip.cat-cross .pc-score{background:#ffe8b8;color:#7c3a00}
 .persona-chip.cat-b2b{border-color:#f8c6a0;color:#a04000;background:#fff3e6}
 .persona-chip.cat-serious{border-color:#d8d3cc;color:#8b8478;background:#f5f3ee;opacity:.85;font-style:italic}
-.persona-chip.cat-serious .pc-score{background:#e8e3da;color:#8b8478}
 .hs-serious-badge{display:inline-block;padding:1px 6px;border-radius:4px;background:#fff0eb;color:#b14745;font-size:10px;font-weight:600;margin-left:4px;vertical-align:middle;border:1px solid #f5d5cd}
-.persona-chip.cat-b2b .pc-score{background:#ffd9b0;color:#a04000}
 .persona-chip.cat-media{border-color:#d0b0f0;color:#5b2d8a;background:#f5f0fa}
-.persona-chip.cat-media .pc-score{background:#e0c8f5;color:#5b2d8a}
 .persona-chip.cat-saas{border-color:#f0b8d0;color:#8a2d5b;background:#fce8f0}
-.persona-chip.cat-saas .pc-score{background:#f5c8e0;color:#8a2d5b}
 .persona-chip:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.06)}
 /* Flyelep 角度行：紧凑小灰条（已不再在标题列下展示，保留类以兼容历史数据） */
 .hs-angle{display:flex;align-items:center;gap:6px;margin-top:3px;padding:3px 8px;background:#f5f5f0;border:1px solid #e6e4dc;border-left:2px solid #a855f7;border-radius:5px;font-size:11px;line-height:1.45;color:#5b6470;word-break:break-word}
@@ -2445,7 +2438,7 @@ ${rules}${fewShotBlock}${learnedBlock}
 - 标题：${h.title||'(无)'}
 - 类型：${(HOT_TYPES[h.type]&&HOT_TYPES[h.type][2])||h.type||'热点'}
 - 来源：${h.source} (${h.market||'全球'} · ${h.platform||''})
-- 玩法类型：${h.angle||'-'}（综合价值 ${h.value||0} · 等级 ${h.grade||'-'} · 热度 ${h.heat||0}）
+- 玩法类型：${h.angle||'-'}（推荐度 ${h.value||0} · 等级 ${h.grade||'-'} · 热度 ${h.heat||0}）
 - 可挂钩商品：${h.product||'(待定)'}（${h.category||'品类未填'}）
 - 价格/销量线索：${h.price||''} ${h.sales||''}
 - 玩法描述：${h.playbook||'(无)'}
@@ -4624,7 +4617,7 @@ function gradeViewCat(){
 // 填充「评级视角」下拉：通用 + 5 类目通用 + 按类目分组 26 个终端画像
 function populateGradeView(){
   const sel=$('#gradeView'); if(!sel) return;
-  let html='<option value="">🎯 评级视角：通用（不区分卖家）</option>';
+  let html='<option value="">🎯 推荐视角：通用（不区分卖家）</option>';
   for(const g of PERSONA_TREE){
     html+=`<option value="cat:${g.cat}">${g.cat}卖家（通用）</option>`;
   }
@@ -4851,10 +4844,10 @@ function renderHotspot(){
   const avgValue = arr.length ? Math.round(arr.reduce((s,h)=>s+valOf(h),0)/arr.length) : 0;
   const archivedCount = (state.hotspots||[]).filter(h=>h.archived).length;
   const liveCount = (state.hotspots||[]).filter(h=>!h.archived).length;
-  const gvSub = gv ? ` · 评级视角：<b style="color:#0b3d80">${gvLbl}</b>` : '';
+  const gvSub = gv ? ` · 推荐视角：<b style="color:#0b3d80">${gvLbl}</b>` : '';
   $('#hotspotKpiGrid').innerHTML=`
     <div class="kpi"><span class="glow"></span><div class="lbl"><span class="ico">📋</span>显示条数</div><div class="num">${arr.length}<span class="kpi-cap">/ 20</span></div><div class="sub">${_showArchived?'归档视图':'本分类综合 Top'} · 库内 ${liveCount}${archivedCount>0?` · 已归档 <b style="color:#b45309">${archivedCount}</b>`:''}${gvSub}</div></div>
-    <div class="kpi b2"><span class="glow"></span><div class="lbl"><span class="ico">📊</span>平均价值</div><div class="num">${avgValue}</div><div class="sub">${arr.length} 条${gv?`· 视角：${gvLbl}`:'综合价值均值'}</div></div>
+    <div class="kpi b2"><span class="glow"></span><div class="lbl"><span class="ico">📊</span>平均推荐度</div><div class="num">${avgValue}</div><div class="sub">${arr.length} 条${gv?`· 视角：${gvLbl}`:'推荐度均值'}</div></div>
     <div class="kpi b3"><span class="glow"></span><div class="lbl"><span class="ico">⭐</span>S / A 级</div><div class="num">${sa}</div><div class="sub">${arr.length} 条中的高价值</div></div>
     <div class="kpi b4"><span class="glow"></span><div class="lbl"><span class="ico">🆕</span>24h 新增</div><div class="num">${new24}</div><div class="sub">${_showArchived?'归档中新增':'本 Tab 内'}</div></div>
   `;
@@ -4974,10 +4967,10 @@ function renderHotspot(){
         ${v3Block}
       </td>
       <td class="hs-grade">
-        <span class="grade-chip ${gCls}"><span class="gc-l">${gTxt}</span><span class="gc-s">级</span><span class="gc-n" title="${gv?('评级视角：'+gvLbl+' · 跟你的匹配 '+(pm??'-')):'推荐度'}">${dv}</span></span>
+        <span class="grade-chip ${gCls}"><span class="gc-l">${gTxt}</span><span class="gc-s">级</span><span class="gc-n" title="${gv?('推荐视角：'+gvLbl+' · 跟你的匹配 '+(pm??'-')):'推荐度'}">${dv}</span></span>
       </td>
       <td class="hs-act">
-        <button class="btn sm" onclick="toggleHsDetail('${h.id}')" title="查看评级理由 / 选题 / 脚本要点 / 素材清单">详情</button>
+        <button class="btn sm" onclick="toggleHsDetail('${h.id}')" title="查看为什么推荐给你 / 选题 / 脚本要点 / 素材清单">详情</button>
         <button class="btn sm primary" onclick="genFromRow('${h.id}')">生成</button>
         <button class="btn sm danger" onclick="deleteHotspot('${h.id}')">删</button>
       </td>
@@ -5749,7 +5742,7 @@ function deriveFlyelepText(h){
   }
   // 用 fitScore 判断：调用本函数时 flyelepTier 尚未赋值（value 计算在后面），不能依赖它
   if((h.fitScore!=null && h.fitScore<40) || h.flyelepTier === 'industry-info'){
-    return '不直接出内容，仅作行业情报';
+    return '还不能直接产出内容，只能先参考';
   }
   return h.flyelepAngle || '';
 }
@@ -5812,7 +5805,7 @@ function evalHotspot(h){
   else { baseScores = {带货:55, 蹭热:55, 痛点规则:45, 节日:35, 其他:55}; }
   h.angleScores = baseScores;
   h.serious = isSerious;
-  if(isSerious){ h.flyelepAngle='⚠️ 严肃新闻（政治/纪念/灾难/事故）——不建议蹭热度做营销内容'; }
+  if(isSerious){ h.flyelepAngle='⚠️ 严肃新闻（政治/纪念/灾难/事故）——这条不建议追，别拿来做营销'; }
   // 🆕 V3 链路环节 + 需求探针 + 谁用得上 + Flyelep 人话描述
   h.linkStages = classifyLinkStage(fullText);
   h.probes = classifyProbe(fullText);
