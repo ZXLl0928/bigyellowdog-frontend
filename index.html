@@ -174,7 +174,7 @@ td .pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:100px
 .badge-grade.g-A{background:#e8a33d;color:#fff}
 .badge-grade.g-B{background:#6fa8d6;color:#fff}
 .badge-grade.g-C{background:#cfcdc4;color:#54534e}
-/* 🆕 无法结合：grade=C 行灰色遮罩 + 角标 */
+/* 🆕 暂不推荐：grade=C 行灰色遮罩 + 角标 */
 tr.hs-cant{opacity:.55;background:#fafaf7!important}
 tr.hs-cant .hs-title{color:#9a958c;text-decoration:line-through}
 .hs-cant-badge{display:inline-block;padding:1px 6px;border-radius:4px;background:#e8e6df;color:#9a958c;font-size:10px;font-weight:600;margin-left:4px;vertical-align:middle}
@@ -327,7 +327,7 @@ tr:hover td{background:#fbfaf7}
 }
 .feed-status{font-size:12px;color:var(--ink2)}
 .feed-status.ok{color:var(--ok)} .feed-status.warn{color:var(--warn)}
-/* 筛选工具条 + 批量操作 — 突出评级视角 */
+/* 筛选工具条 + 批量操作 — 突出推荐视角 */
 .filter-bar{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;margin:0 0 10px;padding:10px 12px;background:#fafaf6;border:1px solid var(--line);border-radius:12px}
 .filter-bar .lbl{font-size:12px;color:var(--muted);margin-right:2px;font-weight:600}
 .filter-bar .gv-hero{display:flex;align-items:center;gap:12px;padding:8px 14px 8px 12px;background:linear-gradient(135deg,#eef4ff 0%,#f3f0ff 100%);border:1px solid #b8caf5;border-radius:10px;box-shadow:0 1px 3px rgba(26,86,163,.08)}
@@ -1136,7 +1136,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <button class="v3-chip ${_aiSub==='llm'?'on':''}" onclick="setAiSub('llm')" type="button">🤖 大模型</button>
         </div>
       </div>
-      <!-- 简化筛选器：聚焦「评级视角」+ 高级筛选开关 + 库管 -->
+      <!-- 简化筛选器：聚焦「推荐视角」+ 高级筛选开关 + 库管 -->
       <div class="filter-bar">
         <div class="gv-hero">
           <span class="gv-icon">🎯</span>
@@ -2438,7 +2438,7 @@ ${rules}${fewShotBlock}${learnedBlock}
 - 标题：${h.title||'(无)'}
 - 类型：${(HOT_TYPES[h.type]&&HOT_TYPES[h.type][2])||h.type||'热点'}
 - 来源：${h.source} (${h.market||'全球'} · ${h.platform||''})
-- 玩法类型：${h.angle||'-'}（推荐度 ${h.value||0} · 等级 ${h.grade||'-'} · 热度 ${h.heat||0}）
+- 玩法类型：${(angleMap[h.angle]&&angleMap[h.angle][1])||h.angle||'-'}（推荐度 ${h.value||0} · 等级 ${h.grade||'-'} · 热度 ${h.heat||0}）
 - 可挂钩商品：${h.product||'(待定)'}（${h.category||'品类未填'}）
 - 价格/销量线索：${h.price||''} ${h.sales||''}
 - 玩法描述：${h.playbook||'(无)'}
@@ -4591,7 +4591,7 @@ function top3PersonasForAngle(angle, geoCat, h){
   }
   return out.slice(0,3);
 }
-// 取当前「评级视角」画像（列表下拉）
+// 取当前「推荐视角」画像（列表下拉）
 function getGradeViewPersona(){
   const v=$('#gradeView')?.value||'';
   if(!v) return null;
@@ -4614,7 +4614,7 @@ function gradeViewCat(){
   if(v.startsWith('key:')) return PERSONA_CAT_BY_KEY[v.slice(4)]?.cat || '';
   return '';
 }
-// 填充「评级视角」下拉：通用 + 5 类目通用 + 按类目分组 26 个终端画像
+// 填充「推荐视角」下拉：通用 + 5 类目通用 + 按类目分组 26 个终端画像
 function populateGradeView(){
   const sel=$('#gradeView'); if(!sel) return;
   let html='<option value="">🎯 推荐视角：通用（不区分卖家）</option>';
@@ -4689,7 +4689,7 @@ const PLAT_RULES={
   ]
 };
 
-/* ========== V3 筛选区：用户画像（能力维度，最突出）+ 链路环节 ==========
+/* ========== V3 筛选区：用户画像（能力维度，最突出）+ 热点环节 ==========
  * 用户画像筛选按 Flyelep 能力类别筛（"这条热点对谁有用"），而非身份维度（"我是 Amazon 卖家"）
  */
 const V3_PERSONA_FILTERS=[
@@ -4738,7 +4738,7 @@ function renderHotspot(){
         fst=$('#filterHStatus')?.value||'',
         fk=$('#filterHKeyword')?.value.toLowerCase()||'',
         onlyNew=$('#onlyNewBtn')?.classList.contains('on')||false,
-        onlyBindable=true,    // 🆕 默认隐藏 grade=C「无法结合」（UI 已隐藏「只看可结合」按钮；C 级永不显示，但保留后门）
+        onlyBindable=true,    // 🆕 默认隐藏 grade=C「暂不推荐」（UI 已隐藏「只看可结合」按钮；C 级永不显示，但保留后门）
         sortBy=$('#sortBy')?.value||'value';
   // 补全老数据评级（无 value/heat/angle 字段时实时计算一次）；同步补 geoCat
   // 升级后：geoCat 强制重算（之前兜底错的『内容自媒体』会重新派到正确类目）
@@ -4776,7 +4776,7 @@ function renderHotspot(){
   }
 
   // 1) Tab 过滤（用户硬性需求：点 Tab 看到对应分类的排行榜）
-  // 🆕 V3 用户画像筛选（能力维度）+ 链路环节筛选
+  // 🆕 V3 用户画像筛选（能力维度）+ 热点环节筛选
   if(_v3Persona && _v3Persona!=='all') arr=arr.filter(h=>(h.flyelepCapabilities||[]).includes(_v3Persona));
   if(_v3Stage && _v3Stage!=='all') arr=arr.filter(h=>(h.linkStages||[]).includes(_v3Stage));
   if(_hotTab && _hotTab!=='all') arr=arr.filter(h=>tabOfHot(h)===_hotTab);
@@ -4794,7 +4794,7 @@ function renderHotspot(){
   if(ff) arr=arr.filter(h=>h.flyelepFit===ff);
   if(fm) arr=arr.filter(h=>h.market===fm);
   if(fst) arr=arr.filter(h=>h.status===fst);
-  // 🎯 默认隐藏 grade=C「无法结合」（用户取消勾选时才显示并打灰色遮罩）
+  // 🎯 默认隐藏 grade=C「暂不推荐」（用户取消勾选时才显示并打灰色遮罩）
   if(onlyBindable) arr=arr.filter(h=>h.grade!=='C');
   // 3) 「本次新增」精确筛选 / 24h 新增筛选
   if(_onlyThisBatch && _lastMergeIds.length){
@@ -4805,7 +4805,7 @@ function renderHotspot(){
   }
 
   // ===== 排序 =====
-  const gv=getGradeViewPersona();          // 🆕 评级视角画像（null=通用）
+  const gv=getGradeViewPersona();          // 🆕 推荐视角画像（null=通用）
   const gvLbl=gradeViewLabel();
   const gvCat=gradeViewCat();
   if(sortBy==='heat'){
@@ -4826,7 +4826,7 @@ function renderHotspot(){
     });
   }
 
-  // ===== Top 20 截断（用户硬性需求：每个 Tab 内只显示综合价值前 20 条） =====
+  // ===== Top 20 截断（用户硬性需求：每个 Tab 内只显示推荐度前 20 条） =====
   arr = arr.slice(0, 20);
   // 🆕 仅看 24h 内新增；或本次新增（更精确，只显示本次扒取的那批）
   if(_onlyThisBatch && _lastMergeIds.length){
@@ -4913,7 +4913,7 @@ function renderHotspot(){
     const featLabel=(FLYELEP_FEATURES.find(f=>f.key===h.flyelepFeature)||{}).label;
     const origHint = h.titleOrig && h.titleOrig!==h.title ? `title="🌐 原文：${escapeHtml(h.titleOrig)}"` : '';
     const isCant = h.grade==='C';
-    const isInfo = h.flyelepTier==='industry-info';   // 🆕 V3 行业情报行（Flyelep 匹配度低，不占 Top）
+    const isInfo = h.flyelepTier==='industry-info';   // 🆕 V3 只能参考行（Flyelep 匹配度低，不占 Top）
     const isFeat = isAiFeatured(h);   // 🆕 今日值得追（高价值作图/视频能力）
     const rowCls = [sel?'selected':'', isCant?'hs-cant':'', isInfo?'v3-info-row':'', isFeat?'hs-featured':''].filter(Boolean).join(' ');
     const cantBadge = isCant ? '<span class="hs-cant-badge" title="这条热点跟你的账号 / Flyelep 暂时接不上">🚫 暂不推荐</span>' : '';
@@ -5034,7 +5034,7 @@ function renderHotMarquee(){
     const title=(h.title||'').slice(0,32);
     const featLabel=(FLYELEP_FEATURES.find(f=>f.key===h.flyelepFeature)||{}).label || (h.flyelepFeature?'':'通用 AI');
     const angleTag = featLabel? `<span class="flyelep-tag" title="${escapeHtml(h.flyelepAngle||'')}">🎯 ${escapeHtml(featLabel)}</span>`:'';
-    const aTag = h.angle? `<span class="angle-tag">${escapeHtml(h.angle)}</span>`:'';
+    const aTag = (angleMap[h.angle]&&angleMap[h.angle][1])? `<span class="angle-tag">${escapeHtml(angleMap[h.angle][1])}</span>`:'';
     return `<span class="marquee-item" data-id="${h.id}" onclick="scrollToHotspot('${h.id}')" title="${escapeHtml((h.title||'')+ (h.flyelepAngle?'\n\n🎯 Flyelep 角度：'+h.flyelepAngle:''))}">`
          + `<span class="grade ${h.grade||''}">${h.grade||'?'}</span>`
          + aTag
@@ -5679,8 +5679,8 @@ const CONTENT_MATCHERS=[
   {kw:/双\s?11|双11|双\s?12|618|618\s?大促|99\s?大促|99\s?划算节|99节|黑五|网一|cyber\s?monday|boxing\s?day|情人节|七夕|圣诞|春节|年货|元宵|端午|中秋|国庆|新年|女王节|妇女节|女神节|母亲节|父亲节|教师节|感恩节|万圣节|复活节/i, score:75, name:'节日/营销节点',
    keys:['淘宝/天猫·精品运营','抖音电商·直播带货','小红书·生活方式种草','抖音/视频号·知识口播']},
 ];
-/* ================== V3 链路环节分类器（7 环节）+ 需求探针分类器（5 探针）==================
- * 链路环节：电商决策链路上"这条热点属于哪一段"——平台选品/成本评估/风险评估/内容生成/自动上架/销售反馈/供应链
+/* ================== V3 热点环节分类器（7 环节）+ 需求探针分类器（5 探针）==================
+ * 热点环节：电商决策链路上"这条热点属于哪一段"——平台选品/成本评估/风险评估/内容生成/自动上架/销售反馈/供应链
  * 需求探针：这条热点"能满足电商用户哪个在意点"——用户角度/价格敏感/行业趋势/产品优势/渠道优势
  * 两者基于标题/笔记/剧本关键词命中，可命中 0-N 个标签
  */
@@ -5734,7 +5734,7 @@ function deriveWhoFor(h){
 /* V3 「Flyelep 怎么用」人话版（去 B 精确/全栈提升标签）—— 用户截图反馈：内部代号看不懂
  * - fullstack(2+ 类别命中) → "Flyelep 接入后所有相关能力升级"
  * - precise(1 类别) → 直接复用 FLYELEP_ANGLE 模板（已含功能名 + 场景）
- * - weak(<40 fitScore) �� "不直接出内容，仅作行业情报"
+ * - weak(<40 fitScore) �� "不直接出内容，仅作只能参考"
  */
 function deriveFlyelepText(h){
   if(h.flyelepMode === 'fullstack'){
@@ -5789,7 +5789,7 @@ function evalHotspot(h){
   h.flyelepMode=fv.mode||'precise';            // 🆕 V3: fullstack(全栈升级) / precise(精准匹配) / weak(弱相关)
   h.flyelepFit = fv.score>=80?'强' : fv.score>=55?'中' : '弱';
   const fitScore=fv.score;   // V3 scoreFlyelep 已直接返回 30-100 的 fitScore
-  h.fitScore=fitScore;   // 🆕 存分量，供「评级视角」展示层重算
+  h.fitScore=fitScore;   // 🆕 存分量，供「推荐视角」展示层重算
   // 玩法类型（仅显示标签，不影响 value）
   const angle=classifyAngle(h, h.heat, fv);
   h.angle=angle;
@@ -5806,7 +5806,7 @@ function evalHotspot(h){
   h.angleScores = baseScores;
   h.serious = isSerious;
   if(isSerious){ h.flyelepAngle='⚠️ 严肃新闻（政治/纪念/灾难/事故）——这条不建议追，别拿来做营销'; }
-  // 🆕 V3 链路环节 + 需求探针 + 谁用得上 + Flyelep 人话描述
+  // 🆕 V3 热点环节 + 需求探针 + 谁用得上 + Flyelep 人话描述
   h.linkStages = classifyLinkStage(fullText);
   h.probes = classifyProbe(fullText);
   h.whoFor = deriveWhoFor(h);
@@ -5821,17 +5821,17 @@ function evalHotspot(h){
   // 画像分先用基础 60 占位，待用户画像分类器上线后接账号定位匹配
   const audienceFit=h.audienceFit!=null ? h.audienceFit : 60;
   let value=Math.round(0.40*audienceFit + 0.40*(h.heat||50) + 0.20*fitScore);
-  // 🆕 V3 低匹配封顶：Flyelep<40 时封顶 59(B 级)并降级为「行业情报」——防高画像+高热度但用不上的热点霸屏
+  // 🆕 V3 低匹配封顶：Flyelep<40 时封顶 59(B 级)并降级为「只能参考」——防高画像+高热度但用不上的热点霸屏
   if(fitScore<40) value=Math.min(value, 59);
   // 严肃新闻大幅降级（基础分 ≤ 35），避免与正常热点混排
   if(isSerious) value = Math.min(value, 35);
   value=Math.min(100, Math.max(0, value));
   h.value=value;
-  // 🆕 V3 双轨分组标记：industry-info → 行业情报(不占 Top) / content-ready → 可出内容(进 Top)
+  // 🆕 V3 双轨分组标记：industry-info → 只能参考(不占 Top) / content-ready → 可出内容(进 Top)
   h.flyelepTier = fitScore<40 ? 'industry-info' : 'content-ready';
   // 等级由综合可发价值决定
   h.grade = value>=80?'S' : value>=60?'A' : value>=40?'B' : 'C';
-  // 评级理由
+  // 推荐理由
   const reasons=[];
   if(isSerious){ reasons.push('⚠️ 严肃新闻'); }
   reasons.push('🔥 热度 '+(h.heat||0));
@@ -6353,7 +6353,7 @@ async function fetchShowHN(){
 /* ================== Init ================== */
 (async function init(){
   load();
-  populateGradeView();   // 🆕 填充「评级视角」下拉
+  populateGradeView();   // 🆕 填充「推荐视角」下拉
   try{   // 包裹：任何初始化异常都不能阻断末尾的 initCloud()（云端 UI + 登录框）
   // 恢复上次的数据文件句柄（浏览器已授权时直接重连，无需重选）
   if(supportsFS()){
