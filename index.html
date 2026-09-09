@@ -1158,7 +1158,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <option value="">全部玩法</option>
           <option value="带货">🔥 带货</option>
           <option value="蹭热">🌊 蹭热度</option>
-          <option value="痛点规则">🛡️ 卖家避坑提醒</option>
+          <option value="卖家避坑提醒">🛡️ 卖家避坑提醒</option>
           <option value="节日">🎉 节日</option>
           <option value="其他">📦 其他</option>
         </select>
@@ -4421,41 +4421,41 @@ const PERSONA_TREE = [
 ];
 
 // 🆕 评级用：画像对 5 类玩法的偏好权重（0-100），命中热点 angle 即该值
-const DEF_PREFER = {带货:60,蹭热:50,痛点规则:55,节日:55,其他:45};
+const DEF_PREFER = {带货:60,蹭热:50,卖家避坑提醒:55,节日:55,其他:45};
 const CAT_DEFAULT_PREFER = {
-  '国内电商':{带货:80,蹭热:60,痛点规则:55,节日:75,其他:45},
-  '跨境电商（出口）':{带货:75,蹭热:40,痛点规则:70,节日:55,其他:40},
-  '外贸 B2B':{带货:45,蹭热:30,痛点规则:70,节日:40,其他:35},
-  '内容自媒体':{带货:65,蹭热:80,痛点规则:65,节日:65,其他:75},
-  '服务/SaaS':{带货:50,蹭热:55,痛点规则:70,节日:45,其他:70},
+  '国内电商':{带货:80,蹭热:60,卖家避坑提醒:55,节日:75,其他:45},
+  '跨境电商（出口）':{带货:75,蹭热:40,卖家避坑提醒:70,节日:55,其他:40},
+  '外贸 B2B':{带货:45,蹭热:30,卖家避坑提醒:70,节日:40,其他:35},
+  '内容自媒体':{带货:65,蹭热:80,卖家避坑提醒:65,节日:65,其他:75},
+  '服务/SaaS':{带货:50,蹭热:55,卖家避坑提醒:70,节日:45,其他:70},
 };
 const PERSONA_PREFER = {
-  '淘宝/天猫·静默铺货':{带货:85,蹭热:55,痛点规则:50,节日:70,其他:40},
-  '淘宝/天猫·精品运营':{带货:88,蹭热:60,痛点规则:70,节日:78,其他:50},
-  '拼多多·爆款铺货':{带货:90,蹭热:35,痛点规则:55,节日:80,其他:35},
-  '抖音电商·短视频带货':{带货:90,蹭热:85,痛点规则:60,节日:82,其他:55},
-  '抖音电商·直播带货':{带货:92,蹭热:88,痛点规则:72,节日:85,其他:55},
-  '小红书电商·种草博主':{带货:85,蹭热:88,痛点规则:55,节日:85,其他:70},
-  '国内美工设计':{带货:80,蹭热:55,痛点规则:35,节日:60,其他:55},
-  '亚马逊·精品FBA':{带货:82,蹭热:30,痛点规则:78,节日:55,其他:50},
-  '亚马逊·精铺多店':{带货:80,蹭热:30,痛点规则:60,节日:50,其他:40},
-  '亚马逊·铺货老卖家':{带货:65,蹭热:25,痛点规则:55,节日:40,其他:35},
-  '亚马逊·Listing美工':{带货:80,蹭热:50,痛点规则:35,节日:55,其他:50},
-  'TikTok Shop·美区达人':{带货:88,蹭热:85,痛点规则:75,节日:80,其他:70},
-  'TikTok Shop·东南亚小店':{带货:85,蹭热:60,痛点规则:55,节日:65,其他:55},
-  'Temu/SHEIN·全托管供货':{带货:85,蹭热:30,痛点规则:78,节日:80,其他:35},
-  'Shopee/Lazada·东南亚多店':{带货:82,蹭热:55,痛点规则:60,节日:78,其他:45},
-  '速卖通/eBay·铺货玩家':{带货:70,蹭热:30,痛点规则:55,节日:55,其他:40},
-  'Shopify独立站·投流型':{带货:85,蹭热:55,痛点规则:72,节日:55,其他:55},
-  'Shopify独立站·品牌DTC':{带货:82,蹭热:55,痛点规则:55,节日:78,其他:75},
-  '跨境培训/服务商·讲师/陪跑':{带货:55,蹭热:60,痛点规则:85,节日:50,其他:80},
-  '外贸工厂·阿里国际站':{带货:55,蹭热:25,痛点规则:60,节日:50,其他:40},
-  '外贸SOHO/小公司·询盘转化':{带货:50,蹭热:25,痛点规则:80,节日:35,其他:45},
-  '抖音/视频号·知识口播':{带货:55,蹭热:82,痛点规则:82,节日:55,其他:80},
-  '小红书·生活方式种草':{带货:78,蹭热:88,痛点规则:55,节日:82,其他:82},
-  'B站/YouTube·中视频创作者':{带货:55,蹭热:80,痛点规则:55,节日:55,其他:82},
-  '代运营公司·项目经理':{带货:55,蹭热:55,痛点规则:78,节日:50,其他:78},
-  'SaaS/营销工具·服务商':{带货:55,蹭热:55,痛点规则:60,节日:45,其他:82},
+  '淘宝/天猫·静默铺货':{带货:85,蹭热:55,卖家避坑提醒:50,节日:70,其他:40},
+  '淘宝/天猫·精品运营':{带货:88,蹭热:60,卖家避坑提醒:70,节日:78,其他:50},
+  '拼多多·爆款铺货':{带货:90,蹭热:35,卖家避坑提醒:55,节日:80,其他:35},
+  '抖音电商·短视频带货':{带货:90,蹭热:85,卖家避坑提醒:60,节日:82,其他:55},
+  '抖音电商·直播带货':{带货:92,蹭热:88,卖家避坑提醒:72,节日:85,其他:55},
+  '小红书电商·种草博主':{带货:85,蹭热:88,卖家避坑提醒:55,节日:85,其他:70},
+  '国内美工设计':{带货:80,蹭热:55,卖家避坑提醒:35,节日:60,其他:55},
+  '亚马逊·精品FBA':{带货:82,蹭热:30,卖家避坑提醒:78,节日:55,其他:50},
+  '亚马逊·精铺多店':{带货:80,蹭热:30,卖家避坑提醒:60,节日:50,其他:40},
+  '亚马逊·铺货老卖家':{带货:65,蹭热:25,卖家避坑提醒:55,节日:40,其他:35},
+  '亚马逊·Listing美工':{带货:80,蹭热:50,卖家避坑提醒:35,节日:55,其他:50},
+  'TikTok Shop·美区达人':{带货:88,蹭热:85,卖家避坑提醒:75,节日:80,其他:70},
+  'TikTok Shop·东南亚小店':{带货:85,蹭热:60,卖家避坑提醒:55,节日:65,其他:55},
+  'Temu/SHEIN·全托管供货':{带货:85,蹭热:30,卖家避坑提醒:78,节日:80,其他:35},
+  'Shopee/Lazada·东南亚多店':{带货:82,蹭热:55,卖家避坑提醒:60,节日:78,其他:45},
+  '速卖通/eBay·铺货玩家':{带货:70,蹭热:30,卖家避坑提醒:55,节日:55,其他:40},
+  'Shopify独立站·投流型':{带货:85,蹭热:55,卖家避坑提醒:72,节日:55,其他:55},
+  'Shopify独立站·品牌DTC':{带货:82,蹭热:55,卖家避坑提醒:55,节日:78,其他:75},
+  '跨境培训/服务商·讲师/陪跑':{带货:55,蹭热:60,卖家避坑提醒:85,节日:50,其他:80},
+  '外贸工厂·阿里国际站':{带货:55,蹭热:25,卖家避坑提醒:60,节日:50,其他:40},
+  '外贸SOHO/小公司·询盘转化':{带货:50,蹭热:25,卖家避坑提醒:80,节日:35,其他:45},
+  '抖音/视频号·知识口播':{带货:55,蹭热:82,卖家避坑提醒:82,节日:55,其他:80},
+  '小红书·生活方式种草':{带货:78,蹭热:88,卖家避坑提醒:55,节日:82,其他:82},
+  'B站/YouTube·中视频创作者':{带货:55,蹭热:80,卖家避坑提醒:55,节日:55,其他:82},
+  '代运营公司·项目经理':{带货:55,蹭热:55,卖家避坑提醒:78,节日:50,其他:78},
+  'SaaS/营销工具·服务商':{带货:55,蹭热:55,卖家避坑提醒:60,节日:45,其他:82},
 };
 // 由树生成 平台·类型 → profile 映射 & 一级兜底（含 prefer）
 const PERSONA_MAP = {};
@@ -4744,6 +4744,8 @@ function renderHotspot(){
   // 升级后：geoCat 强制重算（之前兜底错的『内容自媒体』会重新派到正确类目）
   let needSave=false;
   for(const h of state.hotspots){
+    // 老数据迁移：玩法类型内部值「痛点规则」→ 产品词「卖家避坑提醒」
+    if(h.angle==='痛点规则'){ h.angle='卖家避坑提醒'; needSave=true; }
     if(h.value==null || h.heat==null || h.angle==null){ evalHotspot(h); needSave=true; }
     // 🆕 V3 老数据迁移：缺任一 V3 字段（能力类别/链路/探针/双轨标记）就重跑 evalHotspot 补齐
     if(h.flyelepCapabilities==null || h.linkStages==null || h.probes==null || h.flyelepTier==null){
@@ -4894,7 +4896,7 @@ function renderHotspot(){
     tbody.innerHTML=emptyHtml;
     updateBulkBar(); return;
   }
-  const angleMap={'带货':['an-dai','🔥 带货'],'蹭热':['an-ride','🌊 蹭热度'],'痛点规则':['an-rule','🛡️ 卖家避坑提醒'],'节日':['an-fest','🎉 节日'],'AI资讯':['an-ai','🤖 AI 资讯'],'其他':['an-other','📦 其他']};
+  const angleMap={'带货':['an-dai','🔥 带货'],'蹭热':['an-ride','🌊 蹭热度'],'卖家避坑提醒':['an-rule','🛡️ 卖家避坑提醒'],'节日':['an-fest','🎉 节日'],'AI资讯':['an-ai','🤖 AI 资讯'],'其他':['an-other','📦 其他']};
   const gradeMap={S:['g-S','S'],A:['g-A','A'],B:['g-B','B'],C:['g-C','C']};
   const fitMap={'强':['fit-strong','💪 强'],'中':['fit-mid','🤝 中'],'弱':['fit-weak','😶 弱']};
 
@@ -5018,7 +5020,7 @@ function updateRenderStatus(arr, all, opts){
   }
 }
 
-/* 热门热点跑马灯：横向无缝循环滚动，按综合可发价值取前 20 条（含蹭热/痛点规则） */
+/* 热门热点跑马灯：横向无缝循环滚动，按综合可发价值取前 20 条（含蹭热/卖家避坑提醒） */
 function renderHotMarquee(){
   const track=$('#hotMarqueeTrack');
   if(!track) return;
@@ -5474,7 +5476,7 @@ const FLYELEP_HOT_KW={
   clarity: ['超清','清晰度','模糊修复','老照片','马赛克','细节增强','低清修复','去噪','清晰化','图片变清晰'],
   brandm:  ['品牌模型','专属模型','定制模型','私有模型','品牌 ai','专属 ai','品牌定制','模型微调','训练模型'],
   brandt:  ['品牌模板','预设模板','模板套用','节日模板','营销模板','618 模板','双11 模板','黑五模板','圣诞模板','模板库'],
-  // 平台规则 / 限流 / 痛点（Flyelep 去同质化、AI 化可破解，属「痛点规则」玩法）
+  // 平台规则 / 限流 / 痛点（Flyelep 去同质化、AI 化可破解，属「卖家避坑提醒」玩法）
   rule:   ['限流','算法','审核','同质化','版权','降权','封号','流量分配','推荐机制','合规','政策','搬运','查重','去重','内容审核','新规','规则调整','流量池','权重','打压','限推荐','去同质化','内容治理','平台治理','低质','水印','批量生成'],
   // 通用 Flyelep 关键词（命中但未匹配具体功能时使用）
   '':      ['flyelep','AI 工具','AI工具','AI 电商','AI 电商工具','AI 提效','电商 AI','跨境 AI','选品 AI','AI 选品','AI 主图','AI 详情','AI 视频','AI 抠图','电商人必备','电商效率','效率工具','AI 生产力','AI 创作','AI 营销','ai 商业化','ai 商业化','生成式 AI','生成式','midjourney','stable diffusion','sora','kling','可灵','即梦','dalle','suno','runway','pika','adobe firefly','chatgpt','gpt','gemini','claude','llm','大模型','文心','通义','豆包','kimi','deepseek','混元','hunyuan','qwen','qwen3','ernie','智谱','glm','claude','grok','llama','mistral','ai 助手','ai agent','agent','智能体','ai 工具','aigc','a 工具','aigc 工具','gpt-4','gpt-5','claude 3','claude 4','sora 2','amazon','亚马逊','shopee','lazada','ozon','temu','shein','tiktok shop','速卖通','aliexpress','独立站','shopify','woocommerce','ebay','walmart','mercadolibre','跨境电商平台','电商平台','出海平台','跨境平台','电商运营','亚马逊运营','shopee 运营','tiktok shop 运营','选品','listing 优化','主图优化','listing 撰写','五点描述','商品推广','站内广告','站外引流','自然流量','付费流量','acos','roas','转化率','客单价','uv 价值','aov','gmv','日销','月销','爆款打造','新品推广','店铺装修','品牌打造','私域运营','用户运营','内容运营','海外仓','fba','海外仓发货','fba 头程','物流时效']
@@ -5645,12 +5647,12 @@ function heatFromRecency(dateStr, boost){
   if(boost) h=Math.min(95, h+boost);
   return h;
 }
-// 蹭流 / 痛点规则 关键词
+// 蹭流 / 卖家避坑提醒 关键词
 const RIDE_KW=['热搜','热榜','爆了','出圈','现象级','梗','挑战','meme','viral','刷屏','全网','爆款话题','话题','热议','冲上','登顶','霸榜','神曲','舞蹈','卡点','火了','破圈','刷爆','热梗','挑战赛','热舞'];
 // AI 资讯关键词（用于「AI 资讯」Tab 路由）
 const AI_STRONG=['gpt-4','gpt-5','gpt-4o','gpt-3.5','chatgpt','claude','claude 3','claude 4','claude 5','gemini','gemini pro','gemini ultra','llm','大模型','大语言模型','llama','mistral','qwen','qwen3','通义','文心','ernie','kimi','智谱','glm','glm-4','glm-5','混元','hunyuan','豆包','deepseek','deepseek v3','sora','sora 2','veo','kling','可灵','即梦','pika','runway','midjourney','stable diffusion','sdxl','sd3','sd4','dalle','dall-e','suno','udio','flux','comfyui','aigc','生成式','aigc 工具','ai 视频','ai 出图','ai 抠图','ai 帮写','ai 翻译','ai 写作','ai 编程','ai agent','agent','智能体','多模态','文生图','文生视频','图生视频','ai 直播','数字人','虚拟主播','deepfake','agi','对齐','transformer','cuda','gpu','tpu','npu','h100','h200','a100'];
 const AI_WEAK=['ai','人工智能','机器学习','深度学习','神经网络','nlp','cv','计算机视觉','大模型','神经网络','openai','anthropic','meta ai','google deepmind','deepmind','pytorch','tensorflow','huggingface','hugging face'];
-// 痛点规则：必须含「限制/治理类」强信号词，避免 "AI 图像生成" 这类中性词误判
+// 卖家避坑提醒：必须含「限制/治理类」强信号词，避免 "AI 图像生成" 这类中性词误判
 const RULE_KW=['限流','算法','审核','同质化','版权','降权','封号','流量分配','推荐机制','合规','政策','搬运','查重','去重','内容审核','新规','规则调整','流量池','权重','打压','限推荐','内容治理','平台治理','低质','水印'];
 // 严肃新闻：政治/纪念/灾难/事故/讣告类——命中后 angleScores 全置 0，不推带货/蹭热度画像
 // 设计：双向成对（先名+事，后事+名），避免漏判；保留规则简洁可读
@@ -5731,7 +5733,7 @@ function deriveWhoFor(h){
   return parts.slice(0, 2).join(' · ');
 }
 
-/* V3 「Flyelep 怎么用」人话版（去 B 精确/全栈提升标签）—— 用户截图反馈：内部代号看不懂
+/* V3 「Flyelep 怎么用」人话版（去精确标签/能力升级标签）—— 用户截图反馈：内部代号看不懂
  * - fullstack(2+ 类别命中) → "Flyelep 接入后所有相关能力升级"
  * - precise(1 类别) → 直接复用 FLYELEP_ANGLE 模板（已含功能名 + 场景）
  * - weak(<40 fitScore) �� "不直接出内容，仅作只能参考"
@@ -5747,11 +5749,11 @@ function deriveFlyelepText(h){
   return h.flyelepAngle || '';
 }
 
-// 玩法类型：带货 / 蹭热 / 痛点规则 / 节日 / AI 资讯 / 其他
+// 玩法类型：带货 / 蹭热 / 卖家避坑提醒 / 节日 / AI 资讯 / 其他
 function classifyAngle(h, heat, fv){
   const t=((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')).toLowerCase();
   if(h.type==='festival') return '节日';
-  if(RULE_KW.some(k=>t.includes(k))) return '痛点规则';
+  if(RULE_KW.some(k=>t.includes(k))) return '卖家避坑提醒';
   // AI 资讯型热点：能挂 Flyelep 全部 17 个 AI 工具 → 算「带货」级别（可出 AI 工具演示视频/详情）
   if(h.type==='ai' || (t && classifyAI(t).ai!=='no')) return '带货';
   const ev=classifyEcom(t);
@@ -5797,12 +5799,12 @@ function evalHotspot(h){
   const fullText = ((h.title||'')+' '+(h.note||'')+' '+(h.playbook||''));
   const isSerious = SERIOUS_PATTERNS.some(re => re.test(fullText));
   let baseScores;
-  if(isSerious){ baseScores = {带货:0, 蹭热:0, 痛点规则:0, 节日:0, 其他:0}; }
-  else if(angle==='节日'){ baseScores = {带货:35, 蹭热:55, 痛点规则:25, 节日:85, 其他:25}; }
-  else if(angle==='痛点规则'){ baseScores = {带货:35, 蹭热:45, 痛点规则:85, 节日:20, 其他:30}; }
-  else if(angle==='蹭热'){ baseScores = {带货:40, 蹭热:85, 痛点规则:40, 节日:30, 其他:35}; }
-  else if(angle==='带货'){ baseScores = {带货:85, 蹭热:60, 痛点规则:45, 节日:35, 其他:40}; }
-  else { baseScores = {带货:55, 蹭热:55, 痛点规则:45, 节日:35, 其他:55}; }
+  if(isSerious){ baseScores = {带货:0, 蹭热:0, 卖家避坑提醒:0, 节日:0, 其他:0}; }
+  else if(angle==='节日'){ baseScores = {带货:35, 蹭热:55, 卖家避坑提醒:25, 节日:85, 其他:25}; }
+  else if(angle==='卖家避坑提醒'){ baseScores = {带货:35, 蹭热:45, 卖家避坑提醒:85, 节日:20, 其他:30}; }
+  else if(angle==='蹭热'){ baseScores = {带货:40, 蹭热:85, 卖家避坑提醒:40, 节日:30, 其他:35}; }
+  else if(angle==='带货'){ baseScores = {带货:85, 蹭热:60, 卖家避坑提醒:45, 节日:35, 其他:40}; }
+  else { baseScores = {带货:55, 蹭热:55, 卖家避坑提醒:45, 节日:35, 其他:55}; }
   h.angleScores = baseScores;
   h.serious = isSerious;
   if(isSerious){ h.flyelepAngle='⚠️ 严肃新闻（政治/纪念/灾难/事故）——这条不建议追，别拿来做营销'; }
@@ -5811,7 +5813,7 @@ function evalHotspot(h){
   h.probes = classifyProbe(fullText);
   h.whoFor = deriveWhoFor(h);
   h.flyelepText = deriveFlyelepText(h);
-  // ⚠️ V3 已移除原「蹭热/痛点规则结合度保底 65」：fitScore 由 scoreFlyelep 直接返回真实匹配度，
+  // ⚠️ V3 已移除原「蹭热/卖家避坑提醒结合度保底 65」：fitScore 由 scoreFlyelep 直接返回真实匹配度，
   // 不再人为抬升（Flyelep 权重已降到 20%，保底会让弱相关热点虚高）
   // 蹭热无具体功能时，给一个明确的「Flyelep 广告营销」角度（海报/小红书/社媒模板）
   if(angle==='蹭热' && !h.flyelepFeature){
@@ -5836,7 +5838,7 @@ function evalHotspot(h){
   if(isSerious){ reasons.push('⚠️ 严肃新闻'); }
   reasons.push('🔥 热度 '+(h.heat||0));
   reasons.push('🎯 结合度 '+h.flyelepFit);
-  if(angle==='痛点规则') reasons.push('🛡️ 平台限流/规则痛点');
+  if(angle==='卖家避坑提醒') reasons.push('🛡️ 平台限流/规则痛点');
   else if(angle==='蹭热') reasons.push('��� 蹭热度');
   else if(angle==='带货') reasons.push('🛍️ 可带货');
   else if(angle==='节日') reasons.push('🎉 节日');
@@ -6036,7 +6038,7 @@ async function scrapeHotFromApi(){
     const all=state.hotspots;
     const cntA=a=>all.filter(h=>h.angle===a).length;
     const sab=all.filter(h=>['S','A','B'].includes(h.grade)).length;
-    el.textContent='✅ 本次新增 '+total+' 条（来源：'+src+'）｜库内共 '+all.length+' 条：带货 '+cntA('带货')+' · 蹭热 '+cntA('蹭热')+' · 卖家避坑提醒 '+cntA('痛点规则')+' · 节日 '+cntA('节日')+' · 其他 '+cntA('其他')+'｜S/A 级可用 '+sab+' 条（默认按推荐度展示全部）'+(errors.length?'；失败：'+errors.join('/'):'');
+    el.textContent='✅ 本次新增 '+total+' 条（来源：'+src+'）｜库内共 '+all.length+' 条：带货 '+cntA('带货')+' · 蹭热 '+cntA('蹭热')+' · 卖家避坑提醒 '+cntA('卖家避坑提醒')+' · 节日 '+cntA('节日')+' · 其他 '+cntA('其他')+'｜S/A 级可用 '+sab+' 条（默认按推荐度展示全部）'+(errors.length?'；失败：'+errors.join('/'):'');
     el.className='feed-status ok';
     toast('扒取到 '+total+' 条新热点');
     // 🆕 顶部"新增快报"横幅 —— 8 秒后自动收起；用户点"立即查看"切到本次新增 + 新增时间排序
