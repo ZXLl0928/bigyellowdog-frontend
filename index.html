@@ -1014,7 +1014,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       <div class="form-grid col4" style="margin-bottom:10px">
         <div><label>平台</label><select id="aPlatform"><option value="抖音">抖音</option><option value="小红书">小红书</option><option value="视频号">视频号</option></select></div>
         <div><label>账号名</label><input type="text" id="aName" placeholder="如：Flyelep 抖音主号"></div>
-        <div><label>账号定位</label><select id="aCategory">
+        <div><label>账号定位</label><select id="aCategory" onchange="refreshAcctGenProfile()">
           <option value="">— 选账号定位 —</option>
           <option value="国内电商">国内电商</option>
           <option value="跨境电商（出口）">跨境电商（出口）</option>
@@ -1022,6 +1022,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <option value="内容自媒体">内容自媒体</option>
           <option value="服务/SaaS">服务/SaaS</option>
         </select></div>
+        <div><label>用户画像（选填）</label><select id="aGenProfile"><option value="">通用（按账号定位）</option></select></div>
         <div><label>备注</label><input type="text" id="aNote" placeholder="如：主推号 / 测试号"></div>
       </div>
       <button class="btn primary sm" onclick="addAccount()">+ 添加账号</button>
@@ -1780,13 +1781,33 @@ function addAccount(){
   const platform=$('#aPlatform').value,
         name=$('#aName').value.trim(),
         category=$('#aCategory').value,
+        genProfile=$('#aGenProfile').value,
         note=$('#aNote').value.trim();
   if(!name){ toast('请填写账号名'); return; }
   if(!category){ toast('请选择账号定位'); return; }
-  state.accounts.push({id:uid(),platform,name,category,note});
+  state.accounts.push({id:uid(),platform,name,category,genProfile:genProfile||'',note});
   save(); renderAccountList(); refreshAccountOptions('vAccount');
-  $('#aName').value=''; $('#aCategory').value=''; $('#aNote').value='';
+  $('#aName').value=''; $('#aCategory').value=''; $('#aGenProfile').value=''; $('#aNote').value='';
   toast('账号已添加');
+}
+// 账号管理：根据「账号定位」联动填充可选「用户画像」（三级画像），空=通用按一级类目兜底
+function refreshAcctGenProfile(){
+  const cat=$('#aCategory')?.value||'';
+  const sel=$('#aGenProfile'); if(!sel) return;
+  if(!cat){ sel.innerHTML='<option value="">通用（按账号定位）</option>'; return; }
+  const g=PERSONA_TREE.find(x=>x.cat===cat);
+  let html='<option value="">通用（按账号定位）</option>';
+  if(g){
+    for(const p of g.platforms){
+      if(p.types.length===1){
+        const key=p.name;
+        if(PERSONA_MAP[key]) html+=`<option value="${key}">${key}</option>`;
+      }else{
+        for(const t of p.types){ html+=`<option value="${p.name+'·'+t.t}">${p.name+'·'+t.t}</option>`; }
+      }
+    }
+  }
+  sel.innerHTML=html;
 }
 function removeAccount(id){
   if(!confirm('删除此账号？已有视频不受影响但需要重新关联。')) return;
@@ -4610,6 +4631,12 @@ function getGradeViewPersona(){
   if(!v) return null;
   if(v.startsWith('cat:')) return DEFAULT_BY_CAT[v.slice(4)]||null;
   if(v.startsWith('key:')) return PERSONA_MAP[v.slice(4)]||null;
+  if(v.startsWith('acct:')){
+    const a=state.accounts.find(x=>x.id===v.slice(5));
+    if(!a) return null;
+    const key=a.genProfile;
+    return (key&&PERSONA_MAP[key]) ? PERSONA_MAP[key] : (DEFAULT_BY_CAT[a.category]||null);
+  }
   return null;
 }
 function gradeViewLabel(){
@@ -4617,6 +4644,10 @@ function gradeViewLabel(){
   if(!v) return '通用（不区分卖家）';
   if(v.startsWith('cat:')) return DEFAULT_BY_CAT[v.slice(4)]?.label||v.slice(4);
   if(v.startsWith('key:')) return PERSONA_MAP[v.slice(4)]?.label||v.slice(4);
+  if(v.startsWith('acct:')){
+    const a=state.accounts.find(x=>x.id===v.slice(5));
+    return a ? (a.platform+'·'+a.name) : v;
+  }
   return v;
 }
 // 取当前视角的所属一级类目（'国内电商' / '跨境电商（出口）' / ...），空=通用不区分
@@ -4625,6 +4656,10 @@ function gradeViewCat(){
   if(!v) return '';
   if(v.startsWith('cat:')) return v.slice(4);
   if(v.startsWith('key:')) return PERSONA_CAT_BY_KEY[v.slice(4)]?.cat || '';
+  if(v.startsWith('acct:')){
+    const a=state.accounts.find(x=>x.id===v.slice(5));
+    return a ? (a.category||'') : '';
+  }
   return '';
 }
 // 填充「推荐视角」下拉：通用 + 5 类目通用 + 按类目分组 26 个终端画像
@@ -4645,7 +4680,15 @@ function populateGradeView(){
         }
       }
     }
-    html+=`</optgroup>`;
+      html+=`</optgroup>`;
+  }
+  // 🆕 「按我的账号」分组：选中后整列按该账号定位重排（同类目靠前、跨类目靠后）
+  if((state.accounts||[]).length){
+    html+='<optgroup label="按我的账号">';
+    for(const a of state.accounts){
+      html+=`<option value="acct:${a.id}">${a.platform}·${a.name}</option>`;
+    }
+    html+='</optgroup>';
   }
   sel.innerHTML=html;
 }
@@ -4659,6 +4702,23 @@ function dispValue(h, persona, gvCat){
   // 角度契合度：该热点在『当前 persona 偏好的 angle』上的契合度 0-100
   const af = (h.angleScores && h.angleScores[h.angle]!=null) ? h.angleScores[h.angle] : 50;
   return Math.round(0.3*(h.heat||0) + 0.25*(h.fitScore||0) + 0.2*pm + 0.25*af);
+}
+// 🆕 画像匹配维度接入账号真实定位：排序 / 等级 / 推荐度数字统一用此函数
+// 公式 = 用户拍板的 40/40/20：0.4×画像匹配 + 0.4×热度 + 0.2×Flyelep结合度
+// 画像匹配：同类目用该画像对热点玩法的偏好分；跨类目降级（Flyelep 是内容生成工具，可用但不精准）
+function effectiveAudienceFit(h){
+  const ep=getGradeViewPersona(), cat=gradeViewCat();
+  if(!ep) return 60;                              // 通用视角占位（与 evalHotspot 默认一致）
+  const pm=personaMatchOf(h.angle, ep);           // 该画像对当前热点玩法的契合度 0-100
+  if(cat && h.geoCat && cat!==h.geoCat) return 35; // 跨类目：弱相关
+  return Math.max(45, Math.min(95, pm));          // 同类目：用真实偏好，至少 45 防沉底
+}
+function effectiveValue(h){
+  const af=effectiveAudienceFit(h);
+  let v=Math.round(0.40*af + 0.40*(h.heat||50) + 0.20*(h.fitScore||0));
+  if((h.fitScore||0)<40) v=Math.min(v,59);          // 双轨封顶：只能参考（不占 Top）
+  if(h.serious) v=Math.min(v,35);                   // 严肃新闻降级
+  return Math.max(0, Math.min(100, v));
 }
 function dispGrade(v){ return v>=80?'S' : v>=60?'A' : v>=40?'B' : 'C'; }
 const PLAT_TONE={
@@ -4837,7 +4897,7 @@ function renderHotspot(){
         const fa=featSet.has(a.id)?1:0, fb=featSet.has(b.id)?1:0;
         if(fa!==fb) return fb-fa;
       }
-      return dispValue(b,gv,gvCat)-dispValue(a,gv,gvCat) || (b.heat||0)-(a.heat||0) || ts(b)-ts(a);
+      return effectiveValue(b)-effectiveValue(a) || (b.heat||0)-(a.heat||0) || ts(b)-ts(a);
     });
   }
 
@@ -4852,8 +4912,8 @@ function renderHotspot(){
   }
 
   // KPI 概览（4 列简约现代风）
-  const gradeOf = h => gv ? dispGrade(dispValue(h,gv,gvCat)) : (h.grade||'-');
-  const valOf = h => dispValue(h,gv,gvCat);
+  const gradeOf = h => dispGrade(effectiveValue(h));
+  const valOf = h => effectiveValue(h);
   const sa=arr.filter(h=>['S','A'].includes(gradeOf(h))).length;
   const new24=arr.filter(h=>(h.addedAt||0)>=now-86400000).length;
   const avgValue = arr.length ? Math.round(arr.reduce((s,h)=>s+valOf(h),0)/arr.length) : 0;
@@ -4924,7 +4984,7 @@ function renderHotspot(){
 
   tbody.innerHTML=arr.map(h=>{
     const [aCls,aTxt]=angleMap[h.angle]||['','—'];
-    const dv = dispValue(h, gv, gvCat);
+    const dv = effectiveValue(h);
     const dg = dispGrade(dv);
     const pm = gv ? personaMatchOf(h.angle, gv) : null;
     const [gCls,gTxt]=gradeMap[dg]||['','—'];
