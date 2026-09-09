@@ -235,6 +235,9 @@ a.hs-title:hover{background-size:100% 100%;color:#9a3412}
 .persona-chip.cat-cross{border-color:#f0c674;color:#7c3a00;background:#fff8e6}
 .persona-chip.cat-cross .pc-score{background:#ffe8b8;color:#7c3a00}
 .persona-chip.cat-b2b{border-color:#f8c6a0;color:#a04000;background:#fff3e6}
+.persona-chip.cat-serious{border-color:#d8d3cc;color:#8b8478;background:#f5f3ee;opacity:.85;font-style:italic}
+.persona-chip.cat-serious .pc-score{background:#e8e3da;color:#8b8478}
+.hs-serious-badge{display:inline-block;padding:1px 6px;border-radius:4px;background:#fff0eb;color:#b14745;font-size:10px;font-weight:600;margin-left:4px;vertical-align:middle;border:1px solid #f5d5cd}
 .persona-chip.cat-b2b .pc-score{background:#ffd9b0;color:#a04000}
 .persona-chip.cat-media{border-color:#d0b0f0;color:#5b2d8a;background:#f5f0fa}
 .persona-chip.cat-media .pc-score{background:#e0c8f5;color:#5b2d8a}
@@ -4352,18 +4355,38 @@ function top3PersonasForAngle(angle, geoCat, h){
     {kw:/B站|YouTube|bilibili|哔哩哔哩/i,                             keys:['B站/YouTube·中视频创作者']},
   ];
   let pinned=[];
-  // 同时扫描 platform 和 title——数据源常把 platform='AI资讯' 不填具体平台名
-  const scanText = plat + ' ' + String((h&&h.title)||'');
-  for(const m of PLAT_MATCHERS){
-    if(m.kw.test(scanText)){
-      for(const k of m.keys){
-        if(PERSONA_CAT_BY_KEY[k] && PERSONA_CAT_BY_KEY[k].cat===geoCat){   // 仅前置同类目内的画像（注意：值是对象，要比 .cat）
-          pinned.push({key:k, label:k, score:1000-(pinned.length), cat:geoCat, cls:catCls});
-          if(pinned.length>=3) break;
+  // 严肃新闻 → 跳过全部前置，3 个全走兜底
+  const isSerious = !!(h && h.serious);
+  if(!isSerious){
+    // 同时扫描 platform 和 title——数据源常把 platform='AI资讯' 不填具体平台名
+    const scanText = plat + ' ' + String((h&&h.title)||'');
+    // ① 平台强相关前置
+    for(const m of PLAT_MATCHERS){
+      if(m.kw.test(scanText)){
+        for(const k of m.keys){
+          if(PERSONA_CAT_BY_KEY[k] && PERSONA_CAT_BY_KEY[k].cat===geoCat){
+            pinned.push({key:k, label:k, score:1000-(pinned.length), cat:geoCat, cls:catCls});
+            if(pinned.length>=3) break;
+          }
         }
       }
+      if(pinned.length>=3) break;
     }
-    if(pinned.length>=3) break;
+    // ② 内容关键词前置（AI作图/视频/大模型/政策/节日）
+    if(pinned.length<3){
+      for(const cm of CONTENT_MATCHERS){
+        if(cm.kw.test(scanText)){
+          for(const k of cm.keys){
+            if(PERSONA_CAT_BY_KEY[k] && PERSONA_CAT_BY_KEY[k].cat===geoCat){
+              if(pinned.find(p=>p.key===k)) continue;  // 去重
+              pinned.push({key:k, label:k, score:999-(pinned.length), cat:geoCat, cls:catCls});
+              if(pinned.length>=3) break;
+            }
+          }
+        }
+        if(pinned.length>=3) break;
+      }
+    }
   }
   out.push(...pinned);
 
@@ -4388,7 +4411,12 @@ function top3PersonasForAngle(angle, geoCat, h){
   while(out.length<3){
     const fb = DEFAULT_BY_CAT[geoCat];
     const v = (fb && fb.prefer && fb.prefer[angle]!=null) ? fb.prefer[angle] : 50;
-    out.push({key: geoCat+'卖家·通用', label: geoCat+'卖家（通用）', score: Math.max(40, v-5), cat: geoCat, cls: catCls});
+    if(isSerious){
+      // 严肃新闻：兜底 chip 明确标"不推荐"
+      out.push({key: geoCat+'卖家·通用', label: '不推荐蹭热度', score: 30, cat: geoCat, cls: 'cat-serious'});
+    } else {
+      out.push({key: geoCat+'卖家·通用', label: geoCat+'卖家（通用）', score: Math.max(40, v-5), cat: geoCat, cls: catCls});
+    }
   }
   return out.slice(0,3);
 }
@@ -4438,12 +4466,15 @@ function populateGradeView(){
   sel.innerHTML=html;
 }
 // 🆕 视角下的展示价值 / 等级（不污染原 h.value）
-// gvCat：当前视角画像所属的一级类目；与 hotspot.geoCat 不一致时 personaMatch 失效（避免跨境热点给国内卖家画像打高分）
+// gvCat：当前视角画像所属的一级类目；与 hotspot.geoCat 不一致时 personaMatch 失效
+// 公式：0.3×heat + 0.25×fitScore + 0.2×personaMatch + 0.25×angleFit（角度契合度）
 function dispValue(h, persona, gvCat){
   if(!persona) return h.value||0;
   let pm = personaMatchOf(h.angle, persona);
   if(gvCat && h.geoCat && gvCat!==h.geoCat) pm = 0;
-  return Math.round(0.4*(h.heat||0) + 0.3*(h.fitScore||0) + 0.3*pm);
+  // 角度契合度：该热点在『当前 persona 偏好的 angle』上的契合度 0-100
+  const af = (h.angleScores && h.angleScores[h.angle]!=null) ? h.angleScores[h.angle] : 50;
+  return Math.round(0.3*(h.heat||0) + 0.25*(h.fitScore||0) + 0.2*pm + 0.25*af);
 }
 function dispGrade(v){ return v>=80?'S' : v>=60?'A' : v>=40?'B' : 'C'; }
 const PLAT_TONE={
@@ -4647,6 +4678,8 @@ function renderHotspot(){
     const isCant = h.grade==='C';
     const rowCls = [sel?'selected':'', isCant?'hs-cant':''].filter(Boolean).join(' ');
     const cantBadge = isCant ? '<span class="hs-cant-badge" title="综合价值 &lt; 40，与脚本/Flyelep 无明显结合点">🚫 无法结合</span>' : '';
+    // 🆕 严肃新闻标记
+    const seriousBadge = h.serious ? '<span class="hs-serious-badge" title="政治/纪念/灾难/事故类新闻，不建议蹭热度">⚠️ 不建议蹭</span>' : '';
     // 🆕 推荐 3 个可用画像：按命中 prefer 排序 ≥65
     const topPersonas = top3PersonasForAngle(h.angle||'其他', h.geoCat, h);
     const personaChips = topPersonas.length
@@ -4662,6 +4695,7 @@ function renderHotspot(){
           ${isNew?'<span class="new-badge">🆕 新增</span>':''}
           ${h.titleOrig?'<span class="i18n-badge" title="已自动翻译为中文">🌐</span>':''}
           ${cantBadge}
+          ${seriousBadge}
         </div>
         <div class="hs-meta-row">
           <span class="hs-date">${h.date||'—'}</span>
@@ -5273,6 +5307,33 @@ const AI_STRONG=['gpt-4','gpt-5','gpt-4o','gpt-3.5','chatgpt','claude','claude 3
 const AI_WEAK=['ai','人工智能','机器学习','深度学习','神经网络','nlp','cv','计算机视觉','大模型','神经网络','openai','anthropic','meta ai','google deepmind','deepmind','pytorch','tensorflow','huggingface','hugging face'];
 // 痛点规则：必须含「限制/治理类」强信号词，避免 "AI 图像生成" 这类中性词误判
 const RULE_KW=['限流','算法','审核','同质化','版权','降权','封号','流量分配','推荐机制','合规','政策','搬运','查重','去重','内容审核','新规','规则调整','流量池','权重','打压','限推荐','内容治理','平台治理','低质','水印'];
+// 严肃新闻：政治/纪念/灾难/事故/讣告类——命中后 angleScores 全置 0，不推带货/蹭热度画像
+// 设计：双向成对（先名+事，后事+名），避免漏判；保留规则简洁可读
+const SERIOUS_PATTERNS=[
+  /主席|总书记|国家主席|国务院总理|政治局常委|中央军委|元帅|将军|国家领导人|国家元首|政府首脑/,
+  /(逝世|过世|病逝|辞世|哀悼|追悼|悼念|讣告|吊唁|缅怀|祭奠|深切哀悼|永远怀念)/,
+  /(爆炸|火灾|空难|坠机|沉船|翻车|矿难|塌方|洪灾|地震|海啸|泥石流|重大事故|特大事故|安全事故|重特大|踩踏|坍塌|山体滑坡|洪涝|台风|飓风|龙卷风)/,
+  /(遇难|死伤|伤亡|失踪|失联|搜救|救援|抢救|救护|抢救无效|不治身亡|殉职|牺牲)/,
+  /(国葬|大阅兵|政变|战争|开战|停火|和谈|核武|核试验|恐袭|恐怖袭击|枪击|枪杀|爆炸袭击|劫持|自杀式|生化武器|集束炸弹|种族灭绝|大屠杀|战争罪|反人类)/,
+];
+// 内容关键词前置：标题里出现这些信号 → 优先推对应画像（电商/作图/视频/政策/节日）
+const CONTENT_MATCHERS=[
+  // AI 作图/图片生成/设计 —— 强推美工/Listing/设计SaaS
+  {kw:/ai\s?作图|ai\s?出图|ai\s?生图|文生图|图生图|ai\s?海报|ai\s?详情页|ai\s?主图|chatgpt\s?images|dall-?e|midjourney|stable\s?diffusion|sdxl|flux\s?pro|comfyui|海报生成|一键生成.*图|ai\s?设计|ai\s?抠图|ai\s?修图/i, score:60, name:'AI作图/设计',
+   keys:['亚马逊·Listing美工','国内美工设计','SaaS/营销工具·服务商','抖音/视频号·知识口播']},
+  // AI 视频/数字人/口播 —— 强推视频/直播/SaaS
+  {kw:/ai\s?视频|ai\s?短视频|文生视频|图生视频|数字人|虚拟主播|ai\s?直播|ai\s?口播|sora|veo|可灵|即梦|pika|runway|suno|udio|deepfake/i, score:60, name:'AI视频/数字人',
+   keys:['抖音电商·短视频带货','抖音/视频号·知识口播','SaaS/营销工具·服务商','代运营公司·项目经理']},
+  // 大模型/算法 —— 强推知识口播/中视频/技术解读
+  {kw:/大模型|llm|llama|mistral|qwen|glm|deepseek|gpt-?[345]|claude\s?[345]|gemini|sora\s?2|混元|文心|kimi|智谱|豆包|文生文|多模态|ai\s?agent|智能体|agi|对齐|transformer|cuda|gpu|tpu|npu|h100|h200|a100|h800/i, score:55, name:'大模型/算法',
+   keys:['抖音/视频号·知识口播','B站/YouTube·中视频创作者','小红书·生活方式种草','SaaS/营销工具·服务商']},
+  // 政策/罚款/合规/限流/封号 —— 强推培训讲师/精铺/代运营
+  {kw:/合规|政策|新规|罚款|处罚|制裁|监管|封号|限流|降权|内容审核|版权|搬运|同质化|低质|水印|算法|流量池|权重|打压/i, score:55, name:'政策/合规',
+   keys:['跨境培训/服务商·讲师/陪跑','亚马逊·精铺多店','代运营公司·项目经理','亚马逊·Listing美工']},
+  // 节日/营销节点 —— 强推节日营销相关
+  {kw:/双\s?11|双11|双\s?12|618|618\s?大促|99\s?大促|99\s?划算节|99节|黑五|网一|cyber\s?monday|boxing\s?day|情人节|七夕|圣诞|春节|年货|元宵|端午|中秋|国庆|新年|女王节|妇女节|女神节|母亲节|父亲节|教师节|感恩节|万圣节|复活节/i, score:75, name:'节日/营销节点',
+   keys:['淘宝/天猫·精品运营','抖音电商·直播带货','小红书·生活方式种草','抖音/视频号·知识口播']},
+];
 // 玩法类型：带货 / 蹭热 / 痛点规则 / 节日 / AI 资讯 / 其他
 function classifyAngle(h, heat, fv){
   const t=((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')).toLowerCase();
@@ -5317,6 +5378,19 @@ function evalHotspot(h){
   // 玩法类型（仅显示标签，不影响 value）
   const angle=classifyAngle(h, h.heat, fv);
   h.angle=angle;
+  // 🆕 严肃新闻检测 + 多角度分数
+  const fullText = ((h.title||'')+' '+(h.note||'')+' '+(h.playbook||''));
+  const isSerious = SERIOUS_PATTERNS.some(re => re.test(fullText));
+  let baseScores;
+  if(isSerious){ baseScores = {带货:0, 蹭热:0, 痛点规则:0, 节日:0, 其他:0}; }
+  else if(angle==='节日'){ baseScores = {带货:35, 蹭热:55, 痛点规则:25, 节日:85, 其他:25}; }
+  else if(angle==='痛点规则'){ baseScores = {带货:35, 蹭热:45, 痛点规则:85, 节日:20, 其他:30}; }
+  else if(angle==='蹭热'){ baseScores = {带货:40, 蹭热:85, 痛点规则:40, 节日:30, 其他:35}; }
+  else if(angle==='带货'){ baseScores = {带货:85, 蹭热:60, 痛点规则:45, 节日:35, 其他:40}; }
+  else { baseScores = {带货:55, 蹭热:55, 痛点规则:45, 节日:35, 其他:55}; }
+  h.angleScores = baseScores;
+  h.serious = isSerious;
+  if(isSerious){ h.flyelepAngle='⚠️ 严肃新闻（政治/纪念/灾难/事故）——不建议蹭热度做营销内容'; }
   // 蹭热 / 痛点规则��Flyelep 始终能为其出图/出视频，结合度保底「中」（给 65）
   if((angle==='蹭热'||angle==='痛点规则') && fitScore<65) fitScore=65;
   // 蹭热无具体功能时，给一个明确的「Flyelep 广告营销」角度（海报/小红书/社媒模板）
@@ -5325,12 +5399,15 @@ function evalHotspot(h){
   }
   // 综合可发价值（用户要求：仅用「热度 + 结合度」评级）
   let value=Math.round(0.55*(h.heat||50) + 0.45*fitScore);
+  // 严肃新闻大幅降级（基础分 ≤ 35），避免与正常热点混排
+  if(isSerious) value = Math.min(value, 35);
   value=Math.min(100, Math.max(0, value));
   h.value=value;
   // 等级由综合可发价值决定
   h.grade = value>=80?'S' : value>=60?'A' : value>=40?'B' : 'C';
   // 评级理由
   const reasons=[];
+  if(isSerious){ reasons.push('⚠️ 严肃新闻'); }
   reasons.push('🔥 热度 '+(h.heat||0));
   reasons.push('🎯 结合度 '+h.flyelepFit);
   if(angle==='痛点规则') reasons.push('🛡️ 平台限流/规则痛点');
@@ -5361,9 +5438,13 @@ function deriveGeoCat(h){
   const hasCnSocial = /抖音|视频号|小红书|b站|bili|哔哩哔哩/.test(title);
   // 标题里的强跨境信号（即使数据源错标成『国内/全球』也要纠正）
   const hasCross = /欧洲|出海|关税|海外仓|跨境|北美站|欧洲站|日本站|全球站|美国站|亚马逊海外/.test(title);
+  // 🆕 AI 资讯/技术新闻 → 后续归到『内容自媒体』类目
+  const isAIHot = /chatgpt|gpt-?[345]|claude\s?[345]|gemini|大模型|qwen|glm|deepseek|sora|veo|kling|可灵|即梦|pika|runway|midjourney|stable\s?diffusion|sdxl|suno|udio|flux|comfyui|文生图|文生视频|图生视频|数字人|ai\s?agent|智能体|多模态|agi|对齐|transformer|cuda|gpu|tpu|npu|h100|h200|a100|openai|anthropic|deepmind|pytorch|tensorflow|huggingface|人工智能|机器学习|深度学习|神经网络|nlp|计算机视觉/i.test(title);
   // 1) 市场优先级最高（mkt 已有明确地域）
   if(mkt==='海外') return '跨境电商（出口）';
-  if(mkt==='国内') return hasCross ? '跨境电商（出口）' : '国内电商';
+  if(mkt==='国内') return hasCross ? '跨境电商（出口）' : (isAIHot ? '内容自媒体' : '国内电商');
+  // 🆕 AI 资讯/技术类 → 归到『内容自媒体』类目（推抖音知识口播/B站中视频/小红书生活方式种草）
+  if(isAIHot) return '内容自媒体';
   if(mkt==='全球' && (hasAmazon||hasTemu||hasTiktok||hasAliex||hasShopee||hasShopify||hasCross)) return '跨境电商（出口）';
   // 2) 平台关键词命中（注意：『淘宝/天猫,抖音电商』这种多平台也匹配国内电商）
   if(/淘宝|天猫|拼多多|京东|抖音电商|小红书电商|1688|视频号小店|快手电商/.test(plat)) return '国内电商';
