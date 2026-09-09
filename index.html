@@ -563,27 +563,78 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .todo-bar .chip.no{background:#fff3d6;color:var(--warn)}
 
 /* ===== 生成脚本 ===== */
+/* === 🆕 步骤卡片：更精致的视觉（v2 排版升级） === */
 .gen-panel{background:linear-gradient(180deg,#fffdf6,#fff);border-color:#f0e2bd}
-.gen-panel h2{margin-bottom:4px}
+.gen-panel h2{margin-bottom:6px;font-size:17px;letter-spacing:-.01em;position:relative;padding-left:14px}
+.gen-panel h2::before{content:"";position:absolute;left:0;top:5px;bottom:5px;width:4px;border-radius:2px;background:linear-gradient(180deg,#f3c971,#d49b1a)}
 .gen-intro{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.55}
 .gen-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
-.gen-step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px 10px;display:flex;flex-direction:column;gap:8px;transition:all .15s;position:relative}
-.gen-step:hover{border-color:#e6c98a;box-shadow:0 2px 8px rgba(184,134,11,.08)}
-.gen-step.filled{border-color:#82b366;background:linear-gradient(180deg,#f6fbf3,#fff)}
-.gen-step.filled::after{content:"✓";position:absolute;top:8px;right:10px;color:#82b366;font-weight:700;font-size:14px}
-.gen-step .step-head{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--ink2)}
-.gen-step .step-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#fce5a8,#f3c971);color:#7a5400;font-size:13px;font-weight:700;flex-shrink:0;box-shadow:inset 0 -1px 0 rgba(0,0,0,.06)}
-.gen-step.filled .step-num{background:linear-gradient(135deg,#aedb9c,#82b366);color:#fff}
-.gen-step .req{color:#d6336c;font-weight:700;margin-left:1px}
-.gen-step .opt{color:#1d4ed8;font-weight:600;font-size:11px;background:#dbeafe;padding:1px 7px;border-radius:999px;margin-left:2px}
-.gen-step[data-step="profile"]{grid-column:1/-1;background:linear-gradient(180deg,#f5f8ff,#fff);border-color:#c7d8f0;border-style:dashed}
+.gen-step{
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:14px 16px 12px;display:flex;flex-direction:column;gap:9px;
+  transition:all .2s cubic-bezier(.4,0,.2,1);position:relative;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+.gen-step:hover{
+  border-color:#d8c895;
+  box-shadow:0 4px 14px rgba(184,134,11,.10), 0 1px 2px rgba(15,23,42,.04);
+  transform:translateY(-1px);
+}
+.gen-step.filled{
+  border-color:#86c373;
+  background:linear-gradient(180deg,#f4faf2,#fff);
+  box-shadow:0 2px 8px rgba(130,179,102,.10);
+}
+.gen-step.filled::after{
+  content:"✓";position:absolute;top:10px;right:12px;color:#fff;
+  background:linear-gradient(135deg,#9bd17e,#5fa34a);
+  width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:11px;line-height:1;
+  box-shadow:0 1px 3px rgba(95,163,74,.30);
+}
+.gen-step .step-head{
+  display:flex;align-items:center;gap:10px;
+  font-size:14px;font-weight:600;color:var(--ink2);
+  letter-spacing:-.005em;
+}
+.gen-step .step-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:8px;
+  background:linear-gradient(135deg,#fef3d8,#f5dca0);color:#8a6300;
+  font-size:12px;font-weight:700;flex-shrink:0;
+  box-shadow:inset 0 -1px 0 rgba(0,0,0,.04), 0 1px 2px rgba(184,134,11,.10);
+  font-feature-settings:"tnum";
+}
+.gen-step.filled .step-num{
+  background:linear-gradient(135deg,#aedb9c,#82b366);color:#fff;
+  box-shadow:inset 0 -1px 0 rgba(0,0,0,.06), 0 1px 3px rgba(130,179,102,.25);
+}
+.gen-step .req{color:#e11d48;font-weight:700;margin-left:1px;font-size:13px}
+.gen-step .opt{
+  color:#1d4ed8;font-weight:600;font-size:11px;
+  background:linear-gradient(180deg,#eff6ff,#dbeafe);
+  padding:2px 8px;border-radius:999px;margin-left:4px;letter-spacing:.02em;
+}
+.gen-step[data-step="profile"]{
+  grid-column:1/-1;background:linear-gradient(180deg,#f5f8ff,#fff);
+  border-color:#c7d8f0;border-style:dashed;
+}
 .gen-step[data-step="profile"].filled{border-style:solid;border-color:#82b366}
-.gen-profile-row{display:flex;gap:8px}
+.gen-profile-row{display:flex;gap:10px}
 .gen-profile-row select{flex:1;min-width:0}
-.gen-step select{width:100%;min-width:0;font-size:13px;padding:7px 10px;border-radius:8px;background:#fafafa}
+.gen-step select{
+  width:100%;min-width:0;font-size:13px;padding:9px 12px;border-radius:10px;
+  background:#fafbfc;border:1px solid var(--line);color:var(--ink);
+  transition:all .15s;
+}
+.gen-step select:hover{border-color:#d8c895}
+.gen-step select:focus{outline:none;border-color:#c4a875;background:#fff;box-shadow:0 0 0 3px rgba(184,134,11,.08)}
 .gen-step.filled select{background:#fff}
 .gen-arrow{display:none}
-.gen-step-info{font-size:11.5px;color:var(--muted);line-height:1.45;min-height:16px;padding:2px 0 0}
+.gen-step-info{
+  font-size:11.5px;color:var(--muted);line-height:1.5;min-height:16px;padding:2px 0 0;
+}
 .gen-step-info b{color:var(--brand2);font-weight:600}
 @media(max-width:900px){.gen-steps{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:540px){.gen-steps{grid-template-columns:1fr}}
@@ -743,13 +794,31 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .formula-block .fexample{font-size:11.5px;color:var(--muted);margin-top:6px;font-style:italic}
 .learned-formulas-meta{font-size:11.5px;color:var(--muted);margin-bottom:8px;padding:6px 10px;background:#fafafa;border-radius:6px}
 
-.gen-step[data-step="angle"]{grid-column:1/-1;background:linear-gradient(180deg,#fff8ef,#fff);border-color:#f0d9a8;border-style:dashed}
-.gen-step[data-step="angle"].filled{border-style:solid;border-color:#e6b800}
-.gen-angle-input{width:100%;min-width:0;font-size:13px;padding:8px 10px;border-radius:8px;background:#fafafa;border:1px solid var(--line);resize:vertical;line-height:1.5;font-family:inherit;color:var(--ink)}
-.gen-angle-input:focus{outline:none;border-color:#e6b800;background:#fff}
+.gen-step[data-step="angle"]{
+  grid-column:1/-1;background:linear-gradient(180deg,#fffaf2,#fff);
+  border-color:#f0d9a8;border-style:dashed;
+  box-shadow:0 1px 2px rgba(184,134,11,.04);
+}
+.gen-step[data-step="angle"].filled{
+  border-style:solid;border-color:#e6b800;
+  box-shadow:0 2px 8px rgba(230,184,0,.10);
+}
+.gen-angle-input{
+  width:100%;min-width:0;font-size:13px;padding:10px 12px;border-radius:10px;
+  background:#fafbfc;border:1px solid var(--line);resize:vertical;
+  line-height:1.6;font-family:inherit;color:var(--ink);
+  transition:all .15s;
+}
+.gen-angle-input:hover{border-color:#e0c890}
+.gen-angle-input:focus{outline:none;border-color:#e6b800;background:#fff;box-shadow:0 0 0 3px rgba(230,184,0,.10)}
 .gen-angle-quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
-.angle-chip{font-size:11.5px;padding:4px 10px;border-radius:999px;border:1px solid #e6c98a;background:#fff7e6;color:#8a5a00;cursor:pointer;transition:all .15s;max-width:100%;text-align:left;white-space:normal;line-height:1.35;font-family:inherit}
-.angle-chip:hover{background:#fdeecb;border-color:#d4a017;color:#6b4400}
+.angle-chip{
+  font-size:11.5px;padding:5px 11px;border-radius:999px;
+  border:1px solid #e6c98a;background:#fff7e6;color:#8a5a00;
+  cursor:pointer;transition:all .15s;max-width:100%;
+  text-align:left;white-space:normal;line-height:1.35;font-family:inherit;
+}
+.angle-chip:hover{background:#fdeecb;border-color:#d4a017;color:#6b4400;transform:translateY(-1px);box-shadow:0 2px 6px rgba(212,160,23,.15)}
 .angle-chip:active{transform:scale(.97)}
 </style>
 </head>
@@ -968,7 +1037,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         </div>
       </div>
       <!-- 🆕 渲染状态条：明确告诉用户「当前显示多少条 / 库内多少 / 当前 Tab」，避免被跑马灯默认文字误导 -->
-      <div class="render-status" id="renderStatus" title="实时渲染状态 · 打开 DevTools Console 可看更多调试"><span class="rs-dot warn"></span>渲染状态加载中…</div>
+      <div class="render-status" id="renderStatus" title="实时渲染状态 · 打开 DevTools Console 可看更多调试"><span class="rs-dot warn"></span>热点库就绪 · 点右上方「🔥 一键扒热点」抓一批最新热点</div>
       <div class="bulk-bar" id="bulkBar">
         <span>已选 <span class="cnt" id="bulkCount">0</span> 条</span>
         <span style="font-size:11.5px;color:var(--muted)">⚠️ 删除不可恢复</span>
@@ -1104,7 +1173,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           </div>
         <div class="gen-step-info" id="infoProfile"></div>
         <div class="gen-step" data-step="angle">
-          <div class="step-head"><span class="step-num">8</span>产品/服务角度 <span class="opt">可选</span></div>
+          <div class="step-head"><span class="step-num">8</span>我的产品故事 <span class="opt">可选</span></div>
           <textarea id="genAngle" class="gen-angle-input" rows="2" oninput="this.closest('.gen-step').classList.toggle('filled',!!this.value)" placeholder="可选：想从这个热点讲什么产品故事？例：介绍 Flyelep 接入 Image 2.5，电商图质量升级"></textarea>
           <div class="gen-angle-quick" id="genAngleQuick"></div>
           <div class="gen-step-info">你不填就用系统自动匹配的角度；填了就 100% 按你的角度写（系统推荐角度仅供参考，不会与之冲突）。</div>
@@ -4785,11 +4854,15 @@ function renderHotspot(){
     }
   }
   // 🆕 在面板标题下显示明确的「渲染状态」——避免被默认跑马灯文字「暂无热门热点」误导
-  try{ updateRenderStatus(arr, all); }catch(_){}
+  // 传入 onlyNew / onlyThisBatch 模式标记，updateRenderStatus 内不依赖外层 const
+  try{ updateRenderStatus(arr, all, { onlyNew, onlyThisBatch: !!(_onlyThisBatch && _lastMergeIds.length) }); }catch(_){}
 }
 
-/* 🆕 渲染状态条：把 KPI、跑马灯、表格三处状态串起来，库内有数据时永远不再显示「暂无」 */
-function updateRenderStatus(arr, all){
+/* 🆕 渲染状态条：把 KPI、跑马灯、表格三处状态串起来，库内有数据时永远不再显示「暂无」
+ * opts = { onlyNew: boolean, onlyThisBatch: boolean } —— 由 renderHotspot 显式传入，避免作用域外访问局部 const
+ */
+function updateRenderStatus(arr, all, opts){
+  opts = opts || {};
   const bar=$('#renderStatus');
   if(!bar) return;
   const total=all.length;
@@ -4798,7 +4871,7 @@ function updateRenderStatus(arr, all){
     bar.innerHTML='<span class="rs-dot warn"></span>库内 <b>0</b> 条热点 · 当前 <b>'+tabName+'</b> Tab · 点「🔥 一键扒热点」抓一批';
     bar.className='render-status warn';
   }else{
-    const tag=onlyNew?'24h 新增':(_onlyThisBatch?'本次新增':'全部可结合');
+    const tag = opts.onlyNew ? '24h 新增' : (opts.onlyThisBatch ? '本次新增' : '全部可结合');
     bar.innerHTML='<span class="rs-dot ok"></span>库内 <b>'+total+'</b> 条 · 当前 <b>'+tabName+'</b> Tab · 显示 Top <b>'+arr.length+'</b> 条（'+tag+'）';
     bar.className='render-status ok';
   }
