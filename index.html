@@ -743,6 +743,14 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 .formula-block .fexample{font-size:11.5px;color:var(--muted);margin-top:6px;font-style:italic}
 .learned-formulas-meta{font-size:11.5px;color:var(--muted);margin-bottom:8px;padding:6px 10px;background:#fafafa;border-radius:6px}
 
+.gen-step[data-step="angle"]{grid-column:1/-1;background:linear-gradient(180deg,#fff8ef,#fff);border-color:#f0d9a8;border-style:dashed}
+.gen-step[data-step="angle"].filled{border-style:solid;border-color:#e6b800}
+.gen-angle-input{width:100%;min-width:0;font-size:13px;padding:8px 10px;border-radius:8px;background:#fafafa;border:1px solid var(--line);resize:vertical;line-height:1.5;font-family:inherit;color:var(--ink)}
+.gen-angle-input:focus{outline:none;border-color:#e6b800;background:#fff}
+.gen-angle-quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.angle-chip{font-size:11.5px;padding:4px 10px;border-radius:999px;border:1px solid #e6c98a;background:#fff7e6;color:#8a5a00;cursor:pointer;transition:all .15s;max-width:100%;text-align:left;white-space:normal;line-height:1.35;font-family:inherit}
+.angle-chip:hover{background:#fdeecb;border-color:#d4a017;color:#6b4400}
+.angle-chip:active{transform:scale(.97)}
 </style>
 </head>
 <body>
@@ -1094,8 +1102,14 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
             <select id="genProfilePlatform" onchange="onGenProfilePlatformChange()"><option value="">— 跟账号定位走 —</option></select>
             <select id="genProfileType" onchange="renderGenStepInfo()"><option value="">— 选卖家类型 —</option></select>
           </div>
-          <div class="gen-step-info" id="infoProfile"></div>
+        <div class="gen-step-info" id="infoProfile"></div>
+        <div class="gen-step" data-step="angle">
+          <div class="step-head"><span class="step-num">8</span>产品/服务角度 <span class="opt">可选</span></div>
+          <textarea id="genAngle" class="gen-angle-input" rows="2" oninput="this.closest('.gen-step').classList.toggle('filled',!!this.value)" placeholder="可选：想从这个热点讲什么产品故事？例：介绍 Flyelep 接入 Image 2.5，电商图质量升级"></textarea>
+          <div class="gen-angle-quick" id="genAngleQuick"></div>
+          <div class="gen-step-info">你不填就用系统自动匹配的角度；填了就 100% 按你的角度写（系统推荐角度仅供参考，不会与之冲突）。</div>
         </div>
+      </div>
       </div>
       <div class="gen-actionbar">
         <button class="btn primary gen-primary-btn" id="genGoBtn" onclick="generateScript()">🎬 AI 生成脚本</button>
@@ -1999,6 +2013,7 @@ function renderGenStepInfo(){
     ? `已选：<b>${escapeHtml(pk)}</b> · 脚本按此精细化画像写`
     : '（未细分 · 按账号定位写）';
   setFilled('profile', gp||gt);
+  renderGenAngleQuick();
 }
 
 // 根据当前账号的「账号定位」填充用户画像的「平台」下拉
@@ -2073,6 +2088,33 @@ function genOnHotspotChange(){
   }
   renderGenStepInfo();
 }
+// 生成脚本：基于当前热点，自动给出"产品/服务角度"快捷候选，用户点一下填入输入框
+function renderGenAngleQuick(){
+  const box=document.getElementById('genAngleQuick'); if(!box) return;
+  const hid=$('#genHotspot')?.value;
+  const h=hid?state.hotspots.find(x=>x.id===hid):null;
+  const chips=[];
+  if(h){
+    if(h.flyelepAngle){
+      const t=h.flyelepAngle.length>46?h.flyelepAngle.slice(0,46)+'…':h.flyelepAngle;
+      chips.push('系统推荐角度：'+t);
+    }
+    const short=h.title?(h.title.length>16?h.title.slice(0,16)+'…':h.title):'';
+    if(short) chips.push('讲产品升级：借「'+short+'」说我们工具变强了');
+    chips.push('讲行业影响：解读这个热点，顺带带出我们产品定位');
+  }else{
+    chips.push('讲产品升级：借热点说我们工具变强了');
+    chips.push('讲行业影响：解读热点，带出我们产品定位');
+  }
+  box.innerHTML=chips.map((c,i)=>'<button type="button" class="angle-chip" onclick="fillGenAngle('+i+')">'+escapeHtml(c)+'</button>').join('');
+  box._chips=chips;
+}
+function fillGenAngle(i){
+  const box=document.getElementById('genAngleQuick'); const ta=document.getElementById('genAngle');
+  if(!box||!ta||!box._chips) return;
+  ta.value=box._chips[i]||''; ta.focus();
+  const step=document.querySelector('.gen-step[data-step="angle"]'); if(step) step.classList.toggle('filled',!!ta.value);
+}
 function firstSentence(s){
   if(!s) return '';
   const i=s.indexOf('→'); let t=i>=0?s.slice(0,i):s; t=t.trim();
@@ -2086,6 +2128,7 @@ async function generateScript(){
         vtk=$('#genVidType').value, vdk=$('#genVidDur').value,
         vfk=$('#genFeature').value, sid=$('#genStruct').value;
   if(!hid||!aid){ toast('请先选 热点 和 账号'); return; }
+  const angle=($('#genAngle')?.value||'').trim();
   if(!vtk||!vdk||!vfk){ toast('请选齐 视频类型 / 时长 / 主推功能'); return; }
   if(!sid){ toast('请选择脚本结构'); return; }
   const h=state.hotspots.find(x=>x.id===hid); const a=state.accounts.find(x=>x.id===aid);
@@ -2098,18 +2141,18 @@ async function generateScript(){
   const fn=vf.label;
   const engine=($('#genEngine')?.value)||'ai';
   showGenLoading(h, engine, {vt,vd,vf});
-  if(engine==='local'){ buildLocalScript(h,a,st,plat,fn,vt,vd,vf); return; }
+  if(engine==='local'){ buildLocalScript(h,a,st,plat,fn,vt,vd,vf, angle); return; }
   // 备用通道（DeepSeek/Qwen 等）：未配 Key 时友好提示并回退本地模板
   if(engine==='siliconflow' && window.__engines && window.__engines.siliconflow===false){
     toast('⚠️ 备用通道未启用（owner 需在 Render 设 SILICONFLOW_KEY）。已用 Yellow Dog 本地模板兜底，或切到默认引擎。');
-    buildLocalScript(h,a,st,plat,fn,vt,vd,vf); return;
+    buildLocalScript(h,a,st,plat,fn,vt,vd,vf, angle); return;
   }
   // 火山方舟 Seed-2.1-pro：未连后端或后端无 ARK Key 时直接回退本地模板，避免用户报"什么都出不来"
   if(engine==='ark' && (!API_BASE || (window.__engines && window.__engines.ark===false))){
     toast('⚠️ 团队云未启用 Yellow Dog Seed-2.1-pro（owner 需配 ARK_KEY），已用 Yellow Dog 本地模板兜底。');
-    buildLocalScript(h,a,st,plat,fn,vt,vd,vf); return;
+    buildLocalScript(h,a,st,plat,fn,vt,vd,vf, angle); return;
   }
-  const prompt=buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid);
+  const prompt=buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid, angle);
   const btn=$('#genGoBtn'); if(btn) btn.disabled=true;
   let lastFull='';
   const onToken=(delta, full)=>{ lastFull=full; streamRender(h, full, engineLabel(engine)); };
@@ -2141,13 +2184,13 @@ async function generateScript(){
         return;
       }catch(e2){
         const reason2=(e2&&e2.message)?e2.message:'未知错误';
-        const fallbackScript=buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf);
+        const fallbackScript=buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf, angle);
         renderAiScript(h, null, '⚠️ '+fallback+' 与默认引擎均失败，已用 Yellow Dog 本地模板兜底：'+reason2+'。', fallbackScript);
         toast('所有 Yellow Dog 引擎均不可用，已用本地模板兜底');
         return;
       }
     }else{
-      const fallbackScript=buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf);
+      const fallbackScript=buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf, angle);
       const noKey=!((localStorage.getItem('flyelep_zhipu_key')||'').trim());
       const hint=noKey
         ? '（未检测到引擎 Key —— 请点页面右下角「🔑 配置引擎 Key」填入后重试）'
@@ -2158,7 +2201,7 @@ async function generateScript(){
   }finally{ if(btn) btn.disabled=false; }
 }
 
-function buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid){
+function buildZhipuPrompt(h,a,st,plat,fn,vt,vd,vf, vtk, sid, angle){
   const tone=PLAT_TONE[plat]||PLAT_TONE['默认'];
   const rules=(PLAT_RULES[plat]||PLAT_RULES['默认']||[]).join('\n');
   // ===== 爆款库 · few-shot 自动学习（核心）=====
@@ -2264,6 +2307,13 @@ ${rules}${fewShotBlock}${learnedBlock}
 - **Flyelep 落地**：把主推功能「${vf.label}」怎么用一句话自然落到发布语里（不硬喊"用 Flyelep"）
 - 总字数控制在 350-${vd.beats*100} 字之间，三段加起来的总字数。`;
 
+  let flyelepAngleBlock='';
+  if(angle && angle.trim()){
+    flyelepAngleBlock='\n【用户指定的产品/服务角度（★最高优先级★ — 整条脚本必须围绕这个角度组织）】\n'+angle.trim()+'\n（用户已明确想讲的产品故事方向就是上面这条；钩子怎么引入、痛点怎么点、Flyelep 怎么落，都要服务于这个角度；系统推荐角度仅供参考，不得与之冲突）';
+  } else if(h.flyelepAngle){
+    flyelepAngleBlock='\n【本热点 × Flyelep 推荐角度（按这个角度切入最自然）】\n'+h.flyelepAngle+'\n请围绕这个角度设计脚本：钩子怎么引入 Flyelep、痛点怎么点到 Flyelep 解决、结尾怎么自然落到 Flyelep 工具。';
+  }
+
   const user = `请按你的设定给我写一份可直接开拍的脚本（平台：${plat}，人群：${personaKey}，必须按上面【用户画像 · ${personaKey}】的口吻/痛点/CTA 写，且不能有任何 AI 腔、不能有元叙述）。
 
 【热点信息】
@@ -2276,7 +2326,7 @@ ${rules}${fewShotBlock}${learnedBlock}
 - 玩法描述：${h.playbook||'(无)'}
 - 原始选题要点：${h.topic||'(无)'}
 - 原始素材清单：${h.material||'(无)'} · URL：${h.url||''}
-${h.flyelepAngle?'\n【本热点 × Flyelep 推荐角度（按这个角度切入最自然）】\n'+h.flyelepAngle+'\n请围绕这个角度设计脚本：钩子怎么引入 Flyelep、痛点怎么点到 Flyelep 解决、结尾怎么自然落到 Flyelep 工具。':''}
+${flyelepAngleBlock}
 
 【账号信息】
 - 账号：${a.platform||plat} · ${a.name}
@@ -2961,7 +3011,7 @@ function parseBeat(b){
   return `<div class="gen-beat">${timeHtml}${rowsHtml}</div>`;
 }
 
-function buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf){
+function buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf, angle){
   const hook=st.hook(h.title||h.product||'这个热点');
   // 本地模板同样用新画像逻辑（生成弹窗精确画像优先，否则账号定位兜底）
   const _gp = (typeof getGenProfileKey==='function') ? getGenProfileKey() : '';
@@ -2970,6 +3020,7 @@ function buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf){
   const steps=st.steps.map((s,i)=>{
     let extra='';
     if(i===0 && h.script) extra=`\n　· 画面（${vt.shoot}）：${firstSentence(h.script)}`;
+    if(i===0 && angle) extra+='\n　· 用户角度：'+angle;
     if(i===1 && h.product) extra=`\n　· 可挂钩：${h.product}${h.category?`（${h.category}）`:''}`;
     if((i===2||i===st.steps.length-1) && h.playbook) extra=`\n　· 玩法：${h.playbook}`;
     return `【${i+1}】${s}${extra}`;
@@ -2984,7 +3035,7 @@ ${hook}
 **【脚本前置概要】**
 - 用户画像：${personaKey}
 - 视频结构：${st.label}
-- 主推功能：「${vf.label}」 —— ${vf.desc}
+- 主推功能：「${vf.label}」 —— ${vf.desc}${angle?'\n- 用户指定角度：'+angle:''}
 
 **【视频文案脚本】**
 ${steps}
@@ -2997,8 +3048,8 @@ ${steps}
 - 平台调性：${tone}`.trim();
 }
 
-function buildLocalScript(h,a,st,plat,fn,vt,vd,vf){
-  const script=buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf);
+function buildLocalScript(h,a,st,plat,fn,vt,vd,vf, angle){
+  const script=buildLocalScriptText(h,a,st,plat,fn,vt,vd,vf, angle);
   const box=$('#genResult');
   box.classList.remove('hidden');
   _lastGenScriptRaw = script;
