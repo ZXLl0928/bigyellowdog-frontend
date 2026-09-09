@@ -1118,6 +1118,7 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       <div class="v3-filter">
         <span class="vf-label">这条热点对谁有用</span>
         <div class="v3-chips" id="v3PersonaChips"></div>
+        <button class="v3-reset" id="v3ResetBtn" onclick="resetV3Filters()" title="把上面所有子筛选都清回「全部」" style="margin-left:auto;padding:5px 12px;border:1px dashed #f0c674;border-radius:8px;background:#fff8e6;color:#9a5b00;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;align-self:center">🧹 清空筛选</button>
       </div>
       <!-- 🆕 V3 热点环节筛选（第二行） -->
       <div class="v3-filter v3-filter-sub">
@@ -3679,7 +3680,19 @@ function switchHotTab(tab){
   $$('#hotTabs .hot-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
   // 🆕 AI 资讯分组条只在「AI 资讯」Tab 显示
   const aiSub=$('#aiSubTabs'); if(aiSub) aiSub.style.display = (tab==='ai') ? '' : 'none';
+  // 🆕 切主 Tab 时自动重置子筛选条件（避免「AI 工具动向」等带进「电商热点/选品/网络热点」后变 0）
+  if(tab!=='ai' && (_v3Persona!=='all' || _v3Stage!=='all' || _aiSub!=='all')){
+    _v3Persona='all'; _v3Stage='all'; _aiSub='all';
+    try{ renderV3FilterChips(); }catch(_){}
+    toast('已清空上一 Tab 的筛选条件');
+  }
   renderHotspot();
+}
+function resetV3Filters(){
+  _v3Persona='all'; _v3Stage='all'; _aiSub='all';
+  renderV3FilterChips();
+  renderHotspot();
+  toast('已清空所有筛选');
 }
 const MATCH_MAP={high:['m-high','⭐⭐⭐ 高'],mid:['m-mid','⭐⭐ 中'],low:['m-low','⭐ 低']};
 const MKT_MAP={'国内':['mkt-cn','国内'],'海外':['mkt-overseas','海外'],'全球':['mkt-global','全球']};
@@ -4864,6 +4877,7 @@ function renderHotspot(){
         <div class="big">🛍️</div>
         <div style="font-size:14px;font-weight:600;margin:8px 0 4px">热门选品为空</div>
         <div class="muted" style="margin-bottom:14px">点「🔥 一键扒热点」后会自动拉一批最新爆品 / Amazon Best Seller / TikTok Shop Trending</div>
+        <button class="btn" onclick="resetV3Filters()" style="padding:8px 18px;margin-top:10px">🧹 清空筛选条件</button>
         <div class="muted" style="margin-top:12px;font-size:11.5px">或在右下角导入热点源 JSON 文件</div>
       </td></tr>`;
     }else if(_hotTab==='festival'){
@@ -4879,7 +4893,9 @@ function renderHotspot(){
         <div class="big">📊</div>
         <div style="font-size:14px;font-weight:600;margin:8px 0 4px">电商热点为空</div>
         <div class="muted" style="margin-bottom:14px">「电商热点」只展示有电商平台信号的内容（Amazon/淘宝/京东/拼多多/Temu 等）。其他社会新闻归到「网络热点」</div>
-        <div class="muted" style="margin-top:8px;font-size:11.5px">先点「🔥 一键扒热点」抓一批</div>
+        <button class="btn" onclick="resetV3Filters()" style="padding:8px 18px;margin-top:10px;margin-right:8px">🧹 清空筛选条件</button>
+        <button class="btn" onclick="scrapeHotFromApi()" style="padding:8px 18px;margin-top:10px">🔥 一键扒热点</button>
+        <div class="muted" style="margin-top:12px;font-size:11.5px">当前 30 条电商热点都被筛选条件过滤掉了？点上方「🧹」一键恢复全部</div>
       </td></tr>`;
     }else if(_showArchived){
       const archCount = (state.hotspots||[]).filter(h=>h.archived).length;
@@ -4891,7 +4907,13 @@ function renderHotspot(){
         <div class="muted" style="margin-top:12px;font-size:11.5px">点击上方「📦 已归档」按钮可切回正常视图</div>
       </td></tr>`;
     }else{
-      emptyHtml='<tr><td colspan="4" class="empty"><div class="big">🔥</div>这个 Tab 下没有热点，先点「🔥 一键扒热点」抓一批，或切换 Tab</td></tr>';
+      emptyHtml=`<tr><td colspan="4" class="empty">
+        <div class="big">🔥</div>
+        <div style="font-size:14px;font-weight:600;margin:8px 0 4px">这个 Tab 下没有热点</div>
+        <div class="muted" style="margin-bottom:14px">试试清空筛选条件，或切换到「全部」Tab 看看。</div>
+        <button class="btn" onclick="resetV3Filters()" style="padding:8px 18px;margin-right:8px">🧹 清空筛选条件</button>
+        <button class="btn primary" onclick="scrapeHotFromApi()" style="padding:8px 18px">🔥 一键扒热点</button>
+      </td></tr>`;
     }
     tbody.innerHTML=emptyHtml;
     updateBulkBar(); return;
