@@ -943,6 +943,19 @@ a.hs-title:hover{background-size:0 100%}
 .dt{font-size:12.5px;color:#57514a;line-height:1.75}
 .dt b{display:block;margin:9px 0 2px;font-size:11.5px;font-weight:500;color:#8a8375;letter-spacing:.3px}
 .dt b:first-child{margin-top:0}
+/* ========== V4.2 卡片单元（评级与操作并入卡片内部） ========== */
+#hotspotTable tbody td.hs-title-col{position:relative;padding:0;background:none;vertical-align:middle}
+#hotspotTable tbody td.hs-title-col::before{content:none}
+#hotspotTable tbody td.hs-cb{padding:0 0 0 16px;vertical-align:middle;border-bottom:1px solid #f2eee5}
+.hs-card{display:flex;align-items:center;gap:0;padding:16px 22px 16px 24px;position:relative}
+.hs-card::before{content:'';position:absolute;left:0;top:16px;bottom:16px;width:3px;border-radius:0 2px 2px 0;background:#d9c9a8}
+.hs-main{flex:1;min-width:0}
+.hs-side{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;padding-left:22px;margin-left:22px;border-left:1px solid #f2eee5;min-width:140px}
+.hs-side .hs-act{justify-content:center}
+.hs-side .grade-chip{width:58px;height:54px}
+#hotspotTable tbody tr.hs-featured .hs-card::before{background:#f0a72b}
+#hotspotTable tbody tr.v3-info-row .hs-card::before{background:#c8c5bb}
+#hotspotTable tbody tr.hs-cant .hs-card::before{background:#dedbd4}
 /* ========== V3 筛选区（用户画像第一行，最突出） ========== */
 .v3-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:9px 12px;margin:0 0 10px;
   background:linear-gradient(180deg,#f6fbf3,#fff);border:1px solid #cfe3c6;border-radius:10px}
@@ -1262,7 +1275,7 @@ a.hs-title:hover{background-size:0 100%}
         <span class="advanced-hint">💡 分类请用上方类型 Tab，这里只做精细过滤</span>
       </div>
 <div class="table-scroll"><table id="hotspotTable"><thead><tr>
-        <th class="hs-cb"><input type="checkbox" id="hsSelectAll" onchange="toggleSelectAll(this.checked)" title="全选当前可见行"></th><th class="hs-title-th" style="width:64%">标题 / 适配画像</th><th class="hs-grade-th" style="width:92px">评级 / 价值</th><th class="hs-act-th" style="width:172px">操作</th>
+        <th class="hs-cb"><input type="checkbox" id="hsSelectAll" onchange="toggleSelectAll(this.checked)" title="全选当前可见行"></th><th class="hs-title-th">标题 / 适配画像 / 操作</th>
 </tr></thead><tbody></tbody></table></div>
     </div>
 
@@ -5029,7 +5042,7 @@ function renderHotspot(){
   if(!arr.length){
     let emptyHtml='';
     if(_hotTab==='festival'){
-      emptyHtml=`<tr><td colspan="4" class="empty">
+      emptyHtml=`<tr><td colspan="2" class="empty">
         <div class="big">🎉</div>
         <div style="font-size:14px;font-weight:600;margin:8px 0 4px">电商节日为空</div>
         <div class="muted" style="margin-bottom:14px">点下面按钮一键同步 27 个 2026-2027 电商节日（双十一/618/黑五/圣诞等）</div>
@@ -5039,7 +5052,7 @@ function renderHotspot(){
     }else if(MAIN_TYPE_LABEL[_hotTab]){
       const _mt = MAIN_TYPES.find(t=>t.key===_hotTab)||{};
       const _filtN = (state.hotspots||[]).filter(h=>!h.archived && h.filtered).length;
-      emptyHtml=`<tr><td colspan="4" class="empty">
+      emptyHtml=`<tr><td colspan="2" class="empty">
         <div class="big">${_mt.icon||'💡'}</div>
         <div style="font-size:14px;font-weight:600;margin:8px 0 4px">${escapeHtml(_mt.label||'')} 暂无可用热点</div>
         <div class="muted" style="margin-bottom:14px">${escapeHtml(_mt.desc||'')}</div>
@@ -5049,7 +5062,7 @@ function renderHotspot(){
       </td></tr>`;
     }else if(_showArchived){
       const archCount = (state.hotspots||[]).filter(h=>h.archived).length;
-      emptyHtml=`<tr><td colspan="4" class="empty">
+      emptyHtml=`<tr><td colspan="2" class="empty">
         <div class="big">📦</div>
         <div style="font-size:14px;font-weight:600;margin:8px 0 4px">已归档 ${archCount} 条</div>
         <div class="muted" style="margin-bottom:14px">这些是库内超过 500 条时被自动归档的旧热点。可恢复最近 50 条继续查看。</div>
@@ -5057,7 +5070,7 @@ function renderHotspot(){
         <div class="muted" style="margin-top:12px;font-size:11.5px">点击上方「📦 已归档」按钮可切回正常视图</div>
       </td></tr>`;
     }else{
-      emptyHtml=`<tr><td colspan="4" class="empty">
+      emptyHtml=`<tr><td colspan="2" class="empty">
         <div class="big">🔥</div>
         <div style="font-size:14px;font-weight:600;margin:8px 0 4px">这个 Tab 下没有热点</div>
         <div class="muted" style="margin-bottom:14px">试试清空筛选条件，或切换到「全部」Tab 看看。</div>
@@ -5132,6 +5145,8 @@ function renderHotspot(){
     return `<tr${rowCls?' class="'+rowCls+'"':''} data-id="${h.id}">
       <td class="hs-cb"><input type="checkbox" data-hid="${h.id}" ${sel?'checked':''} onchange="toggleHotspotSelect('${h.id}', this.checked)"></td>
       <td class="hs-title-col">
+        <div class="hs-card">
+        <div class="hs-main">
         <div class="hs-title-row" ${origHint}>
           ${h.url
             ? `<a href="${h.url}" target="_blank" rel="noopener" class="hs-title">${escapeHtml(h.title)}</a>`
@@ -5150,16 +5165,18 @@ function renderHotspot(){
         <div class="hs-type-row">${mtChip}${audChip}${tagChips}${riskChips}${infoBadge}</div>
         ${personaChips}
         ${v3Block}
+        </div>
+        <div class="hs-side">
+          <span class="grade-chip ${gCls}" title="${gv?('推荐视角：'+gvLbl+' · 跟你的匹配 '+(pm??'-')):'推荐度'}"><span class="gc-l">${gTxt}</span><span class="gc-s">级</span><span class="gc-n">${dv}</span></span>
+          <div class="hs-act">
+            <button class="btn sm" onclick="toggleHsDetail('${h.id}')" title="查看为什么推荐给你 / 选题 / 脚本要点 / 素材清单">详情</button>
+            <button class="btn sm primary" onclick="genFromRow('${h.id}')">生成</button>
+            <button class="btn sm danger" onclick="deleteHotspot('${h.id}')">删</button>
+          </div>
+        </div>
+        </div>
       </td>
-      <td class="hs-grade">
-        <span class="grade-chip ${gCls}"><span class="gc-l">${gTxt}</span><span class="gc-s">级</span><span class="gc-n" title="${gv?('推荐视角：'+gvLbl+' · 跟你的匹配 '+(pm??'-')):'推荐度'}">${dv}</span></span>
-      </td>
-      <td class="hs-act">
-        <button class="btn sm" onclick="toggleHsDetail('${h.id}')" title="查看为什么推荐给你 / 选题 / 脚本要点 / 素材清单">详情</button>
-        <button class="btn sm primary" onclick="genFromRow('${h.id}')">生成</button>
-        <button class="btn sm danger" onclick="deleteHotspot('${h.id}')">删</button>
-      </td>
-    </tr>${hasDetail?`<tr class="hs-detail hidden" id="hsd-${h.id}"><td colspan="4"><div class="dt">
+    </tr>${hasDetail?`<tr class="hs-detail hidden" id="hsd-${h.id}"><td colspan="2"><div class="dt">
       ${h.whoFor?`<b>谁用得上</b><div>${escapeHtml(h.whoFor)}</div>`:''}
       ${h.capabilityKind?`<b>适配能力</b><div>Flyelep ${escapeHtml(h.capabilityKind)}</div>`:''}
       ${h.flyelepText?`<b>Flyelep 能帮你</b><div>${escapeHtml(h.flyelepText)}</div>`:''}
@@ -5983,6 +6000,8 @@ function isAITextOnly(text){
  */
 const POOL_A=/卖家|商家|运营|平台规则|政策|审核|合规|限流|封号|降权|选品|上架|listing|sku|erp|供应链|货源|工厂|物流|海外仓|fba|广告投放|acos|roas|转化率|复购|退款|差评|店铺|开店|入驻|佣金|手续费|运费|关税|商标|版权|侵权|素材|产能|返工|批量|效率|提效|工具|软件|系统|后台|设置|功能更新|卖家中心/i;
 const POOL_C=/明星|艺人|偶像|恋情|分手|离婚|出轨|综艺|电视剧|电影|票房|剧情|大结局|番剧|动漫|游戏|夺冠|赛事|比分|演唱会|音乐节|歌手|新歌|专辑|塌房|八卦|吃瓜|追星|搞笑|段子|萌宠|猫咪|狗狗|美食|菜谱|食谱|烘焙|减肥|星座|情感|鸡汤|相亲|彩礼|裸辞|躺平|脱单|表白/i;
+// 🆕 V4.2 社交热榜准入：抖音 / 小红书热搜必须命中消费·商品·视觉信号，否则丢弃（方案第 7 节）
+const SOCIAL_ACCEPT=/好物|种草|必买|推荐|测评|开箱|回购|平替|清单|攻略|避坑|智商税|穿搭|妆容|护肤|美妆|发型|配饰|家居|装修|收纳|数码|手机|电脑|耳机|家电|母婴|育儿|宠物|零食|美食|饮品|咖啡|甜品|服饰|鞋|包|首饰|露营|健身|出行|旅行|酒店|机票|门票|优惠|折扣|便宜|性价比|省钱|团购|秒杀|直播|带货|旗舰店|新品|开售|发售|抢购|断货|销量|爆款|热卖|同款|探店|打卡|拍照|出片|构图|调色|滤镜|模板|教程|改造|对比|技巧|配方|做法|穿搭灵感|夏装|冬装|春装|秋装|换季/i;
 
 function classifyPool(h){
   if(h.type==='festival'||h.type==='product') return 'B';
@@ -6043,6 +6062,11 @@ function preFilter(h){
   }
   // ⑤ 无任何用户画像匹配 → 丢弃
   if(h.d1===0) return '无匹配画像';
+  // ⑥ 🆕 V4.2 社交热榜（抖音 / 小红书）准入：无消费·商品·视觉信号 → 丢弃
+  const isSocial = h.fromSocial || /抖音|小红书/.test(String(h.platform||''));
+  if(isSocial && !SOCIAL_ACCEPT.test(t) && classifyEcom(t).ecom==='no') return '社交热榜 · 与电商无关';
+  // ⑦ 🆕 V4.2 兜底归入「行业观点干货型」但既无 AI 视觉、也无行业信号 → 丢弃（防兜底堆积）
+  if(h.mainType==='insight' && !isAIVisualIndirect(t) && !T_INSIGHT.some(re=>re.test(t))) return '内容笼统 · 已降噪';
   return '';
 }
 
@@ -6678,7 +6702,7 @@ async function fetchUapisHot(type, srcName, market, opts){
       const hot=Number(String(it.hot_value||it.hot||'').replace(/[^\d]/g,''))||0;
       const o={
         date:today, type:opts.hotType||'dy', source:srcName, market:market||'国内',
-        platform:srcName,
+        platform:srcName, fromSocial:true,   // V4.2：社交热榜，准入更严
         title:title.slice(0,140),
         url:it.url||'',
         product:'', category:'', price:'', sales: hot?String(hot):'',
