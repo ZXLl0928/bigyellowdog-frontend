@@ -181,7 +181,7 @@ tr.hs-cant .hs-title{color:#9a958c;text-decoration:line-through}
 .pill.mkt-cn{background:#e6f7ed;color:#1a6e3f} .pill.mkt-overseas{background:#e6f0fa;color:#1a56a3} .pill.mkt-global{background:#f5f0fa;color:#5b2d8a}
 .pill.plat{background:#f0efea;color:var(--ink2);border:1px solid #e0ddd6}
 /* 🆕 四大类 Tab 切换器 */
-.hot-tabs{display:flex;gap:6px;margin:0 0 12px;padding:8px;background:linear-gradient(180deg,#f7f4ec,#efece4);border:1px solid var(--line);border-radius:12px;box-shadow:inset 0 1px 0 #fff}
+.hot-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px;padding:8px;background:linear-gradient(180deg,#f7f4ec,#efece4);border:1px solid var(--line);border-radius:12px;box-shadow:inset 0 1px 0 #fff}
 .hot-tab{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;font-size:13.5px;font-weight:600;color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:9px;cursor:pointer;transition:all .15s ease;white-space:nowrap}
 .hot-tab:hover{border-color:var(--brand);color:var(--brand);background:#fffaf0;transform:translateY(-1px)}
 .hot-tab.active{background:linear-gradient(180deg,#fff8e6,#ffe8b8);border-color:#f0c674;color:#9a5b00;box-shadow:0 2px 6px rgba(240,198,116,.4),inset 0 1px 0 #fff}
@@ -224,6 +224,24 @@ a.hs-title:hover{background-size:100% 100%;color:#9a3412}
 .hs-meta-row .hs-mkt-global{background:#f5f0fa;color:#5b2d8a}
 .hs-meta-row .hs-src{color:#a8a094;display:none}
 .hs-meta-row .hs-angle-inline{font-weight:600;color:#7c3aed;letter-spacing:.2px}
+/* V4 主类型 / 受众 / 辅助标签 / 风险标签 */
+.hs-type-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}
+.mt-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:7px;font-size:11.5px;font-weight:700;border:1px solid transparent;white-space:nowrap}
+.mt-pick{background:#e7f7ee;color:#0b7a45;border-color:#b7e6cc}
+.mt-pain{background:#fdecec;color:#b3261e;border-color:#f6c9c6}
+.mt-visual{background:#f1ebfd;color:#5b32c2;border-color:#d9ccf7}
+.mt-market{background:#fff3df;color:#9a5b00;border-color:#f3d9a8}
+.mt-insight{background:#e8f1fb;color:#0b4f9e;border-color:#bfd8f5}
+.aud-chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:7px;font-size:11px;font-weight:600;white-space:nowrap}
+.aud-biz{background:#1f2937;color:#fff}
+.aud-con{background:#eef2f6;color:#425466;border:1px solid #dbe3ea}
+.aux-tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:7px;font-size:11px;font-weight:600;border:1px solid;white-space:nowrap}
+.aux-img{background:#eafaf3;color:#0d7a52;border-color:#bfe8d7}
+.aux-vid{background:#eef4ff;color:#1a56b8;border-color:#c7daf7}
+.aux-ind{background:#f5f0ff;color:#6b3fc4;border-color:#ddd0f7}
+.aux-risk{background:#fff2f0;color:#b3261e;border-color:#f7cdc8}
+.v3-s b i{font-style:normal;font-weight:600;font-size:10px;opacity:.6}
+.v3-minus{color:#c92a2a}
 /* 🆕 可用画像 chip — 替代原 status pill */
 .hs-personas{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
 .hs-personas-empty{color:#c4c0b8;font-size:11px;font-weight:600;margin-top:3px}
@@ -1088,14 +1106,16 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         <button class="hot-slogan-icon" onclick="document.getElementById('feedFileInput').click()" title="导入热点源文件">📂</button>
         <input type="file" id="feedFileInput" accept=".json,application/json" hidden onchange="importFeedFile(this)">
       </div>
-      <!-- 🆕 四大类 Tab 切换（点哪个看哪个分类的排行榜；每个 Tab 内自动取 value 前 20） -->
+      <!-- 🆕 V4 五大类型 Tab 切换（点哪个看哪个类型的排行榜；每个 Tab 内自动取前 30 条） -->
       <div class="hot-tabs" id="hotTabs">
-        <button class="hot-tab active" data-tab="all"      onclick="switchHotTab('all')">      <span class="ht-ico">🌐</span><span class="ht-label">全部</span>    <span class="ht-badge" id="htCountAll">0</span></button>
-        <button class="hot-tab"        data-tab="ecom"     onclick="switchHotTab('ecom')">     <span class="ht-ico">📊</span><span class="ht-label">电商热点</span><span class="ht-badge" id="htCountEcom">0</span></button>
-        <button class="hot-tab"        data-tab="web"      onclick="switchHotTab('web')">      <span class="ht-ico">🎵</span><span class="ht-label">网络热点</span><span class="ht-badge" id="htCountWeb">0</span></button>
-        <button class="hot-tab"        data-tab="product"  onclick="switchHotTab('product')">  <span class="ht-ico">🛍️</span><span class="ht-label">热门选品</span><span class="ht-badge" id="htCountProduct">0</span></button>
-        <button class="hot-tab"        data-tab="festival" onclick="switchHotTab('festival')"> <span class="ht-ico">🎉</span><span class="ht-label">电商节日</span><span class="ht-badge" id="htCountFestival">0</span></button>
-        <button class="hot-tab"        data-tab="ai"       onclick="switchHotTab('ai')">       <span class="ht-ico">🤖</span><span class="ht-label">AI 资讯</span> <span class="ht-badge" id="htCountAi">0</span></button>
+        <button class="hot-tab active" data-tab="all"      onclick="switchHotTab('all')">      <span class="ht-ico">🌐</span><span class="ht-label">全部</span>          <span class="ht-badge" id="htCountAll">0</span></button>
+        <button class="hot-tab"        data-tab="pick"     onclick="switchHotTab('pick')">     <span class="ht-ico">🛍️</span><span class="ht-label">选品机会型</span>    <span class="ht-badge" id="htCountPick">0</span></button>
+        <button class="hot-tab"        data-tab="pain"     onclick="switchHotTab('pain')">     <span class="ht-ico">🛡️</span><span class="ht-label">运营痛点型</span>    <span class="ht-badge" id="htCountPain">0</span></button>
+        <button class="hot-tab"        data-tab="visual"   onclick="switchHotTab('visual')">   <span class="ht-ico">🎨</span><span class="ht-label">内容视觉趋势型</span><span class="ht-badge" id="htCountVisual">0</span></button>
+        <button class="hot-tab"        data-tab="market"   onclick="switchHotTab('market')">   <span class="ht-ico">📅</span><span class="ht-label">市场舆情窗口型</span><span class="ht-badge" id="htCountMarket">0</span></button>
+        <button class="hot-tab"        data-tab="insight"  onclick="switchHotTab('insight')">  <span class="ht-ico">💡</span><span class="ht-label">行业观点干货型</span><span class="ht-badge" id="htCountInsight">0</span></button>
+        <button class="hot-tab"        data-tab="product"  onclick="switchHotTab('product')">  <span class="ht-ico">📦</span><span class="ht-label">热门选品</span>      <span class="ht-badge" id="htCountProduct">0</span></button>
+        <button class="hot-tab"        data-tab="festival" onclick="switchHotTab('festival')"> <span class="ht-ico">🎉</span><span class="ht-label">电商节日</span>      <span class="ht-badge" id="htCountFestival">0</span></button>
       </div>
       <!-- 🆕 新增快报（每次扒取后高亮 8 秒，含「立即查看本次新增」按钮） -->
       <div class="new-arrival-bar hidden" id="newArrivalBar">
@@ -1157,12 +1177,12 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
       <!-- 高级筛选抽屉（默认收起） -->
       <div class="advanced-filters hidden" id="advancedFilters">
         <select id="filterHAngle" onchange="renderHotspot()">
-          <option value="">全部玩法</option>
-          <option value="带货">🔥 带货</option>
-          <option value="蹭热">🌊 蹭热度</option>
-          <option value="卖家避坑提醒">🛡️ 卖家避坑提醒</option>
-          <option value="节日">🎉 节日</option>
-          <option value="其他">📦 其他</option>
+          <option value="">全部类型</option>
+          <option value="pick">🛍️ 选品机会型</option>
+          <option value="pain">🛡️ 运营痛点型</option>
+          <option value="visual">🎨 内容视觉趋势型</option>
+          <option value="market">📅 市场舆情窗口型</option>
+          <option value="insight">💡 行业观点干货型</option>
         </select>
         <select id="filterHMarket" onchange="renderHotspot()">
           <option value="">全部市场</option>
@@ -2055,7 +2075,7 @@ function showNewArrival(n, src){
   if(_nabHideTimer) clearTimeout(_nabHideTimer);
   _nabHideTimer=setTimeout(()=>{ bar.classList.add('hidden'); }, 8000);
 }
-/* 🆕 立即查看：直接显示本次扒取的全部新增（默认已是 Top 20 + 本 Tab，不需要再放宽筛选） */
+/* 🆕 立即查看：直接显示本次扒取的全部新增（默认已是 Top 30 + 本类型，不需要再放宽筛选） */
 let _onlyThisBatch=false;   // 是否仅显示本次新增
 function jumpToNew(){
   _onlyThisBatch=true;
@@ -2460,7 +2480,7 @@ ${rules}${fewShotBlock}${learnedBlock}
 - 标题：${h.title||'(无)'}
 - 类型：${(HOT_TYPES[h.type]&&HOT_TYPES[h.type][2])||h.type||'热点'}
 - 来源：${h.source} (${h.market||'全球'} · ${h.platform||''})
-- 玩法类型：${(angleMap[h.angle]&&angleMap[h.angle][1])||h.angle||'-'}（推荐度 ${h.value||0} · 等级 ${h.grade||'-'} · 热度 ${h.heat||0}）
+- 热点类型：${MAIN_TYPE_LABEL[h.mainType]||'行业观点干货型'}${(h.tags&&h.tags.length)?('（'+h.tags.join(' / ')+'）'):''}（总分 ${h.value||0} · 等级 ${h.grade||'-'} · 画像匹配 ${h.d1||0}/40 · 真实有效度 ${h.d2||0}/30 · Flyelep 适配 ${h.d3||0}/20）
 - 可挂钩商品：${h.product||'(待定)'}（${h.category||'品类未填'}）
 - 价格/销量线索：${h.price||''} ${h.sales||''}
 - 玩法描述：${h.playbook||'(无)'}
@@ -3584,15 +3604,17 @@ const HOT_TYPES={
   product:['tp-product','🛍️','平台爆品'], festival:['tp-fest','🎉','电商节日'], news:['tp-news','📰','行业资讯'],
   ai:['tp-ai','🤖','AI 资讯']
 };
-const HOT_TAB_OF={ hot:'ecom', dy:'web', ent:'web', news:'web', product:'product', festival:'festival', ai:'ai' };
-/* 5 大类 Tab 配置 */
+const HOT_TAB_OF={ hot:'insight', dy:'pain', ent:'insight', news:'insight', product:'product', festival:'festival', ai:'insight' };
+/* V4 五大热点类型 Tab（方案定稿）+ 全部 + 两个独立工具入口 */
 const HOT_TABS=[
-  {key:'all',      icon:'🌐', label:'全部',     desc:'综合排行榜（前 20）'},
-  {key:'ecom',     icon:'📊', label:'电商热点', desc:'国内外电商平台资讯（前 20）'},
-  {key:'web',      icon:'🎵', label:'网络热点', desc:'抖音 / 娱乐 / 社会热搜（前 20）'},
-  {key:'product',  icon:'🛍️', label:'热门选品', desc:'各平台近期热销爆品（前 20）'},
-  {key:'festival', icon:'🎉', label:'电商节日', desc:'即将到来的电商活动（前 20）'},
-  {key:'ai',       icon:'🤖', label:'AI 资讯',   desc:'国内外最新 AI 动态（前 20）'}
+  {key:'all',      icon:'🌐', label:'全部',          desc:'综合排行榜（每类前 30）'},
+  {key:'pick',     icon:'🛍️', label:'选品机会型',     desc:'品类搜索飙升 / 新品爆发 / 需求上涨，可直接选品铺货'},
+  {key:'pain',     icon:'🛡️', label:'运营痛点型',     desc:'平台新规 / 图片视频审核 / 合规返工 / 素材产能压力'},
+  {key:'visual',   icon:'🎨', label:'内容视觉趋势型', desc:'流行画面风格 / 构图色调 / 短视频镜头模板'},
+  {key:'market',   icon:'📅', label:'市场舆情窗口型', desc:'季节 / 海外节日 / 地域民俗 / 中长期消费趋势'},
+  {key:'insight',  icon:'💡', label:'行业观点干货型', desc:'行业打法 / 工具迭代 / AI 视觉·视频模型更新'},
+  {key:'product',  icon:'📦', label:'热门选品',       desc:'各平台近期热销爆品'},
+  {key:'festival', icon:'🎉', label:'电商节日',       desc:'即将到来的电商活动'}
 ];
 let _hotTab='all';   // 当前 Tab
 /* 智能 tab 路由：type 字段只作粗分类，落到 5 大 Tab 前先看内容是否真有该类信号
@@ -3603,17 +3625,8 @@ let _hotTab='all';   // 当前 Tab
 function tabOfHot(h){
   if(h.type==='festival') return 'festival';
   if(h.type==='product')  return 'product';
-  if(h.type==='ai')       return 'ai';
-  if(h.type==='hot' || h.type==='dy' || h.type==='ent' || h.type==='news'){
-    const text=((h.title||'')+' '+(h.note||'')+' '+(h.source||'')+' '+(h.platform||'')+' '+(h.market||'')).toLowerCase();
-    try{
-      const ev=classifyEcom(text);
-      if(ev.ecom==='strong' || ev.ecom==='weak') return 'ecom';
-      const av=classifyAI(text);
-      if(av.ai==='strong' || av.ai==='weak') return 'ai';
-    }catch(_){}
-  }
-  return 'web';
+  // V4：统一按五大主类型归类（老数据无 mainType 时实时补算）
+  return h.mainType || classifyMainType(h) || 'insight';
 }
 
 /* ================== 一键补全示例：热门选品 + AI 工具新品 ================== */
@@ -3699,10 +3712,9 @@ function seedAllSamples(){
 function switchHotTab(tab){
   _hotTab=tab;
   $$('#hotTabs .hot-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
-  // 🆕 AI 资讯分组条只在「AI 资讯」Tab 显示
-  const aiSub=$('#aiSubTabs'); if(aiSub) aiSub.style.display = (tab==='ai') ? '' : 'none';
-  // 🆕 切主 Tab 时自动重置子筛选条件（避免「AI 工具动向」等带进「电商热点/选品/网络热点」后变 0）
-  if(tab!=='ai' && (_v3Persona!=='all' || _v3Stage!=='all' || _aiSub!=='all')){
+  const aiSub=$('#aiSubTabs'); if(aiSub) aiSub.style.display='none';
+  // 🆕 切主 Tab 时自动重置子筛选条件（避免带进新 Tab 后结果变 0）
+  if(_v3Persona!=='all' || _v3Stage!=='all' || _aiSub!=='all'){
     _v3Persona='all'; _v3Stage='all'; _aiSub='all';
     try{ renderV3FilterChips(); }catch(_){}
     toast('已清空上一 Tab 的筛选条件');
@@ -4713,14 +4725,20 @@ function effectiveAudienceFit(h){
   if(cat && h.geoCat && cat!==h.geoCat) return 35; // 跨类目：弱相关
   return Math.max(45, Math.min(95, pm));          // 同类目：用真实偏好，至少 45 防沉底
 }
+// 🆕 V4：展示分基准 = evalHotspot 的四维百分制总分；选了「推荐视角」时按该画像个性化重算
+// 个性化 = 把「画像匹配」这一维（40 分）替换为该视角画像的契合度，其余三维（有效度/适配/风险）不变
 function effectiveValue(h){
-  const af=effectiveAudienceFit(h);
-  let v=Math.round(0.40*af + 0.40*(h.heat||50) + 0.20*(h.fitScore||0));
-  if((h.fitScore||0)<40) v=Math.min(v,59);          // 双轨封顶：只能参考（不占 Top）
-  if(h.serious) v=Math.min(v,35);                   // 严肃新闻降级
+  const base = (h.value!=null) ? h.value : 0;
+  const ep = getGradeViewPersona();
+  if(!ep) return base;                                   // 通用视角：直接用四维总分
+  const cat = gradeViewCat();
+  let pm = personaMatchOf(h.angle, ep);                  // 该画像对当前热点玩法的契合度 0-100
+  if(cat && h.geoCat && cat!==h.geoCat) pm = 20;         // 跨类目：弱相关
+  const af = Math.round(Math.max(0, Math.min(40, pm/100*40)));   // 折算成 0-40
+  const v = base - (h.d1||0) + af;                        // 替换画像维度
   return Math.max(0, Math.min(100, v));
 }
-function dispGrade(v){ return v>=80?'S' : v>=60?'A' : v>=40?'B' : 'C'; }
+function dispGrade(v){ return v>=80?'S' : v>=70?'A' : v>=60?'B' : 'C'; }
 const PLAT_TONE={
   '抖音':'节奏极快、口语炸裂、前 3 秒必须抛钩子或制造冲突；全程多用"你 / 咱们 / 家人们"，像跟朋友唠嗑；情绪拉满、画面切得快；结尾强引导点主页 / 进橱窗。',
   '小红书':'种草清单风、真实分享口吻；多用 emoji 把段落切小，标题带数字 + 痛点 + 情绪词（踩坑 / 亲测 / 后悔没早买）；像闺蜜安利，强调省时省钱省力。',
@@ -4801,7 +4819,7 @@ function setV3Stage(k){ _v3Stage=k; renderV3FilterChips(); renderHotspot(); }
 function setAiSub(k){ _aiSub=k; renderHotspot(); }
 // 🆕 判断某条 AI 热点是否「今日值得追」：高价值 + 作图/视频强能力（image2.5 / Sora 2 这类直接浮顶）
 function isAiFeatured(h){
-  return (_hotTab==='ai') && (h.value||0)>=65 && (h.flyelepCapabilities||[]).some(c=>c==='ai_image'||c==='ai_video');
+  return (_hotTab==='insight'||_hotTab==='all') && (h.value||0)>=65 && (h.flyelepCapabilities||[]).some(c=>c==='ai_image'||c==='ai_video');
 }
 
 function renderHotspot(){
@@ -4817,11 +4835,10 @@ function renderHotspot(){
   // 升级后：geoCat 强制重算（之前兜底错的『内容自媒体』会重新派到正确类目）
   let needSave=false;
   for(const h of state.hotspots){
-    // 老数据迁移：玩法类型内部值「痛点规则」→ 产品词「卖家避坑提醒」
     if(h.angle==='痛点规则'){ h.angle='卖家避坑提醒'; needSave=true; }
-    if(h.value==null || h.heat==null || h.angle==null){ evalHotspot(h); needSave=true; }
-    // 🆕 V3 老数据迁移：缺任一 V3 字段（能力类别/链路/探针/双轨标记）就重跑 evalHotspot 补齐
-    if(h.flyelepCapabilities==null || h.linkStages==null || h.probes==null || h.flyelepTier==null){
+    // 🆕 V4 老数据迁移：缺任一新版字段（主类型/辅助标签/三池/四维分）就整体重算
+    if(h.value==null || h.heat==null || h.angle==null || h.mainType==null
+       || h.tags==null || h.pool==null || h.d1==null || h.d2==null || h.d3==null){
       evalHotspot(h); needSave=true;
     }
     const newGeo = deriveGeoCat(h);
@@ -4831,8 +4848,9 @@ function renderHotspot(){
 
   // ===== Tab 数量徽章（用全量 state.hotspots） =====
   const all=state.hotspots||[];
-  const visibleAll = all.filter(h => !h.archived);
-  [['htCountAll','all'],['htCountEcom','ecom'],['htCountWeb','web'],['htCountProduct','product'],['htCountFestival','festival'],['htCountAi','ai']].forEach(([id,t])=>{
+  const visibleAll = all.filter(h => !h.archived && !h.filtered);
+  const _badgeIds={pick:'htCountPick',pain:'htCountPain',visual:'htCountVisual',market:'htCountMarket',insight:'htCountInsight',product:'htCountProduct',festival:'htCountFestival'};
+  [['htCountAll','all']].concat(Object.keys(_badgeIds).map(k=>[_badgeIds[k],k])).forEach(([id,t])=>{
     const el=$('#'+id);
     if(el) el.textContent= t==='all' ? visibleAll.length : visibleAll.filter(h=>tabOfHot(h)===t).length;
   });
@@ -4848,6 +4866,8 @@ function renderHotspot(){
     arr = arr.filter(h => h.archived);
   }else{
     arr = arr.filter(h => !h.archived);
+    // 🆕 V4 前置过滤：被降噪规则判为无效的（泛娱乐 / 无画像 / AI 非视觉赛道 / 过期）直接剔除
+    arr = arr.filter(h => !h.filtered);
   }
 
   // 1) Tab 过滤（用户硬性需求：点 Tab 看到对应分类的排行榜）
@@ -4865,7 +4885,7 @@ function renderHotspot(){
   }
   // 2) 高级筛选（关键词 / 玩法 / 结合度 / 市场 / 状态）
   if(fk) arr=arr.filter(h=>[h.title,h.source,h.product,h.playbook,h.topic,h.script,h.material,h.reasons,(h.titleOrig||'')].some(x=>(x||'').toLowerCase().includes(fk)));
-  if(fa) arr=arr.filter(h=>h.angle===fa);
+  if(fa) arr=arr.filter(h=>(h.mainType||'insight')===fa);
   if(ff) arr=arr.filter(h=>h.flyelepFit===ff);
   if(fm) arr=arr.filter(h=>h.market===fm);
   if(fst) arr=arr.filter(h=>h.status===fst);
@@ -4891,7 +4911,7 @@ function renderHotspot(){
     arr.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   }else{
     // 🆕 AI 资讯 Tab：高价值作图/视频热点（image2.5 / Sora 2 等）置顶「今日值得追」
-    const featSet = _hotTab==='ai' ? new Set(arr.filter(isAiFeatured).map(h=>h.id)) : null;
+    const featSet = (_hotTab==='insight'||_hotTab==='all') ? new Set(arr.filter(isAiFeatured).map(h=>h.id)) : null;
     arr.sort((a,b)=>{
       if(featSet){
         const fa=featSet.has(a.id)?1:0, fb=featSet.has(b.id)?1:0;
@@ -4901,8 +4921,8 @@ function renderHotspot(){
     });
   }
 
-  // ===== Top 20 截断（用户硬性需求：每个 Tab 内只显示推荐度前 20 条） =====
-  arr = arr.slice(0, 20);
+  // ===== Top 30 截断（方案要求：每个类型展示 30 条） =====
+  arr = arr.slice(0, 30);
   // 🆕 仅看 24h 内新增；或本次新增（更精确，只显示本次扒取的那批）
   if(_onlyThisBatch && _lastMergeIds.length){
     const idSet=new Set(_lastMergeIds);
@@ -4921,7 +4941,7 @@ function renderHotspot(){
   const liveCount = (state.hotspots||[]).filter(h=>!h.archived).length;
   const gvSub = gv ? ` · 推荐视角：<b style="color:#0b3d80">${gvLbl}</b>` : '';
   $('#hotspotKpiGrid').innerHTML=`
-    <div class="kpi"><span class="glow"></span><div class="lbl"><span class="ico">📋</span>显示条数</div><div class="num">${arr.length}<span class="kpi-cap">/ 20</span></div><div class="sub">${_showArchived?'归档视图':'本分类综合 Top'} · 库内 ${liveCount}${archivedCount>0?` · 已归档 <b style="color:#b45309">${archivedCount}</b>`:''}${gvSub}</div></div>
+    <div class="kpi"><span class="glow"></span><div class="lbl"><span class="ico">📋</span>显示条数</div><div class="num">${arr.length}<span class="kpi-cap">/ 30</span></div><div class="sub">${_showArchived?'归档视图':'本类型综合 Top'} · 库内 ${liveCount}${archivedCount>0?` · 已归档 <b style="color:#b45309">${archivedCount}</b>`:''}${gvSub}</div></div>
     <div class="kpi b2"><span class="glow"></span><div class="lbl"><span class="ico">📊</span>平均推荐度</div><div class="num">${avgValue}</div><div class="sub">${arr.length} 条${gv?`· 视角：${gvLbl}`:'推荐度均值'}</div></div>
     <div class="kpi b3"><span class="glow"></span><div class="lbl"><span class="ico">⭐</span>S / A 级</div><div class="num">${sa}</div><div class="sub">${arr.length} 条中的高价值</div></div>
     <div class="kpi b4"><span class="glow"></span><div class="lbl"><span class="ico">🆕</span>24h 新增</div><div class="num">${new24}</div><div class="sub">${_showArchived?'归档中新增':'本 Tab 内'}</div></div>
@@ -4948,14 +4968,16 @@ function renderHotspot(){
         <button class="btn primary" onclick="seedAllFestivals()" style="padding:8px 18px">📅 一键同步 27 个电商节日到热点库</button>
         <div class="muted" style="margin-top:12px;font-size:11.5px">或到「📅 电商节日营销日历」逐个加入</div>
       </td></tr>`;
-    }else if(_hotTab==='ecom'){
+    }else if(MAIN_TYPE_LABEL[_hotTab]){
+      const _mt = MAIN_TYPES.find(t=>t.key===_hotTab)||{};
+      const _filtN = (state.hotspots||[]).filter(h=>!h.archived && h.filtered).length;
       emptyHtml=`<tr><td colspan="4" class="empty">
-        <div class="big">📊</div>
-        <div style="font-size:14px;font-weight:600;margin:8px 0 4px">电商热点为空</div>
-        <div class="muted" style="margin-bottom:14px">「电商热点」只展示有电商平台信号的内容（Amazon/淘宝/京东/拼多多/Temu 等）。其他社会新闻归到「网络热点」</div>
-        <button class="btn" onclick="resetV3Filters()" style="padding:8px 18px;margin-top:10px;margin-right:8px">🧹 清空筛选条件</button>
-        <button class="btn" onclick="scrapeHotFromApi()" style="padding:8px 18px;margin-top:10px">🔥 一键扒热点</button>
-        <div class="muted" style="margin-top:12px;font-size:11.5px">当前 30 条电商热点都被筛选条件过滤掉了？点上方「🧹」一键恢复全部</div>
+        <div class="big">${_mt.icon||'💡'}</div>
+        <div style="font-size:14px;font-weight:600;margin:8px 0 4px">${escapeHtml(_mt.label||'')} 暂无可用热点</div>
+        <div class="muted" style="margin-bottom:14px">${escapeHtml(_mt.desc||'')}</div>
+        <div class="muted" style="margin-bottom:10px;font-size:12px">新版降噪规则已过滤 ${_filtN} 条泛娱乐 / 无商品价值内容</div>
+        <button class="btn" onclick="resetV3Filters()" style="padding:8px 18px;margin-right:8px">🧹 清空筛选条件</button>
+        <button class="btn primary" onclick="scrapeHotFromApi()" style="padding:8px 18px">🔥 一键扒热点</button>
       </td></tr>`;
     }else if(_showArchived){
       const archCount = (state.hotspots||[]).filter(h=>h.archived).length;
@@ -4984,6 +5006,8 @@ function renderHotspot(){
 
   tbody.innerHTML=arr.map(h=>{
     const [aCls,aTxt]=angleMap[h.angle]||['','—'];
+    const mtKey = h.mainType||'insight';
+    const mtDef = MAIN_TYPES.find(t=>t.key===mtKey)||MAIN_TYPES[4];
     const dv = effectiveValue(h);
     const dg = dispGrade(dv);
     const pm = gv ? personaMatchOf(h.angle, gv) : null;
@@ -4997,32 +5021,41 @@ function renderHotspot(){
     const featLabel=(FLYELEP_FEATURES.find(f=>f.key===h.flyelepFeature)||{}).label;
     const origHint = h.titleOrig && h.titleOrig!==h.title ? `title="🌐 原文：${escapeHtml(h.titleOrig)}"` : '';
     const isCant = h.grade==='C';
-    const isInfo = h.flyelepTier==='industry-info';   // 🆕 V3 只能参考行（Flyelep 匹配度低，不占 Top）
-    const isFeat = isAiFeatured(h);   // 🆕 今日值得追（高价值作图/视频能力）
+    const isInfo = h.flyelepTier==='industry-info';   // 🆕 只能参考行（Flyelep 适配弱，不占 Top）
+    const isFeat = isAiFeatured(h);   // 🆕 今日值得追（高价值 AI 作图/视频热点）
     const rowCls = [sel?'selected':'', isCant?'hs-cant':'', isInfo?'v3-info-row':'', isFeat?'hs-featured':''].filter(Boolean).join(' ');
-    const cantBadge = isCant ? '<span class="hs-cant-badge" title="这条热点跟你的账号 / Flyelep 暂时接不上">🚫 暂不推荐</span>' : '';
+    const cantBadge = isCant ? '<span class="hs-cant-badge" title="这条热点综合分低于 60，暂不推荐">🚫 暂不推荐</span>' : '';
     // 🆕 严肃新闻标记
     const seriousBadge = h.serious ? '<span class="hs-serious-badge" title="政治 / 纪念 / 灾难 / 事故类新闻，建议不追">⚠️ 这条不建议追</span>' : '';
-    // 🆕 V3 卡片字段：归属 pills（链路+探针）+ 谁用得上 + Flyelep 人话描述 + 3 维评分条
+    // 🆕 V4 主类型（唯一）+ 受众标签 + 辅助标签（可多）+ 风险标签
+    const mtChip = `<span class="mt-chip mt-${mtKey}" title="${escapeHtml(mtDef.desc)}">${mtDef.icon} ${escapeHtml(mtDef.label)}</span>`;
+    const audChip = `<span class="aud-chip aud-${h.pool==='A'?'biz':'con'}" title="A 池=商家向话题（最高优先级）／B 池=消费者种草话题">${escapeHtml(h.audienceTag||'消费者种草向')}</span>`;
+    const tagChips = (h.tags||[]).map(t=>{
+      const cls = t==='图像热点'?'aux-img' : (t==='视频热点'?'aux-vid' : 'aux-ind');
+      return `<span class="aux-tag ${cls}">${escapeHtml(t)}</span>`;
+    }).join('');
+    const riskChips = (h.riskTags||[]).map(t=>`<span class="aux-tag aux-risk">⚠️ ${escapeHtml(t)}</span>`).join('');
+    // 🆕 归属 pills（链路 + 探针）+ 谁用得上 + Flyelep 人话描述
     const stagePills = (h.linkStages||[]).map(s=>`<span class="v3-pill v3-stage">${escapeHtml(s)}</span>`).join('');
     const probePills = (h.probes||[]).map(p=>`<span class="v3-pill v3-probe">${escapeHtml(p)}</span>`).join('');
-    const infoBadge = isInfo ? '<span class="v3-pill v3-info" title="跟 Flyelep 暂时接不上，先了解趋势">只能参考</span>' : '';
+    const infoBadge = isInfo ? '<span class="v3-pill v3-info" title="Flyelep 适配偏弱，先了解趋势">只能参考</span>' : '';
     const belongRow = (stagePills||probePills||infoBadge)
       ? `<div class="v3-belong">${infoBadge}${stagePills}${probePills}</div>` : '';
     const whoRow = h.whoFor
       ? `<div class="v3-who"><span class="v3-k">谁用得上</span><span class="v3-v">${escapeHtml(h.whoFor)}</span></div>` : '';
+    const capRow = `<div class="v3-who"><span class="v3-k">适配能力</span><span class="v3-v">Flyelep ${escapeHtml(h.capabilityKind||'图文 / 视频')}</span></div>`;
     const flyRow = h.flyelepText
       ? `<div class="v3-fly"><span class="v3-k">Flyelep 能帮你</span><span class="v3-v">${escapeHtml(h.flyelepText)}</span></div>` : '';
-    const _aud = h.audienceFit!=null ? h.audienceFit : 60;
-    const _heat = h.heat||0;
-    const _fit = h.fitScore||0;
+    // 🆕 四维百分制评分条：画像匹配 40 + 真实有效度 30 + Flyelep 适配 20 + 风险 0~-20
+    const _d1=h.d1||0, _d2=h.d2||0, _d3=h.d3||0, _d4=h.d4||0;
     const _bar = v=>`<span class="v3-bar"><i style="width:${Math.max(0,Math.min(100,v))}%"></i></span>`;
     const scoreRow = `<div class="v3-scores">
-      <span class="v3-s"><span class="v3-k">对你的匹配</span>${_bar(_aud)}<b>${_aud}</b></span>
-      <span class="v3-s"><span class="v3-k">热度</span>${_bar(_heat)}<b>${_heat}</b></span>
-      <span class="v3-s"><span class="v3-k">跟 Flyelep 的匹配</span>${_bar(_fit)}<b>${_fit}</b></span>
+      <span class="v3-s"><span class="v3-k">画像匹配</span>${_bar(_d1/40*100)}<b>${_d1}<i>/40</i></b></span>
+      <span class="v3-s"><span class="v3-k">真实有效度</span>${_bar(_d2/30*100)}<b>${_d2}<i>/30</i></b></span>
+      <span class="v3-s"><span class="v3-k">Flyelep 适配</span>${_bar(_d3/20*100)}<b>${_d3}<i>/20</i></b></span>
+      ${_d4?`<span class="v3-s"><span class="v3-k">风险</span><b class="v3-minus">${_d4}</b></span>`:''}
     </div>`;
-    const v3Block = (belongRow||whoRow||flyRow) ? belongRow+whoRow+flyRow+scoreRow : '';
+    const v3Block = (belongRow||whoRow||flyRow) ? belongRow+whoRow+capRow+flyRow+scoreRow : '';
     // 🆕 推荐 3 个可用画像：按命中 prefer 排序 ≥65
     const topPersonas = top3PersonasForAngle(h.angle||'其他', h.geoCat, h);
     const personaChips = topPersonas.length
@@ -5045,8 +5078,8 @@ function renderHotspot(){
           <span class="hs-date">${h.date||'—'}</span>
           ${h.market?`<span class="hs-mkt mkt-${h.market==='国内'?'cn':h.market==='海外'?'overseas':'global'}">${escapeHtml(h.market)}</span>`:''}
           <span class="hs-src">· ${escapeHtml(h.source||'')}</span>
-          <span class="hs-angle-inline">· ${aTxt}</span>
         </div>
+        <div class="hs-type-row">${mtChip}${audChip}${tagChips}${riskChips}</div>
         ${personaChips}
         ${v3Block}
       </td>
@@ -5091,7 +5124,7 @@ function updateRenderStatus(arr, all, opts){
   const bar=$('#renderStatus');
   if(!bar) return;
   const total=all.length;
-  const tabName = ({all:'全部',ecom:'电商热点',web:'网络热点',product:'热门选品',festival:'电商节日',ai:'AI 资讯'})[_hotTab] || '全部';
+  const tabName = ({all:'全部',pick:'选品机会型',pain:'运营痛点型',visual:'内容视觉趋势型',market:'市场舆情窗口型',insight:'行业观点干货型',product:'热门选品',festival:'电商节日'})[_hotTab] || '全部';
   if(total===0){
     bar.innerHTML='<span class="rs-dot warn"></span>库内 <b>0</b> 条热点 · 当前 <b>'+tabName+'</b> Tab · 点「🔥 一键扒热点」抓一批';
     bar.className='render-status warn';
@@ -5102,7 +5135,7 @@ function updateRenderStatus(arr, all, opts){
   }
 }
 
-/* 热门热点跑马灯：横向无缝循环滚动，按综合可发价值取前 20 条（含蹭热/卖家避坑提醒） */
+/* 热门热点跑马灯：横向无缝循环滚动，按综合可发价值取前 30 条 */
 function renderHotMarquee(){
   const track=$('#hotMarqueeTrack');
   if(!track) return;
@@ -5118,7 +5151,8 @@ function renderHotMarquee(){
     const title=(h.title||'').slice(0,32);
     const featLabel=(FLYELEP_FEATURES.find(f=>f.key===h.flyelepFeature)||{}).label || (h.flyelepFeature?'':'通用 AI');
     const angleTag = featLabel? `<span class="flyelep-tag" title="${escapeHtml(h.flyelepAngle||'')}">🎯 ${escapeHtml(featLabel)}</span>`:'';
-    const aTag = (angleMap[h.angle]&&angleMap[h.angle][1])? `<span class="angle-tag">${escapeHtml(angleMap[h.angle][1])}</span>`:'';
+    const _mtDef = MAIN_TYPES.find(t=>t.key===(h.mainType||'insight'))||MAIN_TYPES[4];
+    const aTag = `<span class="angle-tag">${_mtDef.icon} ${escapeHtml(_mtDef.label)}</span>`;
     return `<span class="marquee-item" data-id="${h.id}" onclick="scrollToHotspot('${h.id}')" title="${escapeHtml((h.title||'')+ (h.flyelepAngle?'\n\n🎯 Flyelep 角度：'+h.flyelepAngle:''))}">`
          + `<span class="grade ${h.grade||''}">${h.grade||'?'}</span>`
          + aTag
@@ -5573,12 +5607,12 @@ const FLYELEP_HOT_KW={
 const AI_CAPABILITY_KW={
   ai_image:{
     name:'AI 作图/设计',
-    kws:[/chatgpt\s?images/i,/dall-?e/i,/midjourney/i,/stable\s?diffusion/i,/sdxl|sd3|sd4/i,/flux\s?pro?/i,/comfyui/i,/文生图/i,/图生图/i,/ai\s?海报/i,/ai\s?出图/i,/ai\s?生图/i,/ai\s?主图/i,/ai\s?详情页/i,/ai\s?设计/i,/ai\s?抠图/i,/ai\s?修图/i,/即梦/i,/海报生成/i,/image\s?generation/i,/text\s?to\s?image/i,/nano\s?banana/i],
+    kws:[/chatgpt\s?images/i,/gpt\s?-?image/i,/dall-?e/i,/midjourney/i,/stable\s?diffusion/i,/sdxl|sd3|sd4/i,/flux\s?pro?/i,/comfyui/i,/seedream/i,/文生图/i,/图生图/i,/ai\s?海报/i,/ai\s?出图/i,/ai\s?生图/i,/ai\s?主图/i,/ai\s?详情页/i,/ai\s?设计/i,/ai\s?抠图/i,/ai\s?修图/i,/即梦/i,/海报生成/i,/image\s?generation/i,/text\s?to\s?image/i,/nano\s?banana/i,/image\s?[2-9]\b/i,/图像生成|图像模型|视觉模型|图片模型|图像细节|图像质感|图像质量/i,/电商图|商品图|产品图|主图|详情图|场景图|白底图/i,/抠图|换色|扩图|延展|无损放大|超清/i],
     features:['main','detail','single','ad']
   },
   ai_video:{
     name:'AI 视频/数字人',
-    kws:[/sora/i,/veo/i,/kling/i,/可灵/i,/即梦/i,/pika/i,/runway/i,/文生视频/i,/图生视频/i,/数字人/i,/虚拟主播/i,/ai\s?直播/i,/ai\s?口播/i,/video\s?generation/i,/deepfake/i,/suno/i,/udio/i],
+    kws:[/sora/i,/veo/i,/kling/i,/可灵/i,/即梦/i,/pika/i,/runway/i,/seedance/i,/文生视频/i,/图生视频/i,/数字人/i,/虚拟主播/i,/ai\s?直播/i,/ai\s?口播/i,/video\s?generation/i,/deepfake/i,/suno/i,/udio/i,/短视频模型|视频模型|动态素材|视频质感|带货视频|口播视频/i,/image\s?to\s?video/i],
     features:['video','ad']
   },
   llm_agent:{
@@ -5831,6 +5865,197 @@ function deriveFlyelepText(h){
   return h.flyelepAngle || '';
 }
 
+/* ================== V4 五大热点类型（方案定稿，主类型唯一，不再新增）==================
+ * 选品机会型 / 运营痛点型 / 内容视觉趋势型 / 市场舆情窗口型 / 行业观点干货型
+ * 规则：主类型唯一（决定脚本模板）+ 可附加多辅助标签（图像热点 / 视频热点 / 间接技术热点）
+ */
+const MAIN_TYPES=[
+  {key:'pick',    icon:'🛍️', label:'选品机会型',    desc:'品类搜索飙升 / 新品爆发 / 需求上涨，可直接选品铺货'},
+  {key:'pain',    icon:'🛡️', label:'运营痛点型',    desc:'平台新规 / 图片视频审核 / 合规返工 / 素材产能压力'},
+  {key:'visual',  icon:'🎨', label:'内容视觉趋势型', desc:'流行画面风格 / 构图色调 / 短视频镜头模板'},
+  {key:'market',  icon:'📅', label:'市场舆情窗口型', desc:'季节 / 海外节日 / 地域民俗 / 中长期消费趋势'},
+  {key:'insight', icon:'💡', label:'行业观点干货型', desc:'行业打法 / 工具迭代 / AI 视觉·视频模型更新'}
+];
+const MAIN_TYPE_LABEL={}; MAIN_TYPES.forEach(t=>MAIN_TYPE_LABEL[t.key]=t.label);
+
+// 主类型判定关键词（优先级：痛点 > 选品 > 视觉 > 舆情窗口 > 干货）
+const T_PAIN=[/新规|新政策|平台政策|监管|处罚|罚款|封号|限流|降权|审核|合规|违规|整改|下架|清退|规则调整|版权|侵权|诉讼|起诉|商标|专利|法案|条例|标准|召回|禁售|限售|资质|认证被拒/i];
+const T_PICK=[/选品|爆品|爆款|热销|畅销|卖爆|新品|上新|飙升|搜索量|需求上涨|缺货|断货|走红|种草|好物|必买|回购|抢空|脱销|best ?seller|trending|viral|销量|订单量|环比增长|同比增长/i];
+const T_VISUAL=[/风格|视觉|画面|构图|色调|滤镜|拍摄|运镜|镜头|模板|特效|转场|变装|妆造|穿搭|布景|摆拍|氛围感|同款|卡点|大片感|实拍|出片|高级感|审美/i];
+const T_MARKET=[/春节|新年|元宵|清明|端午|七夕|中秋|国庆|双11|双十一|双12|618|黑五|网一|圣诞|万圣|复活节|感恩节|情人节|母亲节|父亲节|教师节|女王节|女神节|年货|开学季|毕业季|暑促|换季|旺季|淡季|季节|春季|夏季|秋季|冬季|斋月|开斋节|排灯节|狂欢节|购物节|大促|促销|窗口期|民俗|节日/i];
+const T_INSIGHT=[/行业|趋势|报告|观点|干货|方法论|打法|复盘|拆解|案例|白皮书|数据洞察|榜单|排名|效率|提效|工具|迭代|升级|发布|上线|公测|开放|模型|算法|技术升级|生态|格局|访谈|专访/i];
+
+/* AI 间接热点判定（方案第 6 节）：
+ * 通过 → 归「行业观点干货型」+「间接技术热点」标签
+ * 不通过 → 纯对话大模型 / AI 语音 / AI 办公 / 无视觉能力更新，直接丢弃
+ */
+const AI_VISUAL_WHITELIST=[/image ?\d|imagegen|gpt ?image|gpt-image|图像|文生图|图生图|ai ?绘图|视觉模型|图片模型|ai ?视频|文生视频|图生视频|短视频模型|动态素材|视频模型|素材版权|视频生成|图像生成|视觉生成|midjourney|dall-?e|stable ?diffusion|sdxl|flux|comfyui|sora|veo|kling|可灵|即梦|pika|runway|seedance|seedream|nano ?banana|出图|作图|海报生成|抠图|修图/i];
+const AI_TEXT_ONLY=[/纯对话|对话模型|语音模型|\btts\b|语音合成|语音识别|ai ?办公|office ?copilot|纯文本|文本模型|ai ?写作|ai ?编程|代码模型|推理模型|数学推理|对话助手|chatbot|智能客服|知识库问答/i];
+
+function isAIVisualIndirect(text){
+  const t=String(text||'').toLowerCase();
+  if(!/ai|人工智能|模型|大模型|算法|生成式|图像|图片|视频|视觉|绘图|文生图|图生图|出图|作图/i.test(t)) return false;
+  return AI_VISUAL_WHITELIST.some(re=>re.test(t));
+}
+function isAITextOnly(text){
+  const t=String(text||'').toLowerCase();
+  if(!/ai|人工智能|大模型/.test(t)) return false;
+  if(AI_VISUAL_WHITELIST.some(re=>re.test(t))) return false;
+  return AI_TEXT_ONLY.some(re=>re.test(t));
+}
+
+/* ================== A / B / C 三池降噪（方案第 3.4 节，核心降噪）==================
+ * A 池 商家向话题（最高优先级）：卖家运营 / 平台规则 / 素材 / 效率 / 痛点
+ * B 池 消费者种草话题（有效）：单品爆品 / 视觉风格 / 短视频趋势 / 品类需求
+ * C 池 泛娱乐（直接丢弃）：明星 / 剧情 / 美食 / 无商品价值热点
+ */
+const POOL_A=/卖家|商家|运营|平台规则|政策|审核|合规|限流|封号|降权|选品|上架|listing|sku|erp|供应链|货源|工厂|物流|海外仓|fba|广告投放|acos|roas|转化率|复购|退款|差评|店铺|开店|入驻|佣金|手续费|运费|关税|商标|版权|侵权|素材|产能|返工|批量|效率|提效|工具|软件|系统|后台|设置|功能更新|卖家中心/i;
+const POOL_C=/明星|艺人|偶像|恋情|分手|离婚|出轨|综艺|电视剧|电影|票房|剧情|大结局|番剧|动漫|游戏|夺冠|赛事|比分|演唱会|音乐节|歌手|新歌|专辑|塌房|八卦|吃瓜|追星|搞笑|段子|萌宠|猫咪|狗狗|美食|菜谱|食谱|烘焙|减肥|星座|情感|鸡汤|相亲|彩礼|裸辞|躺平|脱单|表白/i;
+
+function classifyPool(h){
+  if(h.type==='festival'||h.type==='product') return 'B';
+  const t=((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')+' '+(h.product||''));
+  if(POOL_A.test(t)) return 'A';
+  const ev=classifyEcom(t);
+  if(ev.ecom==='strong') return 'A';
+  if(ev.ecom==='weak') return 'B';
+  if(POOL_C.test(t)) return 'C';
+  return 'B';
+}
+
+/* 主类型判定 */
+function classifyMainType(h){
+  const t=((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')+' '+(h.product||'')+' '+(h.source||'')).toLowerCase();
+  if(h.type==='festival') return 'market';
+  if(h.type==='product')  return 'pick';
+  const hit=arr=>arr.some(re=>re.test(t));
+  if(hit(T_PAIN))    return 'pain';
+  if(hit(T_PICK))    return 'pick';
+  if(hit(T_VISUAL))  return 'visual';
+  if(hit(T_MARKET))  return 'market';
+  if(hit(T_INSIGHT)) return 'insight';
+  if(isAIVisualIndirect(t)) return 'insight';
+  const ev=classifyEcom(t);
+  if(ev.ecom==='strong'||ev.ecom==='weak') return 'pick';
+  return 'insight';
+}
+
+/* 辅助标签：图像热点 / 视频热点 / 间接技术热点（可多标签，不冲突主类型） */
+const TAG_IMAGE=/主图|详情图|详情页|商品图|产品图|白底|海报|图片|图像|作图|出图|生图|抠图|修图|换色|换背景|场景图|延展|扩图|清晰度|调色|视觉素材|image|photo|picture|imagegen|midjourney|dall-?e|stable ?diffusion|sdxl|flux|comfyui|gpt ?image|文生图|图生图|美图/i;
+const TAG_VIDEO=/视频|短视频|口播|带货视频|产品视频|数字人|直播|运镜|分镜|镜头|动效|animation|video|reels|短片|vlog|sora|veo|可灵|kling|即梦|pika|runway|文生视频|图生视频/i;
+
+function deriveAuxTags(h){
+  const t=((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')).toLowerCase();
+  const tags=[];
+  if(TAG_IMAGE.test(t)) tags.push('图像热点');
+  if(TAG_VIDEO.test(t)) tags.push('视频热点');
+  if(isAIVisualIndirect(t)) tags.push('间接技术热点');
+  return tags;
+}
+
+/* ================== 前置过滤（方案第 7 节，评分前执行）==================
+ * 满足任意一条 = 无效热点，直接丢弃
+ */
+function preFilter(h){
+  const t=((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')+' '+(h.product||''));
+  // ① AI 热点但不属于图像 / 视频赛道（纯对话 / 语音 / 办公）→ 丢弃
+  if(isAITextOnly(t)) return 'AI 非图像 / 视频赛道';
+  // ② 三池 C 池：纯娱乐、无商品价值 → 丢弃
+  if(h.pool==='C') return '泛娱乐 · 无商品价值';
+  // ③ 违规 / 禁售 / 高风险舆情
+  if(/禁售|违法违规|赌博|诈骗|传销|假货|山寨|涉黄|涉暴|高危风险/.test(t)) return '违规 / 高风险';
+  // ④ 过期（60 天以上，节日类型除外）
+  if(h.type!=='festival' && h.date){
+    const d=Date.parse(String(h.date).replace(/-/g,'/'));
+    if(!isNaN(d) && (Date.now()-d)>60*86400000) return '已过期';
+  }
+  // ⑤ 无任何用户画像匹配 → 丢弃
+  if(h.d1===0) return '无匹配画像';
+  return '';
+}
+
+/* ================== 画像匹配度（维度1，40 分）==================
+ * ≥2 个二级画像匹配：32–40 ／ 1 个：20–31 ／ 仅一级兜底：10–19 ／ 无：0（过滤）
+ */
+function _isSecondPersona(k){ return !!(PERSONA_CAT_BY_KEY[k] && PERSONA_CAT_BY_KEY[k].cat); }
+function _isFallbackPersona(k){ return /·通用$/.test(k) || /（通用）/.test(k); }
+function _prefOf(key, angle, geoCat){
+  const indiv=PERSONA_PREFER[key];
+  if(indiv && indiv[angle]!=null) return indiv[angle];
+  const cd=CAT_DEFAULT_PREFER[geoCat];
+  if(cd && cd[angle]!=null) return cd[angle];
+  return 60;
+}
+function personaFitScore(h){
+  let list=[];
+  try{ list=top3PersonasForAngle(h.angle||'其他', h.geoCat, h)||[]; }catch(_){ list=[]; }
+  const second=list.filter(p => !_isFallbackPersona(p.key) && _isSecondPersona(p.key));
+  const hasFallback=list.some(p=>_isFallbackPersona(p.key) || p.cls==='cat-serious');
+  const angle=h.angle||'其他';
+  if(second.length>=2){
+    const avg=second.reduce((s,p)=>s+_prefOf(p.key,angle,h.geoCat),0)/second.length;
+    return 32+Math.round(Math.min(8, avg/100*8));
+  }
+  if(second.length===1){
+    const v=_prefOf(second[0].key,angle,h.geoCat);
+    return 20+Math.round(Math.min(11, v/100*11));
+  }
+  if(hasFallback) return 10+Math.round(Math.min(9, (h.heat||50)/100*9));
+  return 0;
+}
+
+/* ================== 热点真实有效度（维度2，30 分）==================
+ * 热度增长 15 + 生命周期 10 + 受众体量 5
+ */
+function lifecycleScore(h){
+  if(h.type==='festival') return 9;
+  const t=((h.title||'')+' '+(h.source||''));
+  if(/政策|新规|规则|合规|趋势|报告|行业|标准|法案|条例|模型|发布|上线|升级|迭代|战略|布局/.test(t)) return 9;
+  if(/选品|品类|供应链|旺季|季节|周期/.test(t)) return 7;
+  const d=Date.parse(String(h.date||'').replace(/-/g,'/'));
+  if(isNaN(d)) return 5;
+  const ageD=(Date.now()-d)/86400000;
+  if(ageD<=7) return 2;
+  if(ageD<=30) return 5;
+  return 8;
+}
+
+/* ================== Flyelep 图文 & 视频适配度（维度3，20 分）==================
+ * 强 16–20 ／ 中 10–15 ／ 弱 1–9 ／ 无 0
+ */
+function flyelepAdaptScore(h){
+  const t=((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')+' '+(h.product||''));
+  const caps=(h.flyelepCapabilities||[]).length;
+  const tags=h.tags||[];
+  const indirect=tags.indexOf('间接技术热点')>=0;
+  const fit=h.fitScore||0;
+  if(caps===0 && fit<40 && !indirect) return fit>=30 ? 4 : 0;
+  if(/主图|详情图|详情页|白底|海报|素材|返工|审核|图片规范|视频规范|强制上传|新规|合规图|批量|产能|多语言|多语种|翻译|listing|抠图|换色|延展|复刻/i.test(t)){
+    return Math.min(20, 16+caps);
+  }
+  if(indirect) return Math.min(15, 12+caps);
+  if(/选品|爆品|爆款|热销|风格|视觉|趋势|同款|场景|上新|新品/i.test(t)) return Math.min(15, 10+caps);
+  return Math.max(1, Math.min(9, Math.round(fit/100*9)));
+}
+
+/* 风险扣分（维度4，0 ~ -20） */
+function riskPenalty(h){
+  const t=((h.title||'')+' '+(h.note||''));
+  let p=0;
+  if(/合规风险|禁售|违规|下架|处罚|封号|诉讼|侵权|召回|监管调查/i.test(t)) p-=10;
+  if(/翻车|塌房|负面|危机|抵制|投诉|差评|退货潮|舆情|道歉/i.test(t)) p-=10;
+  if(/传闻|谣言|不实|小道消息|未证实|疑似|爆料/i.test(t)) p-=5;
+  return Math.max(-20, p);
+}
+function riskTagsOf(h){
+  const t=((h.title||'')+' '+(h.note||''));
+  const out=[];
+  if(/合规风险|禁售|违规|下架|处罚|封号|诉讼|侵权|召回|监管调查/i.test(t)) out.push('合规 / 禁售风险');
+  if(/翻车|塌房|负面|危机|抵制|投诉|差评|退货潮|舆情|道歉/i.test(t)) out.push('负面舆情');
+  if(/传闻|谣言|不实|小道消息|未证实|疑似|爆料/i.test(t)) out.push('待证实消息');
+  return out;
+}
+
 // 玩法类型：带货 / 蹭热 / 卖家避坑提醒 / 节日 / AI 资讯 / 其他
 function classifyAngle(h, heat, fv){
   const t=((h.title||'')+' '+(h.note||'')+' '+(h.playbook||'')).toLowerCase();
@@ -5874,9 +6099,16 @@ function evalHotspot(h){
   h.flyelepFit = fv.score>=80?'强' : fv.score>=55?'中' : '弱';
   const fitScore=fv.score;   // V3 scoreFlyelep 已直接返回 30-100 的 fitScore
   h.fitScore=fitScore;   // 🆕 存分量，供「推荐视角」展示层重算
-  // 玩法类型（仅显示标签，不影响 value）
+  // 🆕 V4 geoCat 提前算（画像匹配度维度依赖它）
+  h.geoCat = deriveGeoCat(h);
+  // 玩法类型（保留给画像偏好 / 推荐视角复用，不再作为展示分类）
   const angle=classifyAngle(h, h.heat, fv);
   h.angle=angle;
+  // 🆕 V4 五大主类型（唯一）+ 辅助标签（可多）+ 三池归属
+  h.mainType = classifyMainType(h);
+  h.tags     = deriveAuxTags(h);
+  h.pool     = classifyPool(h);
+  h.audienceTag = h.pool==='A' ? '商家向' : '消费者种草向';
   // 🆕 严肃新闻检测 + 多角度分数
   const fullText = ((h.title||'')+' '+(h.note||'')+' '+(h.playbook||''));
   const isSerious = SERIOUS_PATTERNS.some(re => re.test(fullText));
@@ -5894,40 +6126,59 @@ function evalHotspot(h){
   h.linkStages = classifyLinkStage(fullText);
   h.probes = classifyProbe(fullText);
   h.whoFor = deriveWhoFor(h);
-  h.flyelepText = deriveFlyelepText(h);
   // ⚠️ V3 已移除原「蹭热/卖家避坑提醒结合度保底 65」：fitScore 由 scoreFlyelep 直接返回真实匹配度，
   // 不再人为抬升（Flyelep 权重已降到 20%，保底会让弱相关热点虚高）
   // 蹭热无具体功能时，给一个明确的「Flyelep 广告营销」角度（海报/小红书/社媒模板）
   if(angle==='蹭热' && !h.flyelepFeature){
     h.flyelepAngle='用 Flyelep「广告营销」智能选模板（海报 / 小红书 / 社媒 / 活动海报 / KV），生成该热点营销素材蹭流量';
   }
-  // V3 综合分 = 用户画像 40% + 热度 40% + Flyelep 20%（用户 2026-09-09 拍板）
-  // 画像分先用基础 60 占位，待用户画像分类器上线后接账号定位匹配
-  const audienceFit=h.audienceFit!=null ? h.audienceFit : 60;
-  let value=Math.round(0.40*audienceFit + 0.40*(h.heat||50) + 0.20*fitScore);
-  // 🆕 V3 低匹配封顶：Flyelep<40 时封顶 59(B 级)并降级为「只能参考」——防高画像+高热度但用不上的热点霸屏
-  if(fitScore<40) value=Math.min(value, 59);
-  // 严肃新闻大幅降级（基础分 ≤ 35），避免与正常热点混排
+  // ================== V4 百分制评分（方案第 8 节，四维）==================
+  // 维度1 用户画像匹配度 0-40
+  const s1 = personaFitScore(h);
+  h.d1 = s1;
+  // 前置过滤（评分前执行，命中即丢弃；标记后不进列表）
+  const filt = preFilter(h);
+  h.filtered = !!filt;
+  h.filterReason = filt || '';
+  // 维度2 热点真实有效度 0-30 = 热度增长 15 + 生命周期 10 + 受众体量 5
+  const heatGrow = Math.round(Math.max(0, Math.min(100, h.heat||50))/100*15);
+  const lifeS    = lifecycleScore(h);
+  const audS     = h.pool==='A' ? 5 : (h.pool==='B' ? 3 : 2);
+  const s2 = Math.min(30, heatGrow + lifeS + audS);
+  h.d2 = s2;
+  h.d2Detail = { growth: heatGrow, life: lifeS, audience: audS };
+  // 维度3 Flyelep 图文 & 视频适配度 0-20
+  const s3 = flyelepAdaptScore(h);
+  h.d3 = s3;
+  // 维度4 风险扣分 0 ~ -20
+  const s4 = riskPenalty(h);
+  h.d4 = s4;
+  let value = Math.max(0, s1 + s2 + s3 + s4);
   if(isSerious) value = Math.min(value, 35);
-  value=Math.min(100, Math.max(0, value));
-  h.value=value;
-  // 🆕 V3 双轨分组标记：industry-info → 只能参考(不占 Top) / content-ready → 可出内容(进 Top)
-  h.flyelepTier = fitScore<40 ? 'industry-info' : 'content-ready';
-  // 等级由综合可发价值决定
-  h.grade = value>=80?'S' : value>=60?'A' : value>=40?'B' : 'C';
-  // 推荐理由
+  value = Math.min(100, value);
+  h.value = value;
+  // 双轨分组：弱适配（<10）→ 只能参考；否则可出内容
+  h.flyelepTier = (s3<10 || fitScore<40) ? 'industry-info' : 'content-ready';
+  // 等级（方案第 9 节）：S ≥80 / A 70–79 / B 60–69 / C <60
+  h.grade = value>=80?'S' : value>=70?'A' : value>=60?'B' : 'C';
+  // 风险标签 + 适配能力
+  h.riskTags = riskTagsOf(h);
+  const _caps=h.flyelepCapabilities||[];
+  h.capabilityKind = (_caps.includes('ai_image') && _caps.includes('ai_video')) ? '图片 + 视频'
+                   : _caps.includes('ai_video') ? '视频'
+                   : _caps.includes('ai_image') ? '图片'
+                   : '图文 / 视频';
+  // Flyelep 人话描述（依赖 flyelepTier，须在赋值之后）
+  h.flyelepText = deriveFlyelepText(h);
+  // 推荐理由（V4：主类型 + 辅助标签 + 受众/风险）
   const reasons=[];
   if(isSerious){ reasons.push('⚠️ 严肃新闻'); }
-  reasons.push('🔥 热度 '+(h.heat||0));
-  reasons.push('🎯 结合度 '+h.flyelepFit);
-  if(angle==='卖家避坑提醒') reasons.push('🛡️ 平台限流/规则痛点');
-  else if(angle==='蹭热') reasons.push('��� 蹭热度');
-  else if(angle==='带货') reasons.push('🛍️ 可带货');
-  else if(angle==='节日') reasons.push('🎉 节日');
+  reasons.push('🧩 '+(MAIN_TYPE_LABEL[h.mainType]||'行业观点干货型'));
+  if(h.tags && h.tags.length) reasons.push('🏷️ '+h.tags.join(' / '));
+  reasons.push('👥 '+(h.audienceTag||'消费者种草向'));
+  if(h.riskTags && h.riskTags.length) reasons.push('⚠️ '+h.riskTags.join('/'));
   h.reasons=reasons.join('；');
   h.match = h.grade==='C'?'low':(h.grade==='B'?'mid':'high');
-  // 🆕 按 market/platform 推导该热点适合的一级类目（用于过滤『可用画像』避免跨类目乱推）
-  h.geoCat = deriveGeoCat(h);
   return h;
 }
 // 推 hotspot 的目标类目：market 优先，再按 platform 关键词命中
@@ -6093,6 +6344,19 @@ async function scrapeHotFromApi(){
       const got=await fetchAIRSS();
       if(got>0){ newsGot += got; if(!usedBase) usedBase='机器之心'; }
     }catch(_){}
+    // 🆕 V4 话题平台（方案第 3.2 节）：小红书热搜 / 抖音热点榜 / 抖音电商热词
+    try{
+      const got=await fetchUapisHot('xiaohongshu','小红书热搜','国内',{limit:30, hotType:'dy'});
+      if(got>0){ newsGot += got; if(!usedBase) usedBase='小红书热搜'; }
+    }catch(_){}
+    try{
+      const got=await fetchUapisHot('douyin','抖音热点榜','国内',{limit:30, hotType:'dy'});
+      if(got>0){ newsGot += got; if(!usedBase) usedBase='抖音热点榜'; }
+    }catch(_){}
+    try{
+      const got=await fetchUapisHot('douyin','抖音电商热词','国内',{limit:45, ecomOnly:true, hotType:'hot'});
+      if(got>0){ newsGot += got; if(!usedBase) usedBase='抖音电商热词'; }
+    }catch(_){}
     // Hacker News Show HN：专门展示新 AI 工具 / 项目（AI 主图 / AI 视频 / AI 翻译 等角度）
     try{
       const got=await fetchShowHN();
@@ -6115,7 +6379,7 @@ async function scrapeHotFromApi(){
   }catch(e){ /* 不影响 DailyHotApi 结果 */ }
   if(btn){ btn.disabled=false; btn.textContent='🔥 一键扒热点'; }
   if(usedBase){
-    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心', 'HN Show':'HN Show', '热门选品 / Hacker News':'热门选品', '电商资讯 / Hacker News':'电商资讯'};
+    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心', 'HN Show':'HN Show', '热门选品 / Hacker News':'热门选品', '电商资讯 / Hacker News':'电商资讯', '小红书热搜':'小红书热搜', '抖音热点榜':'抖音热点榜', '抖音电商热词':'抖音电商热词'};
     const src=srcMap[usedBase]||usedBase||'本地/云端';
     const all=state.hotspots;
     const cntA=a=>all.filter(h=>h.angle===a).length;
@@ -6312,6 +6576,48 @@ async function fetchAIRSS(){
   });
   const res=await Promise.all(jobs);
   return res.reduce((a,b)=>a+b,0);
+}
+
+/* 🆕 V4 话题平台抓取：小红书热搜 / 抖音热点榜 / 抖音电商热词
+ * 覆盖方案第 3.2 节「内容话题平台（新增、重点）」——走 uapis.cn 公开热榜接口
+ * ecomOnly=true 时只保留带电商 / 种草信号的词条（用于「抖音电商热词」）
+ */
+const UAPIS_HOT_BASE='https://uapis.cn/api/v1/misc/hotboard';
+async function fetchUapisHot(type, srcName, market, opts){
+  opts=opts||{};
+  const today=todayStr();
+  try{
+    const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(), 15000);
+    const r=await fetch(UAPIS_HOT_BASE+'?type='+encodeURIComponent(type), {signal:ctrl.signal});
+    clearTimeout(to);
+    if(!r.ok) return 0;
+    const j=await r.json();
+    const items=(j && j.list)||[];
+    if(!items.length) return 0;
+    const seen=new Set(); let added=0;
+    for(const it of items.slice(0, opts.limit||30)){
+      const title=String(it.title||'').trim();
+      if(!title || seen.has(title)) continue;
+      seen.add(title);
+      if(opts.ecomOnly){
+        const ev=classifyEcom(title+' '+(it.desc||'')+' '+(it.extra||''));
+        if(ev.ecom==='no') continue;
+      }
+      const hot=Number(String(it.hot_value||it.hot||'').replace(/[^\d]/g,''))||0;
+      const o={
+        date:today, type:opts.hotType||'dy', source:srcName, market:market||'国内',
+        platform:srcName,
+        title:title.slice(0,140),
+        url:it.url||'',
+        product:'', category:'', price:'', sales: hot?String(hot):'',
+        heat: hot ? normHeat(hot,'hotlist') : 62,
+        playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
+        status:'pending', note:''
+      };
+      added += mergeFeed([evalHotspot(o)]);
+    }
+    return added;
+  }catch(_){ return 0; }
 }
 
 /* 🆕 热门选品 API：Hacker News 选品/bestseller/trending product 关键词
