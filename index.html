@@ -855,7 +855,94 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
 #hotspotTable tbody tr.hs-featured td.hs-title-col::before{background:linear-gradient(180deg,#f59f00,#e8590c)}
 .feat-badge{display:inline-flex;align-items:center;gap:2px;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:700;
   background:linear-gradient(90deg,#ff922b,#f76707);color:#fff;margin-left:6px;vertical-align:middle;box-shadow:0 1px 3px rgba(230,90,12,.3)}
-.new-badge{background:#e7f5ff;color:#1c7ed6}
+/* ========== V4.1 卡片重设计（高级感 · 克制配色 · 清晰层级） ========== */
+/* 表头：修复 sticky 背景透明 → 滚动时压住卡片文字 */
+#hotspotTable thead th{background:#fffdf9;position:sticky;top:0;z-index:3;border-bottom:1px solid #eae5da;color:#8a8375;font-weight:500;letter-spacing:.5px;font-size:11px;padding:12px 10px}
+/* 行留白 + 细分割线 */
+#hotspotTable tbody td{border-bottom:1px solid #f2eee5}
+#hotspotTable tbody td.hs-title-col{padding:15px 20px 15px 22px;background:none}
+#hotspotTable tbody td.hs-title-col::before{top:15px;bottom:15px;width:3px;border-radius:2px;background:#d9c9a8}
+/* 标题 */
+.hs-title-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px}
+.hs-title-row .hs-title{font-size:15.5px;font-weight:600;letter-spacing:-.15px;color:#15181d;line-height:1.4}
+.hs-title-row a.hs-title{color:#15181d;text-decoration:none;border-bottom:1px solid transparent}
+.hs-title-row a.hs-title:hover{color:#9a5b00;border-bottom-color:#e8d3a5}
+.hs-title-col .hs-title:hover{color:#9a5b00}
+a.hs-title{background-image:none}
+a.hs-title:hover{background-size:0 100%}
+.hs-title-row .hs-search{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:5px;background:#f5f2ea;color:#a39c8f;font-size:11px;text-decoration:none;flex:0 0 auto}
+.hs-title-row .hs-search:hover{background:#efe8d8;color:#9a5b00}
+/* 元信息 */
+.hs-meta-row{display:flex;gap:7px;align-items:center;font-size:11.5px;color:#a8a196;margin-bottom:8px;flex-wrap:wrap}
+.hs-meta-row .hs-date{color:#a8a196;font-weight:400}
+.hs-meta-row .hs-mkt{padding:0 6px;border-radius:4px;font-size:10px;font-weight:500;letter-spacing:.2px}
+.hs-meta-row .hs-mkt-cn{background:#eef6f1;color:#3f6b53}
+.hs-meta-row .hs-mkt-overseas{background:#eef2f8;color:#41597a}
+.hs-meta-row .hs-mkt-global{background:#f3f0f8;color:#5c5178}
+/* 标签行：统一尺寸，克制的浅底 */
+.hs-type-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;align-items:center}
+.mt-chip{padding:2px 9px;border-radius:6px;font-size:11px;font-weight:500;letter-spacing:.2px;border:none;background:#f4f2ec;color:#6b6355}
+.mt-pick{background:#e9f7ef;color:#0b7a45}
+.mt-pain{background:#fdeeee;color:#b3261e}
+.mt-visual{background:#f2ecfd;color:#5b32c2}
+.mt-market{background:#fff4e2;color:#9a5b00}
+.mt-insight{background:#eaf2fc;color:#0b4f9e}
+.aud-chip{padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:500;border:none}
+.aud-biz{background:#2b3440;color:#fff}
+.aud-con{background:#f2f3f5;color:#5b6470}
+.aux-tag{padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:500;border:none}
+.aux-img{background:#eef8f3;color:#0d7a52}
+.aux-vid{background:#eef3fc;color:#1a56b8}
+.aux-ind{background:#f5f1fd;color:#6b3fc4}
+.aux-risk{background:#fdf0ee;color:#b3261e}
+.v3-pill{padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:500;border:none}
+.v3-info{background:#f4f2ec;color:#8a8375}
+/* 画像 chips：去彩色、去阴影，只留细边 */
+.hs-personas{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+.hs-personas-empty{display:none}
+.persona-chip{padding:2px 9px;border-radius:6px;font-size:11px;font-weight:400;background:#fdfcf8;border:1px solid #ece7dc;color:#6b6355;transition:none;box-shadow:none}
+.persona-chip .pc-label{max-width:180px}
+.persona-chip.cat-dn{background:#fdfcf8;border-color:#e4e9f0;color:#4a6382}
+.persona-chip.cat-cross{background:#fdfcf8;border-color:#f0e6d3;color:#8a6914}
+.persona-chip.cat-b2b{background:#fdfcf8;border-color:#f1e3d7;color:#9a6240}
+.persona-chip.cat-media{background:#fdfcf8;border-color:#e9e3f1;color:#6b5a8a}
+.persona-chip.cat-saas{background:#fdfcf8;border-color:#f1dfe8;color:#8a5470}
+.persona-chip.cat-serious{background:#f8f7f4;border-color:#eae7df;color:#8b8478}
+.persona-chip:hover{transform:none;box-shadow:none}
+/* 四维评分：细线 + 数字，一行克制排布 */
+.v3-scores{display:flex;flex-wrap:wrap;gap:16px;margin-top:0;align-items:center}
+.v3-s{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:#a8a196;letter-spacing:.2px}
+.v3-bar{width:42px;height:3px;background:#f0ece3;border-radius:2px;overflow:hidden;vertical-align:middle}
+.v3-bar i{display:block;height:100%;background:#c2ab84;border-radius:2px}
+.v3-s b{font-size:11px;color:#57514a;font-weight:500;font-variant-numeric:tabular-nums}
+.v3-s b i{font-style:normal;font-weight:400;font-size:9.5px;opacity:.5}
+.v3-minus{color:#c0392b}
+/* 右侧评级：方形徽章，字母 + 分数两行，整体对齐 */
+#hotspotTable td.hs-grade{text-align:center;vertical-align:middle;padding:15px 8px}
+.grade-chip{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0;width:56px;height:52px;padding:0;border-radius:10px;background:#fdfcf8;border:1px solid #ece7dc;box-shadow:none}
+.grade-chip .gc-l{font-size:19px;font-weight:500;line-height:1;letter-spacing:0;color:#57514a}
+.grade-chip .gc-s{font-size:10px;font-weight:400;line-height:1;opacity:.5;margin-left:1px;color:#57514a}
+.grade-chip .gc-n{flex:0 0 100%;text-align:center;font-size:11px;font-weight:400;opacity:.55;line-height:1;margin-top:4px;color:#57514a}
+.grade-chip.g-S{background:#fdf9ef;border-color:#ecdfb8}
+.grade-chip.g-S .gc-l{color:#a06000}
+.grade-chip.g-A{background:#fbf9f3;border-color:#e9e2cd}
+.grade-chip.g-A .gc-l{color:#8a6914}
+.grade-chip.g-B{background:#f7f9fc;border-color:#dfe5ee}
+.grade-chip.g-B .gc-l{color:#4a6382}
+.grade-chip.g-C{background:#f7f6f3;border-color:#e7e4dc}
+.grade-chip.g-C .gc-l{color:#8b8478}
+/* 操作列：统一尺寸、右对齐 */
+#hotspotTable td.hs-act{padding:15px 16px;vertical-align:middle}
+.hs-act{display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:nowrap}
+.hs-act .btn{height:28px;min-width:48px;font-size:11.5px;font-weight:500;border-radius:7px;padding:0 11px}
+.hs-act .btn.primary{background:#2b3440;border-color:#2b3440;box-shadow:none}
+.hs-act .btn.primary:hover{background:#1d242d;border-color:#1d242d;box-shadow:none}
+.hs-act .btn.danger{color:#b0a99c}
+.hs-act .btn.danger:hover{color:#c0392b;background:#fdf2f0;border-color:#f3d9d4}
+/* 详情面板：把原先堆在卡片正面的说明收进来 */
+.dt{font-size:12.5px;color:#57514a;line-height:1.75}
+.dt b{display:block;margin:9px 0 2px;font-size:11.5px;font-weight:500;color:#8a8375;letter-spacing:.3px}
+.dt b:first-child{margin-top:0}
 /* ========== V3 筛选区（用户画像第一行，最突出） ========== */
 .v3-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:9px 12px;margin:0 0 10px;
   background:linear-gradient(180deg,#f6fbf3,#fff);border:1px solid #cfe3c6;border-radius:10px}
@@ -1114,7 +1201,6 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         <button class="hot-tab"        data-tab="visual"   onclick="switchHotTab('visual')">   <span class="ht-ico">🎨</span><span class="ht-label">内容视觉趋势型</span><span class="ht-badge" id="htCountVisual">0</span></button>
         <button class="hot-tab"        data-tab="market"   onclick="switchHotTab('market')">   <span class="ht-ico">📅</span><span class="ht-label">市场舆情窗口型</span><span class="ht-badge" id="htCountMarket">0</span></button>
         <button class="hot-tab"        data-tab="insight"  onclick="switchHotTab('insight')">  <span class="ht-ico">💡</span><span class="ht-label">行业观点干货型</span><span class="ht-badge" id="htCountInsight">0</span></button>
-        <button class="hot-tab"        data-tab="product"  onclick="switchHotTab('product')">  <span class="ht-ico">📦</span><span class="ht-label">热门选品</span>      <span class="ht-badge" id="htCountProduct">0</span></button>
         <button class="hot-tab"        data-tab="festival" onclick="switchHotTab('festival')"> <span class="ht-ico">🎉</span><span class="ht-label">电商节日</span>      <span class="ht-badge" id="htCountFestival">0</span></button>
       </div>
       <!-- 🆕 新增快报（每次扒取后高亮 8 秒，含「立即查看本次新增」按钮） -->
@@ -1135,29 +1221,8 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
         </label>
         <button class="nab-close" onclick="dismissNewBanner()" title="收起">×</button>
       </div>
-      <!-- 🆕 V3 用户画像筛选（第一行，最突出）：按「这条热点对谁有用」快速筛 -->
-      <div class="v3-filter">
-        <span class="vf-label">这条热点对谁有用</span>
-        <div class="v3-chips" id="v3PersonaChips"></div>
-        <button class="v3-reset" id="v3ResetBtn" onclick="resetV3Filters()" title="把上面所有子筛选都清回「全部」" style="margin-left:auto;padding:5px 12px;border:1px dashed #f0c674;border-radius:8px;background:#fff8e6;color:#9a5b00;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;align-self:center">🧹 清空筛选</button>
-      </div>
-      <!-- 🆕 V3 热点环节筛选（第二行） -->
-      <div class="v3-filter v3-filter-sub">
-        <span class="vf-label">热点环节</span>
-        <div class="v3-chips" id="v3StageChips"></div>
-      </div>
-      <!-- 🆕 AI 资讯 Tab 内部二级分组（仅「AI 资讯」Tab 显示） -->
-      <div class="v3-filter v3-filter-sub ai-sub" id="aiSubTabs" style="display:none">
-        <span class="vf-label">AI 资讯分组</span>
-        <div class="v3-chips">
-          <button class="v3-chip ${_aiSub==='all'?'on':''}" onclick="setAiSub('all')" type="button">全部</button>
-          <button class="v3-chip ${_aiSub==='ready'?'on':''}" onclick="setAiSub('ready')" type="button">🔥 直接能拍</button>
-          <button class="v3-chip ${_aiSub==='info'?'on':''}" onclick="setAiSub('info')" type="button">👀 看看就好</button>
-          <button class="v3-chip ${_aiSub==='image'?'on':''}" onclick="setAiSub('image')" type="button">🎨 作图</button>
-          <button class="v3-chip ${_aiSub==='video'?'on':''}" onclick="setAiSub('video')" type="button">🎬 视频</button>
-          <button class="v3-chip ${_aiSub==='llm'?'on':''}" onclick="setAiSub('llm')" type="button">🤖 大模型</button>
-        </div>
-      </div>
+      <!-- V4.1：已移除「这条热点对谁有用」「热点环节」两排子筛选（分类直接用上方类型 Tab） -->
+      <div class="v3-filter v3-filter-sub ai-sub" id="aiSubTabs" style="display:none"></div>
       <!-- 简化筛选器：聚焦「推荐视角」+ 高级筛选开关 + 库管 -->
       <div class="filter-bar">
         <div class="gv-hero">
@@ -1194,10 +1259,10 @@ textarea{min-height:60px;resize:vertical;line-height:1.55}
           <option value="中">🤝 中</option>
           <option value="弱">😶 弱</option>
         </select>
-        <span class="advanced-hint">💡 分类请用上面 4 个 Tab，这里只做精细过滤</span>
+        <span class="advanced-hint">💡 分类请用上方类型 Tab，这里只做精细过滤</span>
       </div>
 <div class="table-scroll"><table id="hotspotTable"><thead><tr>
-        <th class="hs-cb"><input type="checkbox" id="hsSelectAll" onchange="toggleSelectAll(this.checked)" title="全选当前可见行"></th><th class="hs-title-th" style="width:62%">标题 / 可用画像</th><th class="hs-grade-th" style="width:100px">评级 / 价值</th><th class="hs-act-th" style="width:158px">操作</th>
+        <th class="hs-cb"><input type="checkbox" id="hsSelectAll" onchange="toggleSelectAll(this.checked)" title="全选当前可见行"></th><th class="hs-title-th" style="width:64%">标题 / 适配画像</th><th class="hs-grade-th" style="width:92px">评级 / 价值</th><th class="hs-act-th" style="width:172px">操作</th>
 </tr></thead><tbody></tbody></table></div>
     </div>
 
@@ -3613,7 +3678,6 @@ const HOT_TABS=[
   {key:'visual',   icon:'🎨', label:'内容视觉趋势型', desc:'流行画面风格 / 构图色调 / 短视频镜头模板'},
   {key:'market',   icon:'📅', label:'市场舆情窗口型', desc:'季节 / 海外节日 / 地域民俗 / 中长期消费趋势'},
   {key:'insight',  icon:'💡', label:'行业观点干货型', desc:'行业打法 / 工具迭代 / AI 视觉·视频模型更新'},
-  {key:'product',  icon:'📦', label:'热门选品',       desc:'各平台近期热销爆品'},
   {key:'festival', icon:'🎉', label:'电商节日',       desc:'即将到来的电商活动'}
 ];
 let _hotTab='all';   // 当前 Tab
@@ -3624,7 +3688,8 @@ let _hotTab='all';   // 当前 Tab
 */
 function tabOfHot(h){
   if(h.type==='festival') return 'festival';
-  if(h.type==='product')  return 'product';
+  // V4.1：热门选品已并入「选品机会型」
+  if(h.type==='product')  return 'pick';
   // V4：统一按五大主类型归类（老数据无 mainType 时实时补算）
   return h.mainType || classifyMainType(h) || 'insight';
 }
@@ -3666,9 +3731,9 @@ function seedProductExamples(){
     existing.add(k); n++;
   });
   if(n>0){ save(); }
-  // 切到 product tab 让用户看到（AI 资讯示例已一并入库，可在 AI 资讯 tab 中查看）
-  _hotTab='product';
-  $$('#hotTabs .hot-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab==='product'));
+  // 切到「选品机会型」Tab 让用户看到
+  _hotTab='pick';
+  $$('#hotTabs .hot-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab==='pick'));
   renderHotspot();
   toast(n>0? `已添加 ${n} 条选品 / AI 工具 / AI 资讯示例` : '示例已存在，无需重复添加');
 }
@@ -3712,20 +3777,13 @@ function seedAllSamples(){
 function switchHotTab(tab){
   _hotTab=tab;
   $$('#hotTabs .hot-tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
-  const aiSub=$('#aiSubTabs'); if(aiSub) aiSub.style.display='none';
-  // 🆕 切主 Tab 时自动重置子筛选条件（避免带进新 Tab 后结果变 0）
-  if(_v3Persona!=='all' || _v3Stage!=='all' || _aiSub!=='all'){
-    _v3Persona='all'; _v3Stage='all'; _aiSub='all';
-    try{ renderV3FilterChips(); }catch(_){}
-    toast('已清空上一 Tab 的筛选条件');
-  }
   renderHotspot();
 }
 function resetV3Filters(){
   _v3Persona='all'; _v3Stage='all'; _aiSub='all';
-  renderV3FilterChips();
+  ['filterHAngle','filterHFit','filterHMarket','filterHStatus','filterHKeyword'].forEach(id=>{ const el=$('#'+id); if(el) el.value=''; });
   renderHotspot();
-  toast('已清空所有筛选');
+  toast('已清空筛选条件');
 }
 const MATCH_MAP={high:['m-high','⭐⭐⭐ 高'],mid:['m-mid','⭐⭐ 中'],low:['m-low','⭐ 低']};
 const MKT_MAP={'国内':['mkt-cn','国内'],'海外':['mkt-overseas','海外'],'全球':['mkt-global','全球']};
@@ -4805,21 +4863,44 @@ const V3_STAGE_FILTERS=[
 ];
 let _v3Persona='all';
 let _v3Stage='all';
-let _aiSub='all';   // 🆕 AI 资讯 Tab 内部二级分组：all/ready/info/image/video/llm
-function renderV3FilterChips(){
-  const pb=$('#v3PersonaChips'); if(pb){
-    pb.innerHTML=V3_PERSONA_FILTERS.map(f=>`<button class="v3-chip ${_v3Persona===f.k?'on':''}" onclick="setV3Persona('${f.k}')" type="button">${f.label}</button>`).join('');
-  }
-  const sb=$('#v3StageChips'); if(sb){
-    sb.innerHTML=V3_STAGE_FILTERS.map(f=>`<button class="v3-chip ${_v3Stage===f.k?'on':''}" onclick="setV3Stage('${f.k}')" type="button">${f.label}</button>`).join('');
-  }
-}
-function setV3Persona(k){ _v3Persona=k; renderV3FilterChips(); renderHotspot(); }
-function setV3Stage(k){ _v3Stage=k; renderV3FilterChips(); renderHotspot(); }
-function setAiSub(k){ _aiSub=k; renderHotspot(); }
+let _aiSub='all';
+// V4.1：两排子筛选已移除，保留空实现以兼容历史调用
+function renderV3FilterChips(){}
 // 🆕 判断某条 AI 热点是否「今日值得追」：高价值 + 作图/视频强能力（image2.5 / Sora 2 这类直接浮顶）
 function isAiFeatured(h){
   return (_hotTab==='insight'||_hotTab==='all') && (h.value||0)>=65 && (h.flyelepCapabilities||[]).some(c=>c==='ai_image'||c==='ai_video');
+}
+/* V4.1：无原始链接的热点 → 给平台内搜索链接，避免「点了没反应」 */
+function hotSearchUrl(h){
+  const q=encodeURIComponent(String(h.title||'').slice(0,40));
+  const p=String(h.platform||'');
+  if(/抖音/.test(p))   return 'https://www.douyin.com/search/'+q;
+  if(/小红书/.test(p)) return 'https://www.xiaohongshu.com/search_result?keyword='+q;
+  if(/微博/.test(p))   return 'https://s.weibo.com/weibo?q='+q;
+  if(/知乎/.test(p))   return 'https://www.zhihu.com/search?q='+q;
+  if(/B站|哔哩哔哩/i.test(p)) return 'https://search.bilibili.com/all?keyword='+q;
+  return 'https://www.baidu.com/s?wd='+q;
+}
+/* V4.1：脏数据体检与清理
+ * ① 无标题 / 标题 < 4 字 → 移除  ② 同标题重复（保留最新）→ 移除  ③ url 非 http(s) 开头 → 清空 url
+ * 返回 { removed, cleaned }
+ */
+function sanitizeHotspots(){
+  if(!Array.isArray(state.hotspots)) return {removed:0, cleaned:0};
+  const seen=new Set(), kept=[];
+  let removed=0, cleaned=0;
+  const sorted=[...state.hotspots].sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
+  for(const h of sorted){
+    const t=String(h.title||'').trim();
+    if(!t || t.length<4){ removed++; continue; }
+    const key=t.replace(/\s+/g,'');
+    if(seen.has(key)){ removed++; continue; }
+    seen.add(key);
+    if(h.url && !/^https?:\/\//i.test(h.url)){ h.url=''; cleaned++; }
+    kept.push(h);
+  }
+  if(removed||cleaned){ state.hotspots=kept; try{ save(); }catch(_){} }
+  return {removed, cleaned};
 }
 
 function renderHotspot(){
@@ -4833,6 +4914,12 @@ function renderHotspot(){
         sortBy=$('#sortBy')?.value||'value';
   // 补全老数据评级（无 value/heat/angle 字段时实时计算一次）；同步补 geoCat
   // 升级后：geoCat 强制重算（之前兜底错的『内容自媒体』会重新派到正确类目）
+  // 🆕 V4.1 脏数据清理（整个会话只跑一次，避免每次渲染都重排）
+  if(!window.__hsCleaned){
+    window.__hsCleaned=true;
+    const _r=sanitizeHotspots();
+    if(_r.removed>0) setTimeout(()=>toast('已清理 '+_r.removed+' 条无效 / 重复热点'),400);
+  }
   let needSave=false;
   for(const h of state.hotspots){
     if(h.angle==='痛点规则'){ h.angle='卖家避坑提醒'; needSave=true; }
@@ -4849,7 +4936,7 @@ function renderHotspot(){
   // ===== Tab 数量徽章（用全量 state.hotspots） =====
   const all=state.hotspots||[];
   const visibleAll = all.filter(h => !h.archived && !h.filtered);
-  const _badgeIds={pick:'htCountPick',pain:'htCountPain',visual:'htCountVisual',market:'htCountMarket',insight:'htCountInsight',product:'htCountProduct',festival:'htCountFestival'};
+  const _badgeIds={pick:'htCountPick',pain:'htCountPain',visual:'htCountVisual',market:'htCountMarket',insight:'htCountInsight',festival:'htCountFestival'};
   [['htCountAll','all']].concat(Object.keys(_badgeIds).map(k=>[_badgeIds[k],k])).forEach(([id,t])=>{
     const el=$('#'+id);
     if(el) el.textContent= t==='all' ? visibleAll.length : visibleAll.filter(h=>tabOfHot(h)===t).length;
@@ -4870,19 +4957,8 @@ function renderHotspot(){
     arr = arr.filter(h => !h.filtered);
   }
 
-  // 1) Tab 过滤（用户硬性需求：点 Tab 看到对应分类的排行榜）
-  // 🆕 V3 用户画像筛选（能力维度）+ 热点环节筛选
-  if(_v3Persona && _v3Persona!=='all') arr=arr.filter(h=>(h.flyelepCapabilities||[]).includes(_v3Persona));
-  if(_v3Stage && _v3Stage!=='all') arr=arr.filter(h=>(h.linkStages||[]).includes(_v3Stage));
+  // 1) Tab 过滤（点 Tab 看到对应类型的排行榜）
   if(_hotTab && _hotTab!=='all') arr=arr.filter(h=>tabOfHot(h)===_hotTab);
-  // 🆕 AI 资讯 Tab 内部二级分组（直接能拍 / 看看就好 / 作图 / 视频 / 大模型）
-  if(_hotTab==='ai' && _aiSub!=='all'){
-    if(_aiSub==='ready')      arr=arr.filter(h=>h.flyelepTier==='content-ready');
-    else if(_aiSub==='info')  arr=arr.filter(h=>h.flyelepTier==='industry-info');
-    else if(_aiSub==='image') arr=arr.filter(h=>(h.flyelepCapabilities||[]).includes('ai_image'));
-    else if(_aiSub==='video') arr=arr.filter(h=>(h.flyelepCapabilities||[]).includes('ai_video'));
-    else if(_aiSub==='llm')   arr=arr.filter(h=>(h.flyelepCapabilities||[]).includes('llm_agent'));
-  }
   // 2) 高级筛选（关键词 / 玩法 / 结合度 / 市场 / 状态）
   if(fk) arr=arr.filter(h=>[h.title,h.source,h.product,h.playbook,h.topic,h.script,h.material,h.reasons,(h.titleOrig||'')].some(x=>(x||'').toLowerCase().includes(fk)));
   if(fa) arr=arr.filter(h=>(h.mainType||'insight')===fa);
@@ -4952,15 +5028,7 @@ function renderHotspot(){
   if(saSel){ saSel.indeterminate=false; saSel.checked=false; }
   if(!arr.length){
     let emptyHtml='';
-    if(_hotTab==='product'){
-      emptyHtml=`<tr><td colspan="4" class="empty">
-        <div class="big">🛍️</div>
-        <div style="font-size:14px;font-weight:600;margin:8px 0 4px">热门选品为空</div>
-        <div class="muted" style="margin-bottom:14px">点「🔥 一键扒热点」后会自动拉一批最新爆品 / Amazon Best Seller / TikTok Shop Trending</div>
-        <button class="btn" onclick="resetV3Filters()" style="padding:8px 18px;margin-top:10px">🧹 清空筛选条件</button>
-        <div class="muted" style="margin-top:12px;font-size:11.5px">或在右下角导入热点源 JSON 文件</div>
-      </td></tr>`;
-    }else if(_hotTab==='festival'){
+    if(_hotTab==='festival'){
       emptyHtml=`<tr><td colspan="4" class="empty">
         <div class="big">🎉</div>
         <div style="font-size:14px;font-weight:600;margin:8px 0 4px">电商节日为空</div>
@@ -5055,7 +5123,7 @@ function renderHotspot(){
       <span class="v3-s"><span class="v3-k">Flyelep 适配</span>${_bar(_d3/20*100)}<b>${_d3}<i>/20</i></b></span>
       ${_d4?`<span class="v3-s"><span class="v3-k">风险</span><b class="v3-minus">${_d4}</b></span>`:''}
     </div>`;
-    const v3Block = (belongRow||whoRow||flyRow) ? belongRow+whoRow+capRow+flyRow+scoreRow : '';
+    const v3Block = scoreRow;   // V4.1：卡片正面只留四维评分；「谁用得上 / 适配能力 / Flyelep 能帮你 / 归属」收进详情
     // 🆕 推荐 3 个可用画像：按命中 prefer 排序 ≥65
     const topPersonas = top3PersonasForAngle(h.angle||'其他', h.geoCat, h);
     const personaChips = topPersonas.length
@@ -5066,8 +5134,8 @@ function renderHotspot(){
       <td class="hs-title-col">
         <div class="hs-title-row" ${origHint}>
           ${h.url
-            ? `<a href="${h.url}" target="_blank" class="hs-title">${escapeHtml(h.title)}</a>`
-            : `<div class="hs-title">${escapeHtml(h.title)}</div>`}
+            ? `<a href="${h.url}" target="_blank" rel="noopener" class="hs-title">${escapeHtml(h.title)}</a>`
+            : `<a href="${hotSearchUrl(h)}" target="_blank" rel="noopener" class="hs-title" title="这条热点没有原始链接，点击搜索相关内容">${escapeHtml(h.title)}</a><a class="hs-search" href="${hotSearchUrl(h)}" target="_blank" rel="noopener" title="搜索相关内容">↗</a>`}
           ${isNew?'<span class="new-badge">🆕 新增</span>':''}
           ${isFeat?'<span class="feat-badge" title="高价值 AI 作图/视频热点，建议直接追">🔥 今日值得追</span>':''}
           ${h.titleOrig?'<span class="i18n-badge" title="已自动翻译为中文">🌐</span>':''}
@@ -5079,7 +5147,7 @@ function renderHotspot(){
           ${h.market?`<span class="hs-mkt mkt-${h.market==='国内'?'cn':h.market==='海外'?'overseas':'global'}">${escapeHtml(h.market)}</span>`:''}
           <span class="hs-src">· ${escapeHtml(h.source||'')}</span>
         </div>
-        <div class="hs-type-row">${mtChip}${audChip}${tagChips}${riskChips}</div>
+        <div class="hs-type-row">${mtChip}${audChip}${tagChips}${riskChips}${infoBadge}</div>
         ${personaChips}
         ${v3Block}
       </td>
@@ -5092,10 +5160,14 @@ function renderHotspot(){
         <button class="btn sm danger" onclick="deleteHotspot('${h.id}')">删</button>
       </td>
     </tr>${hasDetail?`<tr class="hs-detail hidden" id="hsd-${h.id}"><td colspan="4"><div class="dt">
-      ${h.topic?`<b>📌 视频选题</b><div>${escapeHtml(h.topic)}</div>`:''}
-      ${h.script?`<b>🎬 脚本要点</b><div>${escapeHtml(h.script)}</div>`:''}
-      ${h.material?`<b>🧰 素材清单</b><div>${escapeHtml(h.material)}</div>`:''}
-      ${h.reasons?`<b>🎯 为什么推荐给你</b><div>${escapeHtml(h.reasons)}</div>`:''}
+      ${h.whoFor?`<b>谁用得上</b><div>${escapeHtml(h.whoFor)}</div>`:''}
+      ${h.capabilityKind?`<b>适配能力</b><div>Flyelep ${escapeHtml(h.capabilityKind)}</div>`:''}
+      ${h.flyelepText?`<b>Flyelep 能帮你</b><div>${escapeHtml(h.flyelepText)}</div>`:''}
+      ${((h.linkStages||[]).length||(h.probes||[]).length)?`<b>归属</b><div>${escapeHtml([...(h.linkStages||[]),...(h.probes||[])].join(' · '))}</div>`:''}
+      ${h.topic?`<b>视频选题</b><div>${escapeHtml(h.topic)}</div>`:''}
+      ${h.script?`<b>脚本要点</b><div>${escapeHtml(h.script)}</div>`:''}
+      ${h.material?`<b>素材清单</b><div>${escapeHtml(h.material)}</div>`:''}
+      ${h.reasons?`<b>为什么推荐给你</b><div>${escapeHtml(h.reasons)}</div>`:''}
       ${h.struct?`<b>推荐结构</b><div>${escapeHtml(h.struct)}</div>`:''}
       ${h.note?`<b>备注</b><div>${escapeHtml(h.note)}</div>`:''}
       ${h.url?`<b>链接</b><div><a href="${h.url}" target="_blank" style="color:var(--brand)">${escapeHtml(h.url)}</a></div>`:''}
@@ -5124,7 +5196,7 @@ function updateRenderStatus(arr, all, opts){
   const bar=$('#renderStatus');
   if(!bar) return;
   const total=all.length;
-  const tabName = ({all:'全部',pick:'选品机会型',pain:'运营痛点型',visual:'内容视觉趋势型',market:'市场舆情窗口型',insight:'行业观点干货型',product:'热门选品',festival:'电商节日'})[_hotTab] || '全部';
+  const tabName = ({all:'全部',pick:'选品机会型',pain:'运营痛点型',visual:'内容视觉趋势型',market:'市场舆情窗口型',insight:'行业观点干货型',festival:'电商节日'})[_hotTab] || '全部';
   if(total===0){
     bar.innerHTML='<span class="rs-dot warn"></span>库内 <b>0</b> 条热点 · 当前 <b>'+tabName+'</b> Tab · 点「🔥 一键扒热点」抓一批';
     bar.className='render-status warn';
@@ -6379,7 +6451,7 @@ async function scrapeHotFromApi(){
   }catch(e){ /* 不影响 DailyHotApi 结果 */ }
   if(btn){ btn.disabled=false; btn.textContent='🔥 一键扒热点'; }
   if(usedBase){
-    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心', 'HN Show':'HN Show', '热门选品 / Hacker News':'热门选品', '电商资讯 / Hacker News':'电商资讯', '小红书热搜':'小红书热搜', '抖音热点榜':'抖音热点榜', '抖音电商热词':'抖音电商热词'};
+    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心', 'HN Show':'HN Show', '热门选品 / Hacker News':'选品趋势', '电商资讯 / Hacker News':'电商资讯', '小红书热搜':'小红书热搜', '抖音热点榜':'抖音热点榜', '抖音电商热词':'抖音电商热词'};
     const src=srcMap[usedBase]||usedBase||'本地/云端';
     const all=state.hotspots;
     const cntA=a=>all.filter(h=>h.angle===a).length;
