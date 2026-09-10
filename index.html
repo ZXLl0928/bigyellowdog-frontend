@@ -4946,8 +4946,8 @@ function renderHotspot(){
     // 🆕 V4.2 追加版本标记：强制重算一次，让新准入规则（社交热榜 / insight / Flyelep 适配 / 画像真命中）对老数据也生效
     if(h.value==null || h.heat==null || h.angle==null || h.mainType==null
        || h.tags==null || h.pool==null || h.d1==null || h.d2==null || h.d3==null
-       || h.v43==null){
-      evalHotspot(h); h.v43=1; needSave=true;
+       || h.v44==null){
+      evalHotspot(h); h.v44=1; needSave=true;
     }
     const newGeo = deriveGeoCat(h);
     if(h.geoCat !== newGeo){ h.geoCat = newGeo; needSave=true; }
@@ -5979,7 +5979,8 @@ const MAIN_TYPE_LABEL={}; MAIN_TYPES.forEach(t=>MAIN_TYPE_LABEL[t.key]=t.label);
 
 // 主类型判定关键词（优先级：痛点 > 选品 > 视觉 > 舆情窗口 > 干货）
 const T_PAIN=[/新规|新政策|平台政策|监管|处罚|罚款|封号|限流|降权|审核|合规|违规|整改|下架|清退|规则调整|版权|侵权|诉讼|起诉|商标|专利|法案|条例|标准|召回|禁售|限售|资质|认证被拒/i];
-const T_PICK=[/选品|爆品|爆款|热销|畅销|卖爆|新品|上新|飙升|搜索量|需求上涨|缺货|断货|走红|种草|好物|必买|回购|抢空|脱销|best ?seller|trending|viral|销量|订单量|环比增长|同比增长/i];
+// 🆕 V4.4 只保留「选品机会」信号（品类飙升 / 新品爆发 / 需求上涨）；种草好物归视觉/干货，不再抢走视觉趋势型
+const T_PICK=[/选品|爆品|爆款|热销|畅销|卖爆|新品|上新|飙升|搜索量|需求上涨|缺货|断货|走红|抢空|脱销|爆单|卖断货|best ?seller|trending|viral|销量|订单量|环比增长|同比增长/i];
 const T_VISUAL=[/风格|视觉|画面|构图|色调|滤镜|拍摄|运镜|镜头|模板|特效|转场|变装|妆造|穿搭|布景|摆拍|氛围感|同款|卡点|大片感|实拍|出片|高级感|审美/i];
 // 强窗口：本身就是电商大促 / 购物窗口，直接归「市场舆情窗口型」
 const T_MARKET_STRONG=[/双11|双十一|双12|618|黑五|网一|cyber\s?monday|购物节|年货节|大促|促销|暑促|换季|旺季|淡季|窗口期|购物季|备货季|斋月|开斋节|排灯节|狂欢节/i];
@@ -6016,6 +6017,8 @@ function isAITextOnly(text){
 const POOL_A=/卖家|商家|运营|平台规则|政策|审核|合规|限流|封号|降权|选品|上架|listing|sku|erp|供应链|货源|工厂|物流|海外仓|fba|广告投放|acos|roas|转化率|复购|退款|差评|店铺|开店|入驻|佣金|手续费|运费|关税|商标|版权|侵权|素材|产能|返工|批量|效率|提效|工具|软件|系统|后台|设置|功能更新|卖家中心/i;
 const POOL_C=/明星|艺人|偶像|恋情|分手|离婚|出轨|综艺|电视剧|电影|票房|剧情|大结局|番剧|动漫|游戏|夺冠|赛事|比分|演唱会|音乐节|歌手|新歌|专辑|塌房|八卦|吃瓜|追星|搞笑|段子|萌宠|猫咪|狗狗|美食|菜谱|食谱|烘焙|减肥|星座|情感|鸡汤|相亲|彩礼|裸辞|躺平|脱单|表白/i;
 // 🆕 V4.2 社交热榜准入：抖音 / 小红书热搜必须命中消费·商品·视觉信号，否则丢弃（方案第 7 节）
+// 🆕 V4.4 负面社会事件：社会新闻 / 犯罪 / 隐私 / 伤害类，无电商素材价值 → 直接丢弃
+const NEGATIVE_EVENT=/网络暴力|网暴|人肉|霸凌|性骚扰|性侵|偷拍|未经同意拍摄|隐私泄露|隐私外泄|泄露隐私|造谣|诽谤|侮辱|歧视|虐待|殴打|家暴|自杀|轻生|身亡|遇害|被害|犯罪|嫌犯|嫌疑人|判刑|入狱|拘留|逮捕|车祸|袭击|枪击|拐卖|猥亵|涉黄|涉毒|赌博/i;
 const SOCIAL_ACCEPT=/好物|种草|必买|推荐|测评|开箱|回购|平替|清单|攻略|避坑|智商税|穿搭|妆容|护肤|美妆|发型|配饰|家居|装修|收纳|数码|手机|电脑|耳机|家电|母婴|育儿|宠物|零食|美食|饮品|咖啡|甜品|服饰|鞋|包|首饰|露营|健身|出行|旅行|酒店|机票|门票|优惠|折扣|便宜|性价比|省钱|团购|秒杀|直播|带货|旗舰店|新品|开售|发售|抢购|断货|销量|爆款|热卖|同款|探店|打卡|拍照|出片|构图|调色|滤镜|模板|教程|改造|对比|技巧|配方|做法|穿搭灵感|夏装|冬装|春装|秋装|换季/i;
 
 function classifyPool(h){
@@ -6082,6 +6085,8 @@ function preFilter(h){
   if(isSocial && !SOCIAL_ACCEPT.test(t) && classifyEcom(t).ecom==='no') return '社交热榜 · 与电商无关';
   // ⑦ 🆕 V4.2 兜底归入「行业观点干货型」但既无 AI 视觉、也无行业信号 → 丢弃（防兜底堆积）
   if(h.mainType==='insight' && !isAIVisualIndirect(t) && !T_INSIGHT.some(re=>re.test(t))) return '内容笼统 · 已降噪';
+  // ⑨ 🆕 V4.4 负面社会事件（犯罪 / 隐私 / 伤害 / 纠纷）→ 丢弃，绝不能当电商素材
+  if(NEGATIVE_EVENT.test(t)) return '负面社会事件 · 不宜做营销';
   // ⑧ 🆕 V4.3 方案第 7 节：无法关联 Flyelep 图片 / 视频任一能力 → 丢弃
   //（电商节日日历条目天然有效，豁免此条）
   if(h.type!=='festival' && flyelepAdaptScore(h)<=4) return '与 Flyelep 图片 / 视频能力无关';
@@ -6160,8 +6165,8 @@ function flyelepAdaptScore(h){
 function riskPenalty(h){
   const t=((h.title||'')+' '+(h.note||''));
   let p=0;
-  if(/合规风险|禁售|违规|下架|处罚|封号|诉讼|侵权|召回|监管调查/i.test(t)) p-=10;
-  if(/翻车|塌房|负面|危机|抵制|投诉|差评|退货潮|舆情|道歉/i.test(t)) p-=10;
+  if(/合规风险|禁售|违规|下架|处罚|封号|诉讼|侵权|召回|监管调查|假货|抄袭|盗用|专利纠纷|索赔|维权/i.test(t)) p-=10;
+  if(/翻车|塌房|负面|危机|抵制|投诉|差评|退货潮|舆情|道歉|丑闻|纠纷|争执|被骗/i.test(t)) p-=10;
   if(/传闻|谣言|不实|小道消息|未证实|疑似|爆料/i.test(t)) p-=5;
   return Math.max(-20, p);
 }
@@ -6495,12 +6500,17 @@ async function scrapeHotFromApi(){
       newsGot += got;
       if(got>0 && !usedBase) usedBase='电商资讯 / Hacker News';
     }catch(_){}
+    // 🆕 V4.4 运营痛点型定向抓取：平台政策 / 审核 / 合规 / 卖家踩坑
+    try{
+      const got=await fetchPainPoints();
+      if(got>0){ newsGot += got; if(!usedBase) usedBase='平台规则 / 卖家痛点'; }
+    }catch(_){}
     // 🆕 统一累计：所有补抓（HN / 机器之心 / HN Show / 选品 / 电商资讯）加到 total
     total += newsGot;
   }catch(e){ /* 不影响 DailyHotApi 结果 */ }
   if(btn){ btn.disabled=false; btn.textContent='🔥 一键扒热点'; }
   if(usedBase){
-    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心', 'HN Show':'HN Show', '热门选品 / Hacker News':'选品趋势', '电商资讯 / Hacker News':'电商资讯', '小红书热搜':'小红书热搜', '抖音热点榜':'抖音热点榜', '抖音电商热词':'抖音电商热词'};
+    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心', 'HN Show':'HN Show', '热门选品 / Hacker News':'选品趋势', '电商资讯 / Hacker News':'电商资讯', '小红书热搜':'小红书热搜', '抖音热点榜':'抖音热点榜', '抖音电商热词':'抖音电商热词', '平台规则 / 卖家痛点':'平台规则 / 卖家痛点'};
     const src=srcMap[usedBase]||usedBase||'本地/云端';
     const all=state.hotspots;
     const cntA=a=>all.filter(h=>h.angle===a).length;
@@ -6739,6 +6749,48 @@ async function fetchUapisHot(type, srcName, market, opts){
     }
     return added;
   }catch(_){ return 0; }
+}
+
+/* 🆕 V4.4 运营痛点型定向抓取：平台政策 / 审核 / 合规 / 卖家踩坑
+ * 该类型长期为空的主因是抓取源缺这类内容（HN 技术新闻 / RSS 少平台规则）→ 单独开一条航线
+ * 只保留分类结果为 pain 且未被过滤的条目，避免引入噪音
+ */
+async function fetchPainPoints(){
+  if(!API_BASE) return 0;
+  const TERMS=[
+    'amazon seller policy','amazon listing removed','amazon account suspended','amazon image requirements',
+    'tiktok shop policy','tiktok shop violation','shopee seller policy','temu seller rules',
+    'ecommerce compliance','product listing rejected','marketplace rules sellers',
+    'product image guidelines','counterfeit takedown','seller account suspended','listing suppressed'
+  ];
+  const today=todayStr();
+  const seen=new Set(); let added=0;
+  for(const q of TERMS){
+    try{
+      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),7000);
+      const r=await fetch(API_BASE.replace(/\/$/,'')+'/api/hn?query='+encodeURIComponent(q)+'&limit=3',{signal:ctrl.signal});
+      clearTimeout(to);
+      if(!r.ok) continue;
+      const j=await r.json();
+      for(const h of (j.data||[])){
+        if(!h.title || seen.has(h.id)) continue;
+        seen.add(h.id);
+        const o={
+          date:today, type:'news', source:'平台规则 / 卖家痛点', market:'海外', platform:'平台政策',
+          title:h.title.trim(),
+          url:h.url||('https://news.ycombinator.com/item?id='+h.id),
+          product:'', category:'', price:'', sales:'',
+          heat: normHeat(h.score,'hn'),
+          note:'🛡️ 运营痛点 · 👍 '+(h.score||0),
+          playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
+          status:'pending'
+        };
+        const ev=evalHotspot(o);
+        if(ev.mainType==='pain' && !ev.filtered) added += mergeFeed([ev]);
+      }
+    }catch(_){}
+  }
+  return added;
 }
 
 /* 🆕 热门选品 API：Hacker News 选品/bestseller/trending product 关键词
