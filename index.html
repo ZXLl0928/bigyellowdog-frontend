@@ -953,9 +953,32 @@ a.hs-title:hover{background-size:0 100%}
 .hs-side{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;padding-left:22px;margin-left:22px;border-left:1px solid #f2eee5;min-width:140px}
 .hs-side .hs-act{justify-content:center}
 .hs-side .grade-chip{width:58px;height:54px}
-#hotspotTable tbody tr.hs-featured .hs-card::before{background:#f0a72b}
-#hotspotTable tbody tr.v3-info-row .hs-card::before{background:#c8c5bb}
-#hotspotTable tbody tr.hs-cant .hs-card::before{background:#dedbd4}
+/* ========== V4.7 卡片与等级徽章重设计（等级更醒目 · 层次更清晰） ========== */
+.hs-card{align-items:stretch;padding:0;transition:background .15s ease}
+.hs-card:hover{background:#fffdf6}
+.hs-card::before{content:none}
+.hs-main{padding:17px 22px 17px 26px;position:relative}
+.hs-main::before{content:'';position:absolute;left:0;top:17px;bottom:17px;width:3px;border-radius:0 3px 3px 0;background:#e0d5c0}
+.hs-title-row .hs-title{font-size:16px;font-weight:600;letter-spacing:-.2px}
+.hs-side{gap:13px;padding:16px 20px 16px 22px;margin-left:0;border-left:1px solid #f2eee5;min-width:152px}
+.hs-side .grade-chip{width:68px;height:68px;border-radius:14px}
+.grade-chip{display:inline-flex;flex-wrap:wrap;align-items:baseline;justify-content:center;width:68px;height:68px;border-radius:14px;border-width:1.5px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.grade-chip .gc-l{flex:0 0 auto;font-size:28px;font-weight:700;line-height:1;letter-spacing:-.5px}
+.grade-chip .gc-s{flex:0 0 auto;font-size:11px;font-weight:500;line-height:1;opacity:.7;margin-left:1px}
+.grade-chip .gc-n{flex:0 0 100%;text-align:center;font-size:13px;font-weight:600;line-height:1;margin-top:4px;opacity:.82;font-variant-numeric:tabular-nums}
+.grade-chip.g-S{background:linear-gradient(160deg,#fff7e3,#fce9b6);border-color:#e6c164}
+.grade-chip.g-S .gc-l,.grade-chip.g-S .gc-s,.grade-chip.g-S .gc-n{color:#a35c00}
+.grade-chip.g-A{background:linear-gradient(160deg,#fffbf2,#ffefd4);border-color:#e8ce93}
+.grade-chip.g-A .gc-l,.grade-chip.g-A .gc-s,.grade-chip.g-A .gc-n{color:#8f6408}
+.grade-chip.g-B{background:linear-gradient(160deg,#f7fafd,#e9f0fa);border-color:#ccd9ea}
+.grade-chip.g-B .gc-l,.grade-chip.g-B .gc-s,.grade-chip.g-B .gc-n{color:#3d5878}
+.grade-chip.g-C{background:#f6f5f2;border-color:#e4e1d9}
+.grade-chip.g-C .gc-l,.grade-chip.g-C .gc-s,.grade-chip.g-C .gc-n{color:#8b8478}
+#hotspotTable tbody tr.hs-featured .hs-main::before{background:linear-gradient(180deg,#f5a623,#e8590c)}
+#hotspotTable tbody tr.v3-info-row .hs-main::before{background:#cfcbc1}
+#hotspotTable tbody tr.hs-cant .hs-main::before{background:#e2dfd8}
+.hs-side .hs-act{gap:7px}
+.hs-side .hs-act .btn{height:29px;min-width:50px;font-size:12px}
 /* ========== V3 筛选区（用户画像第一行，最突出） ========== */
 .v3-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:9px 12px;margin:0 0 10px;
   background:linear-gradient(180deg,#f6fbf3,#fff);border:1px solid #cfe3c6;border-radius:10px}
@@ -4946,8 +4969,8 @@ function renderHotspot(){
     // 🆕 V4.2 追加版本标记：强制重算一次，让新准入规则（社交热榜 / insight / Flyelep 适配 / 画像真命中）对老数据也生效
     if(h.value==null || h.heat==null || h.angle==null || h.mainType==null
        || h.tags==null || h.pool==null || h.d1==null || h.d2==null || h.d3==null
-       || h.v46==null){
-      evalHotspot(h); h.v46=1; needSave=true;
+       || h.v47==null){
+      evalHotspot(h); h.v47=1; needSave=true;
     }
     const newGeo = deriveGeoCat(h);
     if(h.geoCat !== newGeo){ h.geoCat = newGeo; needSave=true; }
@@ -5987,7 +6010,7 @@ const T_MARKET_STRONG=[/双11|双十一|双12|618|黑五|网一|cyber\s?monday|�
 // 弱节日名：单独出现不算「窗口期」（避免教师节科普、假期运输这类内容被误判）
 const T_MARKET_WEAK=[/春节|新年|元宵|清明|端午|七夕|中秋|国庆|圣诞|万圣|复活节|感恩节|情人节|母亲节|父亲节|教师节|女王节|女神节|开学季|毕业季|季节|春季|夏季|秋季|冬季|民俗|节日/i];
 // 弱节日名必须同时带「消费 / 营销」信号才算窗口
-const T_MARKET_REQ=/大促|促销|营销|备货|铺货|旺季|销量|选品|上架|素材|主图|海报|种草|好物|推荐|爆款|热销|开卖|开售|预售|礼盒|礼物|送礼|折扣|优惠|清单|商品|价格|消费|购物|买家|卖家/i;
+const T_MARKET_REQ=/大促|促销|营销|备货|铺货|旺季|销量|选品|上架|素材|主图|海报|种草|好物|推荐|爆款|热销|开卖|开售|预售|礼盒|送礼|礼品|折扣|优惠|清单|商品|价格|消费|购物|买家|卖家/i;
 const T_INSIGHT=[/行业|趋势|报告|观点|干货|方法论|打法|复盘|拆解|案例|白皮书|数据洞察|榜单|排名|效率|提效|工具|迭代|升级|发布|上线|公测|开放|模型|算法|技术升级|生态|格局|访谈|专访|policy|regulation|compliance|industry|trend|report|strategy|guideline|update|launch|release|announcement|analysis|insight|forecast|survey|study|platform|seller|merchant|retail/i];
 
 /* AI 间接热点判定（方案第 6 节）：
@@ -6018,7 +6041,9 @@ const POOL_A=/卖家|商家|运营|平台规则|政策|审核|合规|限流|封�
 const POOL_C=/明星|艺人|偶像|恋情|分手|离婚|出轨|综艺|电视剧|电影|票房|剧情|大结局|番剧|动漫|游戏|夺冠|赛事|比分|演唱会|音乐节|歌手|新歌|专辑|塌房|八卦|吃瓜|追星|搞笑|段子|萌宠|猫咪|狗狗|美食|菜谱|食谱|烘焙|减肥|星座|情感|鸡汤|相亲|彩礼|裸辞|躺平|脱单|表白/i;
 // 🆕 V4.2 社交热榜准入：抖音 / 小红书热搜必须命中消费·商品·视觉信号，否则丢弃（方案第 7 节）
 // 🆕 V4.4 负面社会事件：社会新闻 / 犯罪 / 隐私 / 伤害类，无电商素材价值 → 直接丢弃
-const NEGATIVE_EVENT=/网络暴力|网暴|人肉|霸凌|性骚扰|性侵|偷拍|未经同意拍摄|隐私泄露|隐私外泄|泄露隐私|造谣|诽谤|侮辱|歧视|虐待|殴打|家暴|自杀|轻生|身亡|遇害|被害|犯罪|嫌犯|嫌疑人|判刑|入狱|拘留|逮捕|车祸|袭击|枪击|拐卖|猥亵|涉黄|涉毒|赌博/i;
+const NEGATIVE_EVENT=/网络暴力|网暴|人肉|霸凌|性骚扰|性侵|偷拍|未同意|未经同意|未授权|擅自拍|被拍成|隐私泄露|隐私外泄|泄露隐私|造谣|诽谤|侮辱|歧视|虐待|殴打|家暴|自杀|轻生|身亡|遇害|被害|犯罪|嫌犯|嫌疑人|判刑|入狱|拘留|行拘|逮捕|车祸|袭击|枪击|拐卖|猥亵|涉黄|涉毒|赌博/i;
+// 🆕 V4.7 社会事件：现场冲突 / 执法查处类，与电商素材无关 → 丢弃
+const SOCIAL_EVENT=/被拦截|被查获|被收缴|被查处|被取缔|被曝光|警方通报|警方介入|立案调查|立案侦查|行拘|行政拘留|抓捕|落网|整治行动|专项行动|突击检查|通报批评|校门口|学校门口|校园内|教育局回应/i;
 const SOCIAL_ACCEPT=/好物|种草|必买|推荐|测评|开箱|回购|平替|清单|攻略|避坑|智商税|穿搭|妆容|护肤|美妆|发型|配饰|家居|装修|收纳|数码|手机|电脑|耳机|家电|母婴|育儿|宠物|零食|美食|饮品|咖啡|甜品|服饰|鞋|包|首饰|露营|健身|出行|旅行|酒店|机票|门票|优惠|折扣|便宜|性价比|省钱|团购|秒杀|直播|带货|旗舰店|新品|开售|发售|抢购|断货|销量|爆款|热卖|同款|探店|打卡|拍照|出片|构图|调色|滤镜|模板|教程|改造|对比|技巧|配方|做法|穿搭灵感|夏装|冬装|春装|秋装|换季/i;
 
 function classifyPool(h){
@@ -6039,9 +6064,14 @@ function classifyMainType(h){
   if(h.type==='product')  return 'pick';
   const hit=arr=>arr.some(re=>re.test(t));
   if(hit(T_PAIN))    return 'pain';
+  // 🆕 V4.7 窗口 vs 选品：节日窗口（含营销信号）优先归窗口型，
+  // 除非是明确的「品类飙升 / 新品爆发」——那才是真正的选品机会
+  const _isWindow = hit(T_MARKET_STRONG) || (hit(T_MARKET_WEAK) && T_MARKET_REQ.test(t));
+  const _isPickStrong = /新品|首发|搜索量|飙升|暴涨|卖爆|爆单|缺货|断货|抢空|脱销|new release|just launched|surge|sold out/i.test(t);
+  if(_isWindow && !_isPickStrong) return 'market';
   if(hit(T_PICK))    return 'pick';
   if(hit(T_VISUAL))  return 'visual';
-  if(hit(T_MARKET_STRONG) || (hit(T_MARKET_WEAK) && T_MARKET_REQ.test(t))) return 'market';
+  if(_isWindow)      return 'market';
   if(hit(T_INSIGHT)) return 'insight';
   if(isAIVisualIndirect(t)) return 'insight';
   const ev=classifyEcom(t);
@@ -6087,6 +6117,8 @@ function preFilter(h){
   if(h.mainType==='insight' && !isAIVisualIndirect(t) && !T_INSIGHT.some(re=>re.test(t))) return '内容笼统 · 已降噪';
   // ⑨ 🆕 V4.4 负面社会事件（犯罪 / 隐私 / 伤害 / 纠纷）→ 丢弃，绝不能当电商素材
   if(NEGATIVE_EVENT.test(t)) return '负面社会事件 · 不宜做营销';
+  // ⑩ 🆕 V4.7 社会现场事件（校园 / 执法 / 查处）——无商品价值 → 丢弃
+  if(SOCIAL_EVENT.test(t)) return '社会事件 · 与电商无关';
   // ⑧ 🆕 V4.3 方案第 7 节：无法关联 Flyelep 图片 / 视频任一能力 → 丢弃
   //（电商节日日历条目天然有效，豁免此条）
   if(h.type!=='festival' && flyelepAdaptScore(h)<=4) return '与 Flyelep 图片 / 视频能力无关';
@@ -6823,7 +6855,12 @@ const GNEWS_ROUTES=[
   {q:'trending product OR viral product OR best selling products',   name:'全球爆品', mkt:'海外'},
   {q:'跨境电商 旺季 备货 海外仓',                                      name:'跨境旺季备货', mkt:'国内'},
   {q:'电商 大促 促销 活动 备战',                                       name:'电商大促窗口', mkt:'国内'},
-  {q:'短视频 内容趋势 拍摄风格 爆款玩法',                              name:'内容趋势', mkt:'国内'}
+  {q:'短视频 内容趋势 拍摄风格 爆款玩法',                              name:'内容趋势', mkt:'国内'},
+  {q:'搜索量飙升 OR 销量暴涨 OR 卖爆 商品',                            name:'品类飙升', mkt:'国内'},
+  {q:'爆款 选品 卖爆 上架 货盘',                                       name:'爆款选品', mkt:'国内'},
+  {q:'淘宝 OR 拼多多 热搜 飙升 商品',                                  name:'国内热搜爆品', mkt:'国内'},
+  {q:'new product launch trending products 2026',                     name:'新品首发', mkt:'海外'},
+  {q:'tiktok shop viral product bestseller',                          name:'TikTok 爆品榜', mkt:'海外'}
 ];
 function _cleanNewsTitle(t){
   // Google News 标题尾部带「 - 来源名」，清掉
