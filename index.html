@@ -4653,7 +4653,7 @@ function top3PersonasForAngle(angle, geoCat, h){
       if(m.kw.test(scanText)){
         for(const k of m.keys){
           if(PERSONA_CAT_BY_KEY[k] && PERSONA_CAT_BY_KEY[k].cat===geoCat){
-            pinned.push({key:k, label:k, score:1000-(pinned.length), cat:geoCat, cls:catCls});
+            pinned.push({key:k, label:k, score:1000-(pinned.length), cat:geoCat, cls:catCls, src:'pin'});
             if(pinned.length>=3) break;
           }
         }
@@ -4663,11 +4663,17 @@ function top3PersonasForAngle(angle, geoCat, h){
     // ② 内容关键词前置（AI作图/视频/大模型/政策/节日）
     if(pinned.length<3){
       for(const cm of CONTENT_MATCHERS){
-        if(cm.kw.test(scanText)){
+        // 🆕 V4.3：部分规则需同时命中附加条件——如「节日」必须带营销信号，
+        // 否则「教师节为什么定在9月10日」这类科普内容会被当成节日营销热点
+        if(cm.kw.test(scanText) && (!cm.req || cm.req.test(scanText))){
+          // 🆕 V4.3：AI 视觉 / 视频技术热点允许跨类目匹配画像
+          //（方案标杆：GPT Image 2.5 同时命知识口播 / 跨境讲师 / SaaS 服务商）
+          const _allowCross = isAIVisualIndirect(scanText);
           for(const k of cm.keys){
-            if(PERSONA_CAT_BY_KEY[k] && PERSONA_CAT_BY_KEY[k].cat===geoCat){
+            const _kCat = (PERSONA_CAT_BY_KEY[k] && PERSONA_CAT_BY_KEY[k].cat) || geoCat;
+            if(PERSONA_CAT_BY_KEY[k] && (_allowCross || _kCat===geoCat)){
               if(pinned.find(p=>p.key===k)) continue;  // 去重
-              pinned.push({key:k, label:k, score:999-(pinned.length), cat:geoCat, cls:catCls});
+              pinned.push({key:k, label:k, score:999-(pinned.length), cat:_kCat, cls:PERSONA_CAT_CLASS[_kCat]||catCls, src:'pin'});
               if(pinned.length>=3) break;
             }
           }
@@ -4690,7 +4696,7 @@ function top3PersonasForAngle(angle, geoCat, h){
     else { const cd = CAT_DEFAULT_PREFER[geoCat]; if(cd && cd[angle]!=null) v = cd[angle]; }
     if(v==null) continue;
     if(v<65) continue;
-    cands.push({key, label:key, score:v, cat:geoCat, cls:catCls});
+    cands.push({key, label:key, score:v, cat:geoCat, cls:catCls, src:'fill'});
   }
   cands.sort((a,b)=>b.score-a.score);
   for(const c of cands){ if(out.length>=3) break; out.push(c); }
@@ -4701,9 +4707,9 @@ function top3PersonasForAngle(angle, geoCat, h){
     const v = (fb && fb.prefer && fb.prefer[angle]!=null) ? fb.prefer[angle] : 50;
     if(isSerious){
       // 严肃新闻：兜底 chip 明确标"不推荐"
-      out.push({key: geoCat+'卖家·通用', label: '不推荐蹭热度', score: 30, cat: geoCat, cls: 'cat-serious'});
+      out.push({key: geoCat+'卖家·通用', label: '不推荐蹭热度', score: 30, cat: geoCat, cls: 'cat-serious', src:'fallback'});
     } else {
-      out.push({key: geoCat+'卖家·通用', label: geoCat+'卖家（通用）', score: Math.max(40, v-5), cat: geoCat, cls: catCls});
+      out.push({key: geoCat+'卖家·通用', label: geoCat+'卖家（通用）', score: Math.max(40, v-5), cat: geoCat, cls: catCls, src:'fallback'});
     }
   }
   return out.slice(0,3);
@@ -4937,11 +4943,11 @@ function renderHotspot(){
   for(const h of state.hotspots){
     if(h.angle==='痛点规则'){ h.angle='卖家避坑提醒'; needSave=true; }
     // 🆕 V4 老数据迁移：缺任一新版字段（主类型/辅助标签/三池/四维分）就整体重算
-    // 🆕 V4.2 追加 v42 标记：强制重算一次，让「社交热榜准入 / insight 准入」对老数据也生效
+    // 🆕 V4.2 追加版本标记：强制重算一次，让新准入规则（社交热榜 / insight / Flyelep 适配 / 画像真命中）对老数据也生效
     if(h.value==null || h.heat==null || h.angle==null || h.mainType==null
        || h.tags==null || h.pool==null || h.d1==null || h.d2==null || h.d3==null
-       || h.v42==null){
-      evalHotspot(h); h.v42=1; needSave=true;
+       || h.v43==null){
+      evalHotspot(h); h.v43=1; needSave=true;
     }
     const newGeo = deriveGeoCat(h);
     if(h.geoCat !== newGeo){ h.geoCat = newGeo; needSave=true; }
@@ -5140,10 +5146,11 @@ function renderHotspot(){
     </div>`;
     const v3Block = scoreRow;   // V4.1：卡片正面只留四维评分；「谁用得上 / 适配能力 / Flyelep 能帮你 / 归属」收进详情
     // 🆕 推荐 3 个可用画像：按命中 prefer 排序 ≥65
-    const topPersonas = top3PersonasForAngle(h.angle||'其他', h.geoCat, h);
+    // 🆕 V4.3 只展示「真命中」的画像（平台 / 内容前置命中）；凑数补满的通用画像不再展示
+    const topPersonas = top3PersonasForAngle(h.angle||'其他', h.geoCat, h).filter(p=>p.src==='pin' && !_isFallbackPersona(p.key));
     const personaChips = topPersonas.length
       ? `<div class="hs-personas">${topPersonas.map(p=>`<span class="persona-chip ${p.cls}" title="这条热点适合：${escapeHtml(p.cat)}"><span class="pc-label">${escapeHtml(p.label)}</span></span>`).join('')}</div>`
-      : `<div class="hs-personas-empty">—</div>`;
+      : '';
     return `<tr${rowCls?' class="'+rowCls+'"':''} data-id="${h.id}">
       <td class="hs-cb"><input type="checkbox" data-hid="${h.id}" ${sel?'checked':''} onchange="toggleHotspotSelect('${h.id}', this.checked)"></td>
       <td class="hs-title-col">
@@ -5873,7 +5880,7 @@ const SERIOUS_PATTERNS=[
 // 内容关键词前置：标题里出现这些信号 → 优先推对应画像（电商/作图/视频/政策/节日）
 const CONTENT_MATCHERS=[
   // AI 作图/图片生成/设计 —— 强推美工/Listing/设计SaaS
-  {kw:/ai\s?作图|ai\s?出图|ai\s?生图|文生图|图生图|ai\s?海报|ai\s?详情页|ai\s?主图|chatgpt\s?images|dall-?e|midjourney|stable\s?diffusion|sdxl|flux\s?pro|comfyui|海报生成|一键生成.*图|ai\s?设计|ai\s?抠图|ai\s?修图/i, score:60, name:'AI作图/设计',
+  {kw:/ai\s?作图|ai\s?出图|ai\s?生图|文生图|图生图|ai\s?海报|ai\s?详情页|ai\s?主图|chatgpt\s?images|gpt\s?-?image|image\s?[2-9]|dall-?e|midjourney|stable\s?diffusion|sdxl|flux\s?pro|comfyui|海报生成|一键生成.*图|ai\s?设计|ai\s?抠图|ai\s?修图|图像生成|图像模型|视觉模型|图像细节|图像质感|图像质量/i, score:60, name:'AI作图/设计',
    keys:['亚马逊·Listing美工','国内美工设计','SaaS/营销工具·服务商','抖音/视频号·知识口播']},
   // AI 视频/数字人/口播 —— 强推视频/直播/SaaS
   {kw:/ai\s?视频|ai\s?短视频|文生视频|图生视频|数字人|虚拟主播|ai\s?直播|ai\s?口播|sora|veo|可灵|即梦|pika|runway|suno|udio|deepfake/i, score:60, name:'AI视频/数字人',
@@ -5884,8 +5891,9 @@ const CONTENT_MATCHERS=[
   // 政策/罚款/合规/限流/封号 —— 强推培训讲师/精铺/代运营
   {kw:/合规|政策|新规|罚款|处罚|制裁|监管|封号|限流|降权|内容审核|版权|搬运|同质化|低质|水印|算法|流量池|权重|打压/i, score:55, name:'政策/合规',
    keys:['跨境培训/服务商·讲师/陪跑','亚马逊·精铺多店','代运营公司·项目经理','亚马逊·Listing美工']},
-  // 节日/营销节点 —— 强推节日营销相关
+  // 节日/营销节点 —— 强推节日营销相关。🆕 V4.3 必须同时带营销信号（避免节日科普误配画像）
   {kw:/双\s?11|双11|双\s?12|618|618\s?大促|99\s?大促|99\s?划算节|99节|黑五|网一|cyber\s?monday|boxing\s?day|情人节|七夕|圣诞|春节|年货|元宵|端午|中秋|国庆|新年|女王节|妇女节|女神节|母亲节|父亲节|教师节|感恩节|万圣节|复活节/i, score:75, name:'节日/营销节点',
+   req:/大促|促销|营销|备货|铺货|送礼|礼盒|礼物|活动|旺季|折扣|优惠|销量|选品|上架|素材|主图|海报|广告|种草|好物|推荐|爆款|热销|开卖|开售|预售|清单/i,
    keys:['淘宝/天猫·精品运营','抖音电商·直播带货','小红书·生活方式种草','抖音/视频号·知识口播']},
 ];
 /* ================== V3 热点环节分类器（7 环节）+ 需求探针分类器（5 探针）==================
@@ -5973,7 +5981,12 @@ const MAIN_TYPE_LABEL={}; MAIN_TYPES.forEach(t=>MAIN_TYPE_LABEL[t.key]=t.label);
 const T_PAIN=[/新规|新政策|平台政策|监管|处罚|罚款|封号|限流|降权|审核|合规|违规|整改|下架|清退|规则调整|版权|侵权|诉讼|起诉|商标|专利|法案|条例|标准|召回|禁售|限售|资质|认证被拒/i];
 const T_PICK=[/选品|爆品|爆款|热销|畅销|卖爆|新品|上新|飙升|搜索量|需求上涨|缺货|断货|走红|种草|好物|必买|回购|抢空|脱销|best ?seller|trending|viral|销量|订单量|环比增长|同比增长/i];
 const T_VISUAL=[/风格|视觉|画面|构图|色调|滤镜|拍摄|运镜|镜头|模板|特效|转场|变装|妆造|穿搭|布景|摆拍|氛围感|同款|卡点|大片感|实拍|出片|高级感|审美/i];
-const T_MARKET=[/春节|新年|元宵|清明|端午|七夕|中秋|国庆|双11|双十一|双12|618|黑五|网一|圣诞|万圣|复活节|感恩节|情人节|母亲节|父亲节|教师节|女王节|女神节|年货|开学季|毕业季|暑促|换季|旺季|淡季|季节|春季|夏季|秋季|冬季|斋月|开斋节|排灯节|狂欢节|购物节|大促|促销|窗口期|民俗|节日/i];
+// 强窗口：本身就是电商大促 / 购物窗口，直接归「市场舆情窗口型」
+const T_MARKET_STRONG=[/双11|双十一|双12|618|黑五|网一|cyber\s?monday|购物节|年货节|大促|促销|暑促|换季|旺季|淡季|窗口期|购物季|备货季|斋月|开斋节|排灯节|狂欢节/i];
+// 弱节日名：单独出现不算「窗口期」（避免教师节科普、假期运输这类内容被误判）
+const T_MARKET_WEAK=[/春节|新年|元宵|清明|端午|七夕|中秋|国庆|圣诞|万圣|复活节|感恩节|情人节|母亲节|父亲节|教师节|女王节|女神节|开学季|毕业季|季节|春季|夏季|秋季|冬季|民俗|节日/i];
+// 弱节日名必须同时带「消费 / 营销」信号才算窗口
+const T_MARKET_REQ=/大促|促销|营销|备货|铺货|旺季|销量|选品|上架|素材|主图|海报|种草|好物|推荐|爆款|热销|开卖|开售|预售|礼盒|礼物|送礼|折扣|优惠|清单|商品|价格|消费|购物|买家|卖家/i;
 const T_INSIGHT=[/行业|趋势|报告|观点|干货|方法论|打法|复盘|拆解|案例|白皮书|数据洞察|榜单|排名|效率|提效|工具|迭代|升级|发布|上线|公测|开放|模型|算法|技术升级|生态|格局|访谈|专访/i];
 
 /* AI 间接热点判定（方案第 6 节）：
@@ -6025,7 +6038,7 @@ function classifyMainType(h){
   if(hit(T_PAIN))    return 'pain';
   if(hit(T_PICK))    return 'pick';
   if(hit(T_VISUAL))  return 'visual';
-  if(hit(T_MARKET))  return 'market';
+  if(hit(T_MARKET_STRONG) || (hit(T_MARKET_WEAK) && T_MARKET_REQ.test(t))) return 'market';
   if(hit(T_INSIGHT)) return 'insight';
   if(isAIVisualIndirect(t)) return 'insight';
   const ev=classifyEcom(t);
@@ -6069,6 +6082,9 @@ function preFilter(h){
   if(isSocial && !SOCIAL_ACCEPT.test(t) && classifyEcom(t).ecom==='no') return '社交热榜 · 与电商无关';
   // ⑦ 🆕 V4.2 兜底归入「行业观点干货型」但既无 AI 视觉、也无行业信号 → 丢弃（防兜底堆积）
   if(h.mainType==='insight' && !isAIVisualIndirect(t) && !T_INSIGHT.some(re=>re.test(t))) return '内容笼统 · 已降噪';
+  // ⑧ 🆕 V4.3 方案第 7 节：无法关联 Flyelep 图片 / 视频任一能力 → 丢弃
+  //（电商节日日历条目天然有效，豁免此条）
+  if(h.type!=='festival' && flyelepAdaptScore(h)<=4) return '与 Flyelep 图片 / 视频能力无关';
   return '';
 }
 
@@ -6085,10 +6101,15 @@ function _prefOf(key, angle, geoCat){
   return 60;
 }
 function personaFitScore(h){
+  // 电商节日日历条目天然适配全类目卖家（节日营销窗口），直接给「节日窗口」档
+  if(h.type==='festival') return 36;
   let list=[];
   try{ list=top3PersonasForAngle(h.angle||'其他', h.geoCat, h)||[]; }catch(_){ list=[]; }
-  const second=list.filter(p => !_isFallbackPersona(p.key) && _isSecondPersona(p.key));
-  const hasFallback=list.some(p=>_isFallbackPersona(p.key) || p.cls==='cat-serious');
+  // 🆕 V4.3 只认「真命中」（平台/内容前置 pin）：同类目高分补满(fill)不再计入，
+  // 否则任何一条国内内容都会被凑成 2 个二级画像 → 恒定 38-40 分，失去区分度
+  const second=list.filter(p => p.src==='pin' && !_isFallbackPersona(p.key) && _isSecondPersona(p.key));
+  // 有任意画像（同类目泛匹配 fill / 一级兜底 fallback）即算「仅兜底」档 10-19；完全没有才 0
+  const hasFallback=list.length>0;
   const angle=h.angle||'其他';
   if(second.length>=2){
     const avg=second.reduce((s,p)=>s+_prefOf(p.key,angle,h.geoCat),0)/second.length;
@@ -6127,12 +6148,11 @@ function flyelepAdaptScore(h){
   const tags=h.tags||[];
   const indirect=tags.indexOf('间接技术热点')>=0;
   const fit=h.fitScore||0;
-  if(caps===0 && fit<40 && !indirect) return fit>=30 ? 4 : 0;
   if(/主图|详情图|详情页|白底|海报|素材|返工|审核|图片规范|视频规范|强制上传|新规|合规图|批量|产能|多语言|多语种|翻译|listing|抠图|换色|延展|复刻/i.test(t)){
     return Math.min(20, 16+caps);
   }
   if(indirect) return Math.min(15, 12+caps);
-  if(/选品|爆品|爆款|热销|风格|视觉|趋势|同款|场景|上新|新品/i.test(t)) return Math.min(15, 10+caps);
+  if(/选品|爆品|爆款|热销|风格|视觉|趋势|同款|场景|上新|新品|大促|促销|营销|备货|备战|旺季|换季|节点|窗口|流量|推荐|清单|好物|种草|开箱|测评|探店|打卡|送礼|礼盒|礼物|拍照|出片|构图|滤镜|模板|教程|穿搭|妆容|变装|氛围感|平替|必买|回购|爆红|刷屏/i.test(t)) return Math.min(15, 10+caps);
   return Math.max(1, Math.min(9, Math.round(fit/100*9)));
 }
 
@@ -6298,7 +6318,10 @@ function deriveGeoCat(h){
   // 标题里的强跨境信号（即使数据源错标成『国内/全球』也要纠正）
   const hasCross = /欧洲|出海|关税|海外仓|跨境|北美站|欧洲站|日本站|全球站|美国站|亚马逊海外/.test(title);
   // 🆕 AI 资讯/技术新闻 → 后续归到『内容自媒体』类目
-  const isAIHot = /chatgpt|gpt-?[345]|claude\s?[345]|gemini|大模型|qwen|glm|deepseek|sora|veo|kling|可灵|即梦|pika|runway|midjourney|stable\s?diffusion|sdxl|suno|udio|flux|comfyui|文生图|文生视频|图生视频|数字人|ai\s?agent|智能体|多模态|agi|对齐|transformer|cuda|gpu|tpu|npu|h100|h200|a100|openai|anthropic|deepmind|pytorch|tensorflow|huggingface|人工智能|机器学习|深度学习|神经网络|nlp|计算机视觉/i.test(title);
+  const isAIHot = /chatgpt|gpt-?[345]|gpt\s?-?image|image\s?[2-9]|claude\s?[345]|gemini|大模型|qwen|glm|deepseek|sora|veo|kling|可灵|即梦|pika|runway|midjourney|stable\s?diffusion|sdxl|suno|udio|flux|comfyui|文生图|文生视频|图生视频|数字人|ai\s?agent|智能体|多模态|agi|对齐|transformer|cuda|gpu|tpu|npu|h100|h200|a100|openai|anthropic|deepmind|pytorch|tensorflow|huggingface|人工智能|机器学习|深度学习|神经网络|nlp|计算机视觉/i.test(title);
+  // 0.5) 🆕 V4.3 AI 视觉 / 视频技术热点 → 优先归「内容自媒体」（对全类目内容创作者都有价值）
+  // 必须早于 market 判断，否则「海外」的 AI 热点会被跨境吞掉，画像也 pin 不到
+  if(isAIHot) return '内容自媒体';
   // 1) 市场优先级最高（mkt 已有明确地域）
   if(mkt==='海外') return '跨境电商（出口）';
   if(mkt==='国内') return hasCross ? '跨境电商（出口）' : (isAIHot ? '内容自媒体' : '国内电商');
