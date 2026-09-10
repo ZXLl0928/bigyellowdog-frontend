@@ -4937,9 +4937,11 @@ function renderHotspot(){
   for(const h of state.hotspots){
     if(h.angle==='痛点规则'){ h.angle='卖家避坑提醒'; needSave=true; }
     // 🆕 V4 老数据迁移：缺任一新版字段（主类型/辅助标签/三池/四维分）就整体重算
+    // 🆕 V4.2 追加 v42 标记：强制重算一次，让「社交热榜准入 / insight 准入」对老数据也生效
     if(h.value==null || h.heat==null || h.angle==null || h.mainType==null
-       || h.tags==null || h.pool==null || h.d1==null || h.d2==null || h.d3==null){
-      evalHotspot(h); needSave=true;
+       || h.tags==null || h.pool==null || h.d1==null || h.d2==null || h.d3==null
+       || h.v42==null){
+      evalHotspot(h); h.v42=1; needSave=true;
     }
     const newGeo = deriveGeoCat(h);
     if(h.geoCat !== newGeo){ h.geoCat = newGeo; needSave=true; }
