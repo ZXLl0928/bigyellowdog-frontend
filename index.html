@@ -4946,8 +4946,8 @@ function renderHotspot(){
     // 🆕 V4.2 追加版本标记：强制重算一次，让新准入规则（社交热榜 / insight / Flyelep 适配 / 画像真命中）对老数据也生效
     if(h.value==null || h.heat==null || h.angle==null || h.mainType==null
        || h.tags==null || h.pool==null || h.d1==null || h.d2==null || h.d3==null
-       || h.v44==null){
-      evalHotspot(h); h.v44=1; needSave=true;
+       || h.v45==null){
+      evalHotspot(h); h.v45=1; needSave=true;
     }
     const newGeo = deriveGeoCat(h);
     if(h.geoCat !== newGeo){ h.geoCat = newGeo; needSave=true; }
@@ -5978,17 +5978,17 @@ const MAIN_TYPES=[
 const MAIN_TYPE_LABEL={}; MAIN_TYPES.forEach(t=>MAIN_TYPE_LABEL[t.key]=t.label);
 
 // 主类型判定关键词（优先级：痛点 > 选品 > 视觉 > 舆情窗口 > 干货）
-const T_PAIN=[/新规|新政策|平台政策|监管|处罚|罚款|封号|限流|降权|审核|合规|违规|整改|下架|清退|规则调整|版权|侵权|诉讼|起诉|商标|专利|法案|条例|标准|召回|禁售|限售|资质|认证被拒/i];
+const T_PAIN=[/新规|新政策|平台政策|监管|处罚|罚款|封号|限流|降权|审核|合规|违规|整改|下架|清退|规则调整|版权|侵权|诉讼|起诉|商标|专利|法案|条例|标准|召回|禁售|限售|资质|认证被拒|policy|regulation|compliance|guideline|requirement|banned|suspend|suspension|penalty|fine|violation|takedown|take down|removed|rejected|restriction|new rules|rule change/i];
 // 🆕 V4.4 只保留「选品机会」信号（品类飙升 / 新品爆发 / 需求上涨）；种草好物归视觉/干货，不再抢走视觉趋势型
-const T_PICK=[/选品|爆品|爆款|热销|畅销|卖爆|新品|上新|飙升|搜索量|需求上涨|缺货|断货|走红|抢空|脱销|爆单|卖断货|best ?seller|trending|viral|销量|订单量|环比增长|同比增长/i];
-const T_VISUAL=[/风格|视觉|画面|构图|色调|滤镜|拍摄|运镜|镜头|模板|特效|转场|变装|妆造|穿搭|布景|摆拍|氛围感|同款|卡点|大片感|实拍|出片|高级感|审美/i];
+const T_PICK=[/选品|爆品|爆款|热销|畅销|卖爆|新品|上新|飙升|搜索量|需求上涨|缺货|断货|走红|抢空|脱销|爆单|卖断货|best ?seller|bestseller|top selling|top-selling|best-selling|new arrival|sold out|hot sale|must.?have|demand surge|trending|viral|销量|订单量|环比增长|同比增长/i];
+const T_VISUAL=[/风格|视觉|画面|构图|色调|滤镜|拍摄|运镜|镜头|模板|特效|转场|变装|妆造|穿搭|布景|摆拍|氛围感|同款|卡点|大片感|实拍|出片|高级感|审美|aesthetic|visual style|photo trend|photography|filter|outfit|makeup|design trend|creative style|video style/i];
 // 强窗口：本身就是电商大促 / 购物窗口，直接归「市场舆情窗口型」
-const T_MARKET_STRONG=[/双11|双十一|双12|618|黑五|网一|cyber\s?monday|购物节|年货节|大促|促销|暑促|换季|旺季|淡季|窗口期|购物季|备货季|斋月|开斋节|排灯节|狂欢节/i];
+const T_MARKET_STRONG=[/双11|双十一|双12|618|黑五|网一|cyber\s?monday|购物节|年货节|大促|促销|暑促|换季|旺季|淡季|窗口期|购物季|备货季|斋月|开斋节|排灯节|狂欢节|black friday|cyber monday|prime day|holiday shopping|peak season|shopping season|back to school|holiday season/i];
 // 弱节日名：单独出现不算「窗口期」（避免教师节科普、假期运输这类内容被误判）
 const T_MARKET_WEAK=[/春节|新年|元宵|清明|端午|七夕|中秋|国庆|圣诞|万圣|复活节|感恩节|情人节|母亲节|父亲节|教师节|女王节|女神节|开学季|毕业季|季节|春季|夏季|秋季|冬季|民俗|节日/i];
 // 弱节日名必须同时带「消费 / 营销」信号才算窗口
 const T_MARKET_REQ=/大促|促销|营销|备货|铺货|旺季|销量|选品|上架|素材|主图|海报|种草|好物|推荐|爆款|热销|开卖|开售|预售|礼盒|礼物|送礼|折扣|优惠|清单|商品|价格|消费|购物|买家|卖家/i;
-const T_INSIGHT=[/行业|趋势|报告|观点|干货|方法论|打法|复盘|拆解|案例|白皮书|数据洞察|榜单|排名|效率|提效|工具|迭代|升级|发布|上线|公测|开放|模型|算法|技术升级|生态|格局|访谈|专访/i];
+const T_INSIGHT=[/行业|趋势|报告|观点|干货|方法论|打法|复盘|拆解|案例|白皮书|数据洞察|榜单|排名|效率|提效|工具|迭代|升级|发布|上线|公测|开放|模型|算法|技术升级|生态|格局|访谈|专访|policy|regulation|compliance|industry|trend|report|strategy|guideline|update|launch|release|announcement|analysis|insight|forecast|survey|study|platform|seller|merchant|retail/i];
 
 /* AI 间接热点判定（方案第 6 节）：
  * 通过 → 归「行业观点干货型」+「间接技术热点」标签
@@ -6153,11 +6153,11 @@ function flyelepAdaptScore(h){
   const tags=h.tags||[];
   const indirect=tags.indexOf('间接技术热点')>=0;
   const fit=h.fitScore||0;
-  if(/主图|详情图|详情页|白底|海报|素材|返工|审核|图片规范|视频规范|强制上传|新规|合规图|批量|产能|多语言|多语种|翻译|listing|抠图|换色|延展|复刻/i.test(t)){
+  if(/主图|详情图|详情页|白底|海报|素材|返工|审核|图片规范|视频规范|强制上传|新规|合规图|批量|产能|多语言|多语种|翻译|listing|抠图|换色|延展|复刻|listing image|product photo|main image|image requirement|photo guideline|video ad|ad creative|product video|a\+ content|new rule|policy update|compliance/i.test(t)){
     return Math.min(20, 16+caps);
   }
   if(indirect) return Math.min(15, 12+caps);
-  if(/选品|爆品|爆款|热销|风格|视觉|趋势|同款|场景|上新|新品|大促|促销|营销|备货|备战|旺季|换季|节点|窗口|流量|推荐|清单|好物|种草|开箱|测评|探店|打卡|送礼|礼盒|礼物|拍照|出片|构图|滤镜|模板|教程|穿搭|妆容|变装|氛围感|平替|必买|回购|爆红|刷屏/i.test(t)) return Math.min(15, 10+caps);
+  if(/选品|爆品|爆款|热销|风格|视觉|趋势|同款|场景|上新|新品|大促|促销|营销|备货|备战|旺季|换季|节点|窗口|流量|推荐|清单|好物|种草|开箱|测评|探店|打卡|送礼|礼盒|礼物|拍照|出片|构图|滤镜|模板|教程|穿搭|妆容|变装|氛围感|平替|必买|回购|爆红|刷屏|bestseller|trending|listing|product photo|product image|product video|design|creative|visual|template|style|aesthetic|review|retail|merchant|shopper|store|shop|brand/i.test(t)) return Math.min(15, 10+caps);
   return Math.max(1, Math.min(9, Math.round(fit/100*9)));
 }
 
@@ -6505,12 +6505,22 @@ async function scrapeHotFromApi(){
       const got=await fetchPainPoints();
       if(got>0){ newsGot += got; if(!usedBase) usedBase='平台规则 / 卖家痛点'; }
     }catch(_){}
+    // 🆕 V4.5 电商选品 / 平台新规定向航线（Google News 关键词搜索）
+    try{
+      const got=await fetchGoogleNewsRoutes();
+      if(got>0){ newsGot += got; if(!usedBase) usedBase='电商资讯航线'; }
+    }catch(_){}
+    // 🆕 V4.5 专业电商媒体 RSS（平台政策 / 行业动态 / 选品趋势）
+    try{
+      const got=await fetchEcomRSS();
+      if(got>0){ newsGot += got; if(!usedBase) usedBase='电商专业媒体'; }
+    }catch(_){}
     // 🆕 统一累计：所有补抓（HN / 机器之心 / HN Show / 选品 / 电商资讯）加到 total
     total += newsGot;
   }catch(e){ /* 不影响 DailyHotApi 结果 */ }
   if(btn){ btn.disabled=false; btn.textContent='🔥 一键扒热点'; }
   if(usedBase){
-    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心', 'HN Show':'HN Show', '热门选品 / Hacker News':'选品趋势', '电商资讯 / Hacker News':'电商资讯', '小红书热搜':'小红书热搜', '抖音热点榜':'抖音热点榜', '抖音电商热词':'抖音电商热词', '平台规则 / 卖家痛点':'平台规则 / 卖家痛点'};
+    const srcMap={local:'本机反代', api:'团队云后端', imsyy:'公共实例', NewsAPI:'News 资讯', 'Hacker News':'Hacker News', '机器之心':'机器之心', 'HN Show':'HN Show', '热门选品 / Hacker News':'选品趋势', '电商资讯 / Hacker News':'电商资讯', '小红书热搜':'小红书热搜', '抖音热点榜':'抖音热点榜', '抖音电商热词':'抖音电商热词', '平台规则 / 卖家痛点':'平台规则 / 卖家痛点', '电商资讯航线':'电商资讯航线', '电商专业媒体':'电商专业媒体'};
     const src=srcMap[usedBase]||usedBase||'本地/云端';
     const all=state.hotspots;
     const cntA=a=>all.filter(h=>h.angle===a).length;
@@ -6758,10 +6768,9 @@ async function fetchUapisHot(type, srcName, market, opts){
 async function fetchPainPoints(){
   if(!API_BASE) return 0;
   const TERMS=[
-    'amazon seller policy','amazon listing removed','amazon account suspended','amazon image requirements',
-    'tiktok shop policy','tiktok shop violation','shopee seller policy','temu seller rules',
-    'ecommerce compliance','product listing rejected','marketplace rules sellers',
-    'product image guidelines','counterfeit takedown','seller account suspended','listing suppressed'
+    'amazon seller policy','amazon listing removed','amazon account suspended',
+    'tiktok shop policy','shopee seller policy',
+    'ecommerce compliance','product listing rejected','listing suppressed'
   ];
   const today=todayStr();
   const seen=new Set(); let added=0;
@@ -6791,6 +6800,78 @@ async function fetchPainPoints(){
     }catch(_){}
   }
   return added;
+}
+
+/* 🆕 V4.5 电商选品 / 平台新规 定向航线（Google News 关键词搜索，经后端代理）
+ * 背景：HN 技术新闻 / AI RSS 抓不到「电商平台新规、卖家政策、选品趋势」→ 改用新闻搜索航线
+ * 每航线并行，只入库未被前置过滤的条目
+ */
+const GNEWS_BASE='https://news.google.com/rss/search?q=';
+const GNEWS_ROUTES=[
+  {q:'amazon seller policy OR listing removed OR account suspended', name:'亚马逊卖家政策', mkt:'海外'},
+  {q:'tiktok shop seller rules OR policy update',                    name:'TikTok Shop 规则', mkt:'海外'},
+  {q:'temu OR shein OR shopee seller policy',                        name:'跨境平台政策', mkt:'海外'},
+  {q:'ecommerce regulation OR compliance OR tariff',                 name:'电商合规与关税', mkt:'海外'},
+  {q:'amazon best sellers OR trending products',                     name:'亚马逊选品', mkt:'海外'},
+  {q:'tiktok shop trending products viral',                          name:'TikTok 爆品', mkt:'海外'},
+  {q:'跨境电商 选品',                                                 name:'跨境选品', mkt:'国内'},
+  {q:'电商 新规 政策 审核',                                           name:'国内电商新规', mkt:'国内'},
+  {q:'电商 选品 爆款',                                                name:'国内选品', mkt:'国内'}
+];
+function _cleanNewsTitle(t){
+  // Google News 标题尾部带「 - 来源名」，清掉
+  return String(t||'').replace(/\s+-\s+[^-]{2,42}$/,'').trim();
+}
+async function _fetchRssRoute(base, src, market, limit, notePrefix, minHeat){
+  try{
+    const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),12000);
+    const resp=await fetch(base+'/api/rss?url='+encodeURIComponent(src),{signal:ctrl.signal});
+    clearTimeout(to);
+    if(!resp.ok) return 0;
+    const j=await resp.json();
+    const today=todayStr();
+    let add=0;
+    for(const d of (j.data||[]).slice(0,limit)){
+      const title=_cleanNewsTitle(d.title);
+      if(!title) continue;
+      const o={
+        date:today, type:'news', source:notePrefix, market:market, platform:notePrefix,
+        title:title.slice(0,140), url:d.url||'',
+        product:'', category:'', price:'', sales:'',
+        heat: heatFromRecency(d.pubDate, minHeat==null?8:minHeat),
+        playbook:'', fn:'', match:'', topic:'', script:'', material:'', struct:'',
+        status:'pending', note:'📰 '+notePrefix
+      };
+      const ev=evalHotspot(o);
+      if(!ev.filtered) add += mergeFeed([ev]);
+    }
+    return add;
+  }catch(_){ return 0; }
+}
+async function fetchGoogleNewsRoutes(){
+  if(!API_BASE) return 0;
+  const base=API_BASE.replace(/\/$/,'');
+  const jobs=GNEWS_ROUTES.map(r=>{
+    const loc = r.mkt==='国内' ? '&hl=zh-CN&gl=CN&ceid=CN:zh-Hans' : '&hl=en-US&gl=US&ceid=US:en';
+    return _fetchRssRoute(base, GNEWS_BASE+encodeURIComponent(r.q)+loc, r.mkt, 12, r.name, 8);
+  });
+  const res=await Promise.all(jobs);
+  return res.reduce((a,b)=>a+b,0);
+}
+
+/* 🆕 V4.5 专业电商媒体 RSS（平台政策 / 行业动态 / 选品趋势）—— 实测可用的 6 个源 */
+const ECOM_RSS_SOURCES=[
+  {url:'https://www.ecommercebytes.com/feed/',      name:'EcommerceBytes',       market:'海外'},
+  {url:'https://www.digitalcommerce360.com/feed/',  name:'Digital Commerce 360', market:'海外'},
+  {url:'https://www.modernretail.co/feed/',         name:'Modern Retail',        market:'海外'},
+  {url:'https://www.retaildive.com/feeds/news/',    name:'Retail Dive',          market:'海外'}
+];
+async function fetchEcomRSS(){
+  if(!API_BASE) return 0;
+  const base=API_BASE.replace(/\/$/,'');
+  const jobs=ECOM_RSS_SOURCES.map(s=>_fetchRssRoute(base, s.url, s.market, 10, s.name, 6));
+  const res=await Promise.all(jobs);
+  return res.reduce((a,b)=>a+b,0);
 }
 
 /* 🆕 热门选品 API：Hacker News 选品/bestseller/trending product 关键词
